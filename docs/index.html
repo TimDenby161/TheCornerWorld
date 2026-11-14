@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- GitHub Pages can't send security headers, so the policy is here. Everything is served from this
+     site: no inline script or styles, no outside images or connections. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>The Corner World</title>
+<meta name="description" content="Explore the world on a map, read destination guides and plan your trip.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#2a78d6">
+<script src="assets/theme.js"></script>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#panel">Skip to content</a>
+
+<header class="app-bar">
+  <p class="brand"><span class="brand-mark" aria-hidden="true"></span><span>The Corner World</span></p>
+  <nav class="tabs" aria-label="Main">
+    <button type="button" data-tab="discover" aria-current="page">Discover</button>
+    <button type="button" data-tab="trip">My trip<span class="count" id="trip-count" hidden></span></button>
+    <a href="guides/">Guides</a>
+    <a href="plan/">Plan a trip</a>
+  </nav>
+  <button type="button" class="ghost-btn" id="theme-btn" aria-label="Switch between light and dark">&#9680;</button>
+</header>
+
+<main class="layout">
+  <section class="map-wrap" aria-label="World map">
+    <svg id="map" viewBox="0 0 960 500" role="img" aria-label="World map. Use the search box to pick a country without the map."></svg>
+    <div class="map-controls">
+      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+      <button type="button" id="zoom-out" aria-label="Zoom out">&minus;</button>
+      <button type="button" id="zoom-reset" aria-label="Show the whole world">&#8962;</button>
+    </div>
+    <p class="legend"><span class="swatch guide"></span>Guide available<span class="swatch trip"></span>In your trip<span class="key-airport"><span class="swatch airport"></span>Airport</span></p>
+    <div class="tip" id="tip" hidden></div>
+  </section>
+
+  <section class="panel" id="panel" tabindex="-1">
+    <p class="loading">Loading the map&hellip;</p>
+  </section>
+</main>
+
+<p class="toast" id="toast" role="status" hidden></p>
+
+<script src="assets/lib/d3.min.js"></script>
+<script src="assets/lib/topojson-client.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

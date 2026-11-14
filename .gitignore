@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+.env
+
+# Client briefs, names and emails: never commit or publish
+business/clients/
