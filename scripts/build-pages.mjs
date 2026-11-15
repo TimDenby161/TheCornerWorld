@@ -72,6 +72,9 @@ ${index ? "" : `<meta name="robots" content="noindex">\n`}${base ? `<link rel="c
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:type" content="article">
 <link rel="icon" type="image/svg+xml" href="${up}favicon.svg">
+<link rel="apple-touch-icon" href="${up}apple-touch-icon.png">
+<link rel="manifest" href="${up}manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Corner World">
 <meta name="theme-color" content="#2a78d6">
 <script src="${up}assets/theme.js"></script>
 <link rel="stylesheet" href="${up}assets/styles.css">
