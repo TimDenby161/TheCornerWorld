@@ -802,7 +802,6 @@ function renderDiscover() {
 
   panel.replaceChildren(
     h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
-    h("p", { class: "lede", text: `Spin the globe and pick a country, or search ${plural(live.length, "guide")}.` }),
     h("label", { class: "sr-only", for: "search", text: "Search countries and places" }),
     h("div", { class: "search" }, icon("search"), search, h("kbd", { text: "/", "aria-hidden": "true" })),
     filters,

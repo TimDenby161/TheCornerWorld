@@ -185,7 +185,7 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 .panel.swap > :nth-child(n+7) { animation-delay: .18s; }
 
 .home .panel h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
-.home .panel h1.hero { margin: 4px 0 10px; font-size: 42px; line-height: 1; letter-spacing: -0.045em; }
+.home .panel h1.hero { margin: 4px 0 18px; font-size: 42px; line-height: 1; letter-spacing: -0.045em; }
 .hero em { font-style: normal; background: linear-gradient(100deg, var(--blue) 0%, var(--aqua) 55%, var(--orange) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .home .lede { margin-bottom: 18px; font-size: 15px; }
 .home .section { margin: 26px 0 10px; font-size: 12px; font-weight: 650; letter-spacing: .06em; }
