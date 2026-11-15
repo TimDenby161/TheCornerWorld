@@ -1,0 +1,362 @@
+/* The Corner World: the map page (index.html). The globe fills the window; the guides and the trip sit over
+   it in a panel, which on a phone is a sheet that pulls up from the bottom. Builds on styles.css: the same
+   colours, buttons and form parts. The --g-* colours are read by assets/globe.js, which draws the map. */
+body.home {
+  --gap: 16px;
+  --panel-w: 432px;
+  --free-r: calc(var(--panel-w) + var(--gap) * 2); /* the right-hand edge of the part of the window the panel leaves clear */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --glass: rgba(252, 252, 251, .84);
+  --glass-solid: rgba(252, 252, 251, .95); --glass-sheet: rgba(252, 252, 251, .94);
+  --glass-line: rgba(11, 11, 11, .08);
+  --strong-line: rgba(11, 11, 11, .2);
+  --lift: 0 1px 2px rgba(11, 11, 11, .05), 0 10px 28px -12px rgba(11, 11, 11, .25);
+  --lift-lg: 0 1px 2px rgba(11, 11, 11, .05), 0 30px 70px -28px rgba(11, 11, 11, .42);
+  --aqua-strong: #12855c;
+  --critical: #c0392b;
+  --stage: radial-gradient(1100px 760px at 32% 28%, #ffffff 0%, #eef3f9 46%, #dce6f1 100%);
+  --g-ocean-lit: #e6f1fc; --g-ocean-deep: #a6c9ec; --g-ocean-flat: #c9dff4;
+  --g-land: #e9e6db; --g-guide: #57c79d; --g-trip: #eb6834; --g-selected: #2a78d6;
+  --g-line: #ffffff; --g-grid: rgba(30, 70, 120, .10);
+  --g-halo: #6aa9ee; --g-halo-a: .30; --g-shade: .20; --g-gloss: .45; --g-stars: 0; --g-ground: .20;
+  --g-label: rgba(11, 11, 11, .6); --g-ink: #0b0b0b; --g-paper: #ffffff; --g-edge: #ffffff; --g-muted: #6d6b66;
+  --g-hover: rgba(255, 255, 255, .36); --g-hover-line: #0b0b0b; --g-airport: #3d4a5c;
+  --thumb: #ffffff;
+  display: block; height: 100dvh; overflow: hidden; background: #e6edf5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) body.home {
+    --glass: rgba(22, 23, 26, .86);
+    --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93);
+    --glass-line: rgba(255, 255, 255, .10);
+    --strong-line: rgba(255, 255, 255, .26);
+    --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -12px rgba(0, 0, 0, .7);
+    --lift-lg: 0 1px 2px rgba(0, 0, 0, .3), 0 30px 70px -28px rgba(0, 0, 0, .9);
+    --aqua-strong: #17946a;
+    --stage: radial-gradient(1100px 820px at 32% 26%, #131d2e 0%, #0a0f18 48%, #05070b 100%);
+    --g-ocean-lit: #1d3757; --g-ocean-deep: #0a1524; --g-ocean-flat: #10203a;
+    --g-land: #3b424e; --g-guide: #25a87c; --g-trip: #e8662f; --g-selected: #4a94ee;
+    --g-line: #0c1522; --g-grid: rgba(255, 255, 255, .06);
+    --g-halo: #4f96ff; --g-halo-a: .36; --g-shade: .5; --g-gloss: .13; --g-stars: .9; --g-ground: 0;
+    --g-label: rgba(255, 255, 255, .78); --g-ink: #ffffff; --g-paper: #0d1520; --g-edge: #ffffff; --g-muted: #9aa3b0;
+    --g-hover: rgba(255, 255, 255, .2); --g-hover-line: #ffffff; --g-airport: #c6d2e3; --thumb: #45453f;
+    background: #05070b;
+  }
+}
+/* Dark chosen with the Theme button (assets/theme.js sets data-theme) */
+:root[data-theme="dark"] body.home {
+  --glass: rgba(22, 23, 26, .86);
+  --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93);
+  --glass-line: rgba(255, 255, 255, .10);
+  --strong-line: rgba(255, 255, 255, .26);
+  --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -12px rgba(0, 0, 0, .7);
+  --lift-lg: 0 1px 2px rgba(0, 0, 0, .3), 0 30px 70px -28px rgba(0, 0, 0, .9);
+  --aqua-strong: #17946a;
+  --stage: radial-gradient(1100px 820px at 32% 26%, #131d2e 0%, #0a0f18 48%, #05070b 100%);
+  --g-ocean-lit: #1d3757; --g-ocean-deep: #0a1524; --g-ocean-flat: #10203a;
+  --g-land: #3b424e; --g-guide: #25a87c; --g-trip: #e8662f; --g-selected: #4a94ee;
+  --g-line: #0c1522; --g-grid: rgba(255, 255, 255, .06);
+  --g-halo: #4f96ff; --g-halo-a: .36; --g-shade: .5; --g-gloss: .13; --g-stars: .9; --g-ground: 0;
+  --g-label: rgba(255, 255, 255, .78); --g-ink: #ffffff; --g-paper: #0d1520; --g-edge: #ffffff; --g-muted: #9aa3b0;
+  --g-hover: rgba(255, 255, 255, .2); --g-hover-line: #ffffff; --g-airport: #c6d2e3; --thumb: #45453f;
+  background: #05070b;
+}
+
+.ic { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ic-play, .ic-stop, .ic-spark, .surprise .ic { fill: currentColor; stroke-width: 1.2; }
+.glass {
+  background: var(--glass); border: 1px solid var(--glass-line); box-shadow: var(--lift);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+}
+
+.stage, .topbar, .sheet-head { -webkit-user-select: none; user-select: none; }
+
+/* The map: two canvases, one over the other, filling the window */
+.stage { position: fixed; inset: 0; overflow: hidden; background: var(--stage); }
+.globe { position: absolute; inset: 0; outline: none; opacity: 0; transition: opacity 1s ease; }
+.ready .globe { opacity: 1; }
+.globe canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.globe:focus-visible::after { content: ""; position: absolute; inset: 6px var(--free-r) 6px 6px; border-radius: 22px; outline: 2px solid var(--blue); outline-offset: -2px; pointer-events: none; }
+#map-over { touch-action: none; cursor: grab; }
+#map-over.can-click { cursor: pointer; }
+#map-over.dragging { cursor: grabbing; }
+
+/* Until the map's data has loaded, a ring marks where the globe will be and everything else waits. Then
+   the pieces arrive: the globe turning into place (assets/globe.js), the panel and the bars sliding in. */
+.stage::before {
+  content: ""; position: absolute; left: calc((100% - var(--free-r) + var(--gap)) / 2); top: 50%; width: 120px; height: 120px; margin: -60px;
+  border-radius: 50%; border: 2px solid var(--g-halo); opacity: 0; pointer-events: none; animation: wait 1.6s ease-in-out .4s infinite;
+}
+.ready .stage::before { display: none; }
+@keyframes wait { 0%, 100% { opacity: 0; transform: scale(.8); } 50% { opacity: .55; transform: scale(1); } }
+body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; }
+.ready .sheet { animation: arrive-side .9s var(--ease) backwards; }
+.ready .topbar { animation: arrive-top .8s var(--ease) .1s backwards; }
+.ready :is(.legend, .tools, .cue) { animation: fade .8s ease .5s backwards; }
+@keyframes arrive-side { from { opacity: 0; transform: translateX(32px); } }
+@keyframes arrive-top { from { opacity: 0; transform: translateY(-14px); } }
+@keyframes arrive-up { from { opacity: 0; transform: translateY(48px); } }
+@keyframes fade { from { opacity: 0; } }
+
+/* The name and the site's links, floating over the top of the map */
+.topbar {
+  position: fixed; z-index: 4; top: calc(env(safe-area-inset-top) + var(--gap)); left: var(--gap); right: var(--free-r);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; pointer-events: none;
+}
+.topbar > * { pointer-events: auto; }
+.home .brand { padding: 7px 16px 7px 8px; border-radius: 999px; font-size: 16px; letter-spacing: -0.01em; }
+.home .brand-mark { width: 26px; height: 26px; }
+.links { display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; }
+.links a, .links .round {
+  display: inline-grid; place-items: center; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: none;
+  color: var(--text-secondary); font-weight: 600; font-size: 14px; text-decoration: none; white-space: nowrap; transition: background .15s, color .15s;
+}
+.links .round { width: 34px; padding: 0; }
+.links a:hover, .links .round:hover { background: var(--chip-bg); color: var(--text-primary); }
+.links a.accent { background: var(--text-primary); color: var(--surface-1); }
+.links a.accent:hover { background: var(--text-primary); color: var(--surface-1); filter: brightness(1.25); }
+
+/* What sits on the map: the card that follows the pointer, the key, the view and zoom buttons, "Surprise me" */
+.home .tip {
+  position: absolute; z-index: 5; left: 0; top: 0; min-width: 150px; max-width: 264px; padding: 11px 13px; border-radius: 14px;
+  background: var(--glass-solid); color: var(--text-primary); font-size: 13px; line-height: 1.4; pointer-events: none; will-change: transform;
+}
+.tip p { margin: 0; }
+.tip-title { display: flex; align-items: center; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.tip-sub { color: var(--text-muted); font-size: 12px; }
+.tip p.tip-meta, .tip p.tip-text { margin-top: 6px; color: var(--text-secondary); }
+.tip p.tip-go { margin-top: 8px; color: var(--blue-text); font-size: 12px; font-weight: 650; }
+.tip-go::after { content: " \2192"; }
+.tip-go.none { color: var(--text-muted); font-weight: 500; }
+.tip-go.none::after { content: ""; }
+
+.legend { position: absolute; z-index: 2; left: var(--gap); bottom: var(--gap); margin: 0; padding: 9px 14px; border-radius: 999px; font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.swatch.guide { background: var(--g-guide); }
+.swatch.trip { background: var(--g-trip); margin-left: 12px; }
+.swatch.airport { width: 8px; height: 8px; border-radius: 0; transform: rotate(45deg); background: var(--g-airport); margin-left: 14px; margin-right: 7px; }
+
+.tools { position: absolute; z-index: 2; right: var(--free-r); bottom: var(--gap); display: flex; align-items: center; gap: 8px; }
+.zoom { display: flex; padding: 3px; border-radius: 999px; }
+.zoom button { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: none; color: var(--text-secondary); transition: background .15s, color .15s; }
+.zoom button:hover { background: var(--chip-bg); color: var(--text-primary); }
+.zoom button:active { transform: scale(.92); }
+
+.cue { position: absolute; z-index: 2; left: calc((100% - var(--free-r) + var(--gap)) / 2); bottom: var(--gap); transform: translateX(-50%); display: grid; justify-items: center; gap: 10px; pointer-events: none; }
+.hint { margin: 0; padding: 5px 12px; border-radius: 999px; background: var(--glass); color: var(--text-secondary); font-size: 12.5px; white-space: nowrap; transition: opacity .5s ease, transform .5s ease; }
+.hint:empty, .hint.gone { opacity: 0; transform: translateY(6px); }
+.surprise {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 168px; height: 42px; padding: 0 20px 0 16px;
+  border: 0; border-radius: 999px; background: var(--text-primary); color: var(--surface-1); font-weight: 700; font-size: 15px; white-space: nowrap;
+  box-shadow: 0 12px 30px -12px rgba(11, 11, 11, .55); pointer-events: auto; transition: transform .2s var(--ease), box-shadow .2s;
+}
+.surprise .ic { color: var(--orange); }
+.surprise:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -12px rgba(11, 11, 11, .6); }
+.surprise:active { transform: scale(.97); }
+.surprise.rolling .ic { animation: twirl .7s linear infinite; }
+@keyframes twirl { to { transform: rotate(360deg); } }
+
+/* A two-way switch with a sliding thumb: Discover and My trip, Globe and Flat */
+.seg { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 4px; border-radius: 999px; background: var(--chip-bg); }
+.seg.glass { background: var(--glass); }
+.seg::before {
+  content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--thumb);
+  box-shadow: 0 1px 2px rgba(11, 11, 11, .14), 0 3px 10px -3px rgba(11, 11, 11, .16); transition: transform .34s var(--ease);
+}
+.seg[data-on="1"]::before { transform: translateX(100%); }
+.seg button { position: relative; height: 34px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--text-secondary); font-weight: 650; font-size: 14px; white-space: nowrap; transition: color .2s; }
+.seg button:hover, .seg button[aria-current], .seg button[aria-pressed="true"] { color: var(--text-primary); }
+.count.bump { animation: bump .5s var(--ease); }
+@keyframes bump { 40% { transform: scale(1.45); } }
+
+/* The panel */
+.sheet { position: fixed; z-index: 3; top: var(--gap); right: var(--gap); bottom: var(--gap); width: var(--panel-w); display: flex; flex-direction: column; border-radius: 26px; overflow: hidden; background: var(--glass-sheet); box-shadow: var(--lift-lg); }
+.sheet-head { flex: none; padding: 14px 16px 10px; border-bottom: 1px solid transparent; transition: border-color .2s; }
+.sheet.scrolled .sheet-head { border-bottom-color: var(--glass-line); }
+.grip { display: none; }
+.panel { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 22px calc(env(safe-area-inset-bottom) + 28px); outline: none; scrollbar-width: thin; scrollbar-color: var(--strong-line) transparent; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+.panel.swap > * { animation: rise .5s var(--ease) backwards; }
+.panel.swap > :nth-child(2) { animation-delay: .03s; }
+.panel.swap > :nth-child(3) { animation-delay: .06s; }
+.panel.swap > :nth-child(4) { animation-delay: .09s; }
+.panel.swap > :nth-child(5) { animation-delay: .12s; }
+.panel.swap > :nth-child(6) { animation-delay: .15s; }
+.panel.swap > :nth-child(n+7) { animation-delay: .18s; }
+
+.home .panel h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.home .panel h1.hero { margin: 4px 0 10px; font-size: 42px; line-height: 1; letter-spacing: -0.045em; }
+.hero em { font-style: normal; background: linear-gradient(100deg, var(--blue) 0%, var(--aqua) 55%, var(--orange) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.home .lede { margin-bottom: 18px; font-size: 15px; }
+.home .section { margin: 26px 0 10px; font-size: 12px; font-weight: 650; letter-spacing: .06em; }
+
+.search { position: relative; }
+.search .ic { position: absolute; left: 15px; top: 15px; color: var(--text-muted); pointer-events: none; }
+.search input { height: 48px; padding: 0 40px 0 44px; border-radius: 14px; background: var(--surface-1); font-size: 15px; transition: border-color .15s, box-shadow .15s; }
+.search input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 20%, transparent); }
+.search kbd { position: absolute; right: 13px; top: 13px; min-width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); background: var(--chip-bg); color: var(--text-muted); font: 600 12px/20px system-ui, sans-serif; text-align: center; pointer-events: none; transition: opacity .15s; }
+.search input:focus ~ kbd, .search input:not(:placeholder-shown) ~ kbd { opacity: 0; }
+@media (pointer: coarse) { .search kbd { display: none; } }
+
+.home .filters { margin-top: 0; }
+.group { margin-top: 16px; }
+.group-label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 7px; font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.group-value { font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
+.home .chips { margin-top: 0; }
+.home .chip { padding: 6px 13px; background: var(--surface-1); font-weight: 550; transition: background .15s, border-color .15s, color .15s, transform .15s var(--ease); }
+.home .chip:hover { border-color: var(--strong-line); color: var(--text-primary); }
+.home .chip:active { transform: scale(.95); }
+.home .chip[aria-pressed="true"] { background: var(--blue-btn); border-color: var(--blue-btn); color: #fff; }
+.month-bar { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
+.month-bar button { position: relative; height: 38px; padding: 0; border: 0; border-radius: 10px; background: var(--chip-bg); color: var(--text-secondary); font-size: 13px; font-weight: 650; transition: background .15s, color .15s, transform .2s var(--ease), box-shadow .2s; }
+.month-bar button:hover { background: color-mix(in srgb, var(--aqua) 24%, var(--chip-bg)); color: var(--text-primary); }
+.month-bar button[aria-pressed="true"] { background: var(--aqua-strong); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 16px -8px var(--aqua-strong); }
+.month-bar .now::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; opacity: .55; }
+.seg-row { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 4px; border-radius: 12px; background: var(--chip-bg); }
+.seg-row button { height: 32px; padding: 0 4px; border: 0; border-radius: 9px; background: none; color: var(--text-secondary); font-size: 13px; font-weight: 600; white-space: nowrap; transition: background .15s, color .15s; }
+.seg-row button:hover { color: var(--text-primary); }
+.seg-row button[aria-pressed="true"] { background: var(--thumb); color: var(--text-primary); box-shadow: 0 1px 2px rgba(11, 11, 11, .14); }
+
+.more { margin-top: 14px; }
+.more summary { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; color: var(--blue-text); font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary .ic { width: 14px; height: 14px; transition: transform .2s var(--ease); }
+.more[open] summary .ic { transform: rotate(180deg); }
+.more summary b { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--blue-btn); color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.more summary b:empty { display: none; }
+.more .group:first-of-type { margin-top: 8px; }
+
+.results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 10px; }
+.home .results-head .section { margin: 0; }
+.results-head b { color: var(--text-primary); font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.results-head .link { font-size: 13px; }
+
+.home .cards { gap: 8px; }
+.cards li { content-visibility: auto; contain-intrinsic-size: auto 112px; }
+.home .card { grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 14px 12px 14px 14px; border-radius: 16px; background: var(--surface-1); transition: transform .2s var(--ease), box-shadow .2s, border-color .2s; }
+.home .card:hover, .home .card.lit { border-color: color-mix(in srgb, var(--blue) 60%, transparent); transform: translateY(-1px); box-shadow: 0 12px 24px -16px rgba(11, 11, 11, .45); }
+.card-flag { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--chip-bg); font-size: 25px; line-height: 1; }
+.card-main { display: grid; gap: 1px; min-width: 0; }
+.home .card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.card-sub { font-size: 12px; color: var(--text-muted); }
+.home .card-text { margin-top: 5px; font-size: 13.5px; line-height: 1.45; }
+.card-meta { margin-top: 5px; font-size: 12px; font-weight: 600; color: var(--aqua-strong); }
+.card > .ic { align-self: center; color: var(--text-muted); transition: transform .2s var(--ease), color .2s; }
+.card:hover > .ic { transform: translateX(3px); color: var(--text-primary); }
+.home .rows { margin-top: 10px; }
+.home .row { align-items: center; padding: 11px 10px; border-bottom: 0; border-radius: 10px; }
+.home .row:hover, .home .row:focus-visible { background: var(--chip-bg); }
+.row-main { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.row .flag { margin: 0; font-size: 18px; line-height: 1; }
+.row .flag.dot { width: 8px; height: 8px; margin: 0 7px; border-radius: 50%; background: var(--orange); }
+
+/* Buttons, as styles.css has them, with a little more to press */
+.home .primary { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 12px; box-shadow: 0 10px 22px -12px var(--blue-btn); transition: transform .15s var(--ease), filter .15s; }
+.home .primary:hover:not(:disabled) { transform: translateY(-1px); }
+.primary.danger { background: var(--critical); box-shadow: 0 10px 22px -12px var(--critical); }
+.home .primary:active:not(:disabled) { transform: scale(.97); }
+.home .small { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 10px; background: var(--surface-1); transition: border-color .15s, transform .15s var(--ease); }
+.home .small:active { transform: scale(.96); }
+.home .small .ic { width: 14px; height: 14px; }
+.home .actions .small { min-height: 42px; }
+.home .back { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px -10px; padding: 6px 14px 6px 10px; border-radius: 999px; font-weight: 600; transition: background .15s; }
+.home .back:hover { background: var(--chip-bg); }
+
+/* A destination */
+.home .dest-head { gap: 14px; }
+.home .flag.big { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 18px; background: var(--chip-bg); font-size: 38px; }
+.home .summary { font-size: 15px; line-height: 1.55; }
+.home .stat { border-radius: 14px; background: var(--surface-1); }
+.home .months span { padding: 7px 0; border-radius: 8px; }
+.home .months .on { background: var(--aqua-strong); }
+.home .places li, .home .itinerary { margin: 0 -10px; padding: 12px 10px; border-bottom: 0; border-radius: 12px; transition: background .15s; }
+.home .places li:hover, .home .places li.lit, .home .places li.active, .home .itinerary:hover { background: var(--chip-bg); }
+.home .places li.active { box-shadow: inset 3px 0 0 var(--orange); }
+.home button.tag { padding: 5px 12px; font-size: 13px; transition: background .15s, color .15s; }
+.home button.tag:hover { background: var(--blue-btn); color: #fff; }
+
+/* The trip */
+.trip-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.home .builder { border-radius: 16px; background: var(--surface-1); }
+.home .builder summary { display: flex; align-items: center; gap: 8px; list-style: none; }
+.home .builder summary::-webkit-details-marker { display: none; }
+.home .builder summary .ic { color: var(--orange); }
+.home .stops li { position: relative; margin: 0 -10px; padding: 14px 10px; border-bottom: 0; border-radius: 14px; transition: background .15s, opacity .15s; }
+.home .stops li:hover, .home .stops li.lit { background: var(--chip-bg); }
+/* The dotted line from one stop's number down to the next */
+.stops li:not(:last-child)::before { content: ""; position: absolute; left: 22px; top: 46px; bottom: -12px; width: 2px; background: repeating-linear-gradient(var(--orange) 0 4px, transparent 4px 9px); opacity: .55; pointer-events: none; }
+.home .num { width: 26px; height: 26px; line-height: 26px; }
+.stops li[draggable] { cursor: grab; }
+.stops li.lifted { opacity: .35; }
+.stops li.drop-above { box-shadow: 0 -3px 0 -1px var(--blue); }
+.stops li.drop-below { box-shadow: 0 3px 0 -1px var(--blue); }
+.home .icon { display: grid; place-items: center; }
+.home .icon .ic { width: 15px; height: 15px; }
+.flash { animation: flash 1.4s ease; }
+@keyframes flash { 0%, 35% { background: color-mix(in srgb, var(--orange) 24%, transparent); } }
+.pitch {
+  display: grid; justify-items: start; gap: 12px; margin-top: 16px; padding: 16px; border: 1px solid var(--border); border-radius: 16px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--blue) 13%, var(--surface-1)), color-mix(in srgb, var(--aqua) 13%, var(--surface-1)) 55%, color-mix(in srgb, var(--orange) 13%, var(--surface-1)));
+}
+.pitch p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+
+.ask { max-width: min(380px, calc(100vw - 32px)); padding: 22px; border: 1px solid var(--glass-line); border-radius: 22px; background: var(--surface-1); color: var(--text-primary); box-shadow: var(--lift-lg); }
+.ask[open] { animation: rise .3s var(--ease); }
+.ask::backdrop { background: rgba(6, 10, 16, .5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.ask p { margin: 0; font-size: 16px; font-weight: 600; }
+.ask .actions { justify-content: flex-end; }
+.home .toast { left: calc((100% - var(--free-r) + var(--gap)) / 2); bottom: calc(env(safe-area-inset-bottom) + 76px); padding: 10px 18px; font-weight: 600; box-shadow: var(--lift); animation: rise .3s var(--ease); }
+
+/* As the window narrows, the bottom row runs out of room: "Surprise me" moves to the left and the key goes
+   above the view buttons, then the zoom buttons go (the wheel and pinching still zoom) */
+@media (max-width: 1280px) {
+  .cue { left: var(--gap); transform: none; justify-items: start; }
+  .legend { left: auto; right: var(--free-r); bottom: calc(var(--gap) + 52px); }
+}
+@media (max-width: 940px) { .zoom { display: none; } }
+
+/* A phone: the panel becomes a sheet, as tall as --sheet-h, which assets/app.js sets as it is dragged */
+@media (max-width: 820px) {
+  body.home { --gap: 10px; --free-r: 10px; --sheet-h: 47dvh; }
+  .home .brand { padding: 5px 14px 5px 6px; font-size: 15px; }
+  .links a, .links .round { height: 32px; padding: 0 12px; }
+  .links .round { padding: 0; width: 32px; }
+  .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h); border-radius: 24px 24px 0 0; border-bottom: 0; background: var(--glass-solid); transition: height .42s var(--ease); }
+  .sheet-head { padding: 8px 12px 8px; touch-action: none; }
+  .grip { display: block; width: 44px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--strong-line); }
+  .panel { padding: 6px 16px calc(env(safe-area-inset-bottom) + 28px); }
+  .home .panel h1.hero { font-size: 34px; }
+  .legend, .zoom, .hint { display: none; }
+  .sheet-drag { -webkit-user-select: none; user-select: none; }
+  .tools, .cue { bottom: calc(var(--sheet-h) + 10px); transition: bottom .42s var(--ease); }
+  .cue { left: var(--gap); transform: none; }
+  .surprise { min-width: 0; height: 40px; font-size: 14px; }
+  .home .toast { left: 50%; bottom: calc(var(--sheet-h) + 60px); }
+  .sheet-drag .sheet, .sheet-drag .tools, .sheet-drag .cue { transition: none; }
+  .ready .sheet { animation-name: arrive-up; }
+  .stage::before { left: 50%; top: 30%; }
+}
+@media (max-width: 480px) { .links .round { display: none; } }
+@media (hover: none) { .stops li[draggable] { cursor: auto; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .home *, .home *::before, .home *::after { animation: none !important; transition: none !important; }
+}
+
+/* On paper: the map across the top, then the panel's contents in full. A printed page is narrow, so the
+   phone's rules above apply too and are undone here. Nothing is mid-entrance, whenever Print was pressed. */
+@media print {
+  :root:has(body.home) { background: #fff; }
+  body.home { height: auto; overflow: visible; background: #fff; }
+  .home *, .home *::before, .home *::after { animation: none !important; transition: none !important; }
+  .links, .tools, .cue, .legend, .home .tip, .sheet-head, .builder, #play, .stage::before, .back, .places .small, .itinerary .small { display: none !important; }
+  .topbar, .stage, .sheet { position: static; }
+  .topbar { margin-bottom: 12px; }
+  .stage { position: relative; height: 9cm; background: none; }
+  .globe canvas { object-fit: contain; }
+  .glass, .sheet { background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sheet { display: block; width: auto; height: auto; overflow: visible; }
+  .panel { overflow: visible; padding: 12px 0 0; }
+  .cards li { content-visibility: visible; }
+  .stops li::before { display: none; }
+}

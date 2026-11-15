@@ -13,35 +13,64 @@
 <meta name="theme-color" content="#2a78d6">
 <script src="assets/theme.js"></script>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/home.css">
 </head>
-<body>
+<body class="home">
 <a class="skip-link" href="#panel">Skip to content</a>
 
-<header class="app-bar">
-  <p class="brand"><span class="brand-mark" aria-hidden="true"></span><span>The Corner World</span></p>
-  <nav class="tabs" aria-label="Main">
-    <button type="button" data-tab="discover" aria-current="page">Discover</button>
-    <button type="button" data-tab="trip">My trip<span class="count" id="trip-count" hidden></span></button>
+<header class="topbar">
+  <p class="brand glass"><span class="brand-mark" aria-hidden="true"></span><span>The Corner World</span></p>
+  <nav class="links glass" aria-label="Site">
     <a href="guides/">Guides</a>
-    <a href="plan/">Plan a trip</a>
+    <a href="plan/" class="accent">Plan a trip</a>
+    <button type="button" class="round" id="theme-btn" aria-label="Switch between light and dark">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
   </nav>
-  <button type="button" class="ghost-btn" id="theme-btn" aria-label="Switch between light and dark">&#9680;</button>
 </header>
 
 <main class="layout">
-  <section class="map-wrap" aria-label="World map">
-    <svg id="map" viewBox="0 0 960 500" role="img" aria-label="World map. Use the search box to pick a country without the map."></svg>
-    <div class="map-controls">
-      <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
-      <button type="button" id="zoom-out" aria-label="Zoom out">&minus;</button>
-      <button type="button" id="zoom-reset" aria-label="Show the whole world">&#8962;</button>
+  <section class="stage" aria-label="World map">
+    <div class="globe" id="globe" tabindex="0" role="group" aria-label="World map. The arrow keys turn it, and plus and minus zoom. The search box picks a country without the map.">
+      <canvas id="map-base" aria-hidden="true"></canvas>
+      <canvas id="map-over" aria-hidden="true"></canvas>
     </div>
-    <p class="legend"><span class="swatch guide"></span>Guide available<span class="swatch trip"></span>In your trip<span class="key-airport"><span class="swatch airport"></span>Airport</span></p>
-    <div class="tip" id="tip" hidden></div>
+    <div class="tip glass" id="tip" hidden></div>
+
+    <p class="legend glass"><span class="swatch guide"></span>Guide<span class="swatch trip"></span>In your trip<span class="key-airport" id="key-airport" hidden><span class="swatch airport"></span>Airport</span></p>
+
+    <div class="cue">
+      <p class="hint" id="hint" aria-hidden="true"></p>
+      <button type="button" class="surprise" id="surprise">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+        <span id="surprise-text">Surprise me</span>
+      </button>
+    </div>
+
+    <div class="tools">
+      <div class="seg glass" id="view-seg" role="group" aria-label="Map view" data-on="0">
+        <button type="button" data-view="globe" aria-pressed="true">Globe</button>
+        <button type="button" data-view="flat" aria-pressed="false">Flat</button>
+      </div>
+      <div class="zoom glass">
+        <button type="button" id="zoom-in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" id="zoom-out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        <button type="button" id="zoom-reset" aria-label="Show the whole world"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+    </div>
   </section>
 
-  <section class="panel" id="panel" tabindex="-1">
-    <p class="loading">Loading the map&hellip;</p>
+  <section class="sheet glass" id="sheet" aria-label="Guides and your trip">
+    <div class="sheet-head" id="sheet-head">
+      <span class="grip" aria-hidden="true"></span>
+      <nav class="seg" id="tabs" aria-label="Main" data-on="0">
+        <button type="button" data-tab="discover" aria-current="page">Discover</button>
+        <button type="button" data-tab="trip">My trip<span class="count" id="trip-count" hidden></span></button>
+      </nav>
+    </div>
+    <div class="panel" id="panel" tabindex="-1">
+      <p class="loading">Loading the map&hellip;</p>
+    </div>
   </section>
 </main>
 
@@ -49,6 +78,7 @@
 
 <script src="assets/lib/d3.min.js"></script>
 <script src="assets/lib/topojson-client.min.js"></script>
+<script src="assets/globe.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

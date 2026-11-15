@@ -1,12 +1,24 @@
 # The Corner World
 
-An interactive world map with destination guides and a trip planner. A static site in `docs/`, built the same way as The Corner FC: no outside requests, ready for GitHub Pages. The usual build step is `npm run build:pages` after editing a guide.
+An interactive globe with destination guides and a trip planner. A static site in `docs/`, built the same way as The Corner FC: no outside requests, ready for GitHub Pages. The usual build step is `npm run build:pages` after editing a guide.
 
 ## Run it
 
 ```bash
 npm run serve        # then open http://localhost:8000
 ```
+
+## The map page
+
+`docs/index.html` is a globe that fills the window, with the guides and the trip in a panel over it. On a phone the panel is a sheet that pulls up from the bottom.
+
+- `docs/assets/globe.js` draws the map and handles dragging, zooming and flying from place to place. It knows nothing about guides or trips.
+- `docs/assets/app.js` is the guides, the filters and the trip planner. It tells the globe what to colour and hears what was clicked.
+- `docs/assets/home.css` is the page's look. The map's colours are the `--g-*` values at the top, one set for light and one for dark. The dark set is written out twice, as in `styles.css`.
+
+On the map a visitor can drag to spin, scroll or pinch to zoom, click a country, place or airport, and switch between the globe and a flat map. "Surprise me" spins to a guide at random (one that matches the filters, if any are on). Pointing at a guide in the list turns the globe to it. In My trip, "Play route" flies along the stops in order, and a stop can be dragged to a new position with a mouse.
+
+The map is drawn at three levels of detail so that it moves smoothly: full detail close in, and two thinned copies of the shapes from further out. The copies are made in the browser from `world.json` as the page loads, so nothing needs rebuilding when the map data changes.
 
 ## Adding and editing guides
 
@@ -66,7 +78,7 @@ Where no journey is written, the site uses the driving time from that file. Fail
 
 `docs/data/airports.json` holds two things: every airport in the world with scheduled flights and a three-letter code (about 4,000), and the airports for each place, which are the nearest with scheduled flights and the nearest large one if that is another. `npm run build:airports` rebuilds it from [OurAirports](https://ourairports.com/data/); run it after adding or moving places, and now and then to pick up new and closed airports. Distances to an airport are straight lines.
 
-Every airport is on the map as a small diamond. They come into view as the map is zoomed in: large airports first, then medium ones, then airstrips. Pointing at one, or tapping it, gives its name and code.
+Every airport is on the map as a small diamond. They come into view as the map is zoomed in: large airports first, then medium ones, then airstrips. Pointing at one, or tapping it, gives its name and code. How far in each size appears is `AIRPORT_PPD` in `docs/assets/globe.js`.
 
 A place's airports are shown under it in a guide and on the guide pages. In a trip:
 
