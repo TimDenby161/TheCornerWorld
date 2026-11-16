@@ -134,6 +134,7 @@ const wrong = accountsProblem(accounts) || (Boolean(accounts.url) !== Boolean(ac
 if (wrong) fail(join(docs, "data/site.json"), `accounts: ${wrong}`);
 if (accounts.url && !site.contactEmail) warnings.push("Accounts are on but contactEmail in data/site.json is empty, so the privacy page gives people no way to reach you about their data.");
 if (accounts.url && accounts.url.startsWith("http://")) warnings.push(`Accounts point at a database on this computer (${accounts.url}). Don't publish like this: run "npm run accounts -- off" or give it the real project.`);
+if (!site.trader?.name || !site.trader?.address) warnings.push("trader in data/site.json needs your name and a postal address (a PO box or virtual office is fine): the law on selling online asks for both on the site. Then run npm run build:pages.");
 if (site.contactEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(site.contactEmail)) fail(join(docs, "data/site.json"), "contactEmail is not an email address");
 if (site.planning?.url && !/^https:\/\//.test(site.planning.url)) fail(join(docs, "data/site.json"), "planning.url must start with https://");
 for (const partner of site.partners || []) if (!/^https:\/\//.test(partner.url || "")) fail(join(docs, "data/site.json"), `partner "${partner.label}" needs an https:// address`);

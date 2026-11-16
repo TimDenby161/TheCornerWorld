@@ -1,6 +1,10 @@
 {
   "currency": "GBP",
   "contactEmail": "timdenby161@gmail.com",
+  "trader": {
+    "name": "Tim Denby",
+    "address": "Flat 127, 21 Durnsford Road, London SW19 8GW"
+  },
   "url": "https://thecornerworld.com/",
   "partners": [],
   "planning": {

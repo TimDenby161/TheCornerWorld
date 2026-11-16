@@ -2,6 +2,7 @@
 // and the two vendored libraries. Run with `npm run build:data` after `npm install`.
 // The travel guides (docs/data/guides.json) are written by hand and are not touched here.
 import { writeFileSync, copyFileSync } from "node:fs";
+import { advice } from "./advice.mjs";
 import { createRequire } from "node:module";
 import { geoArea, geoCentroid, geoDistance } from "d3";
 import { feature, merge } from "topojson-client";
@@ -266,6 +267,9 @@ const countries = all
     };
   })
   .sort((a, b) => a.name.localeCompare(b.name));
+// The UK government's travel advice for each (see scripts/advice.mjs)
+const countryById = new Map(countries.map((c) => [c.id, c]));
+for (const c of countries) c.advice = advice(c, countryById);
 
 writeFileSync(new URL("data/world.json", out), JSON.stringify(world));
 writeFileSync(new URL("data/countries.json", out), JSON.stringify(countries));

@@ -888,7 +888,19 @@ function renderResults() {
 }
 
 function credits() {
-  return h("p", { class: "credits", text: "Map shapes: Natural Earth. Country facts: mledoze/countries (ODbL). Road distances: OSRM, © OpenStreetMap contributors. Airports: OurAirports." });
+  const odbl = () => h("a", { href: "https://opendatacommons.org/licenses/odbl/1-0/", target: "_blank", rel: "noopener", text: "ODbL" });
+  return h("p", { class: "credits" },
+    "Map shapes: Natural Earth. Country facts: mledoze/countries (", odbl(), "). Road distances: OSRM, © OpenStreetMap contributors (", odbl(),
+    "). Airports: OurAirports. ", h("a", { href: "privacy/", text: "Privacy" }), " · ", h("a", { href: "terms/", text: "Terms" }));
+}
+
+// The UK government's travel advice for a country (`advice` in countries.json, from scripts/advice.mjs).
+// As on the guide pages (scripts/build-pages.mjs). Nothing for the UK itself.
+function adviceLine(c) {
+  if (c.advice == null) return null;
+  return h("p", { class: "note" }, "Before you book, read the ",
+    h("a", { href: `https://www.gov.uk/foreign-travel-advice/${c.advice}`, target: "_blank", rel: "noopener", text: `UK government's travel advice for ${c.name}` }),
+    ": safety, entry rules and health. Guides are for ideas and planning, and things change, so check anything important before you go.");
 }
 
 function monthStrip(best) {
@@ -976,6 +988,9 @@ function renderDestination() {
 
   const booking = bookRow(partnerLinks(c), g?.links);
   if (booking) kids.push(h("h2", { class: "section", text: "Book it" }), booking);
+
+  const advice = adviceLine(c);
+  if (advice) kids.push(h("h2", { class: "section", text: "Before you go" }), advice);
 
   kids.push(
     h("h2", { class: "section", text: "Facts" }),

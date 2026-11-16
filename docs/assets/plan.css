@@ -151,6 +151,7 @@ body.plan { display: block; height: auto; min-height: 100%; background: var(--pa
 .launch { margin: 28px auto 0; max-width: 720px; padding: 14px 18px; border-radius: 16px; text-align: center; background: var(--warn-bg); color: var(--warn-text); font-weight: 500; }
 .launch a { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .small-print { margin: 18px 0 0; text-align: center; font-size: 14px; color: var(--text-muted); }
+.small-print a, .section-lede a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
 /* Not included */
 .honest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
