@@ -17,45 +17,83 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
 // Coarser copies of the map's shapes, for when it is zoomed out and the detail is smaller than a pixel.
 // The world is thousands of lines ("arcs"), each shared by the countries either side of it, so thinning the
-// arcs rather than the countries keeps neighbours meeting exactly. `tol` is the furthest, in radians, a
-// dropped point may be from the line drawn without it; the lines are great circles, as d3 draws them.
-function thinner(topology, object) {
+// arcs rather than the countries keeps neighbours meeting exactly. Every point of an arc gets a score:
+// the furthest, in radians, the line would stray if the point and the lesser ones around it were dropped
+// (the lines are great circles, as d3 draws them). A copy thinned to a tolerance keeps the points that
+// score above it, so one scoring serves every level of detail. `floor` is the finest tolerance that
+// will be asked for: scores at or under it are not worked out.
+function thinner(topology, object, floor) {
   const { scale: [kx, ky], translate: [dx, dy] } = topology.transform;
   const arcs = topology.arcs.map((arc) => { let x = 0, y = 0; return arc.map(([ax, ay]) => [(x += ax) * kx + dx, (y += ay) * ky + dy]); });
-  const vecs = arcs.map((arc) => arc.map(([lng, lat]) => vec(lng, lat)));
-  const chord = (cos) => Math.sqrt(Math.max(0, 2 - 2 * cos));
+  // Each arc's points on the unit sphere, as x, y, z one after another
+  const vecs = arcs.map((arc) => {
+    const v = new Float64Array(arc.length * 3);
+    for (let i = 0; i < arc.length; i++) { const l = arc[i][0] * RAD, p = arc[i][1] * RAD, c = Math.cos(p); v[i * 3] = c * Math.cos(l); v[i * 3 + 1] = c * Math.sin(l); v[i * 3 + 2] = Math.sin(p); }
+    return v;
+  });
 
-  function thinArc(points, v, tol) {
-    const n = points.length;
-    if (n <= 2) return points;
-    const keep = new Uint8Array(n), stack = [0, n - 1];
-    keep[0] = keep[n - 1] = 1;
+  function score(v) {
+    const n = v.length / 3, out = new Float32Array(n), stack = [0, n - 1, Infinity];
+    if (n) out[0] = out[n - 1] = Infinity;
     while (stack.length) {
-      const j = stack.pop(), i = stack.pop();
+      const cap = stack.pop(), j = stack.pop(), i = stack.pop();
       if (j - i < 2) continue;
-      const a = v[i], b = v[j], ab = dot(a, b);
-      const nx = a[1] * b[2] - a[2] * b[1], ny = a[2] * b[0] - a[0] * b[2], nz = a[0] * b[1] - a[1] * b[0], len = Math.hypot(nx, ny, nz);
+      const ax = v[i * 3], ay = v[i * 3 + 1], az = v[i * 3 + 2], bx = v[j * 3], by = v[j * 3 + 1], bz = v[j * 3 + 2], ab = ax * bx + ay * by + az * bz;
+      const nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx, len = Math.sqrt(nx * nx + ny * ny + nz * nz);
       let worst = 0, at = -1;
       for (let m = i + 1; m < j; m++) {
-        const q = v[m], qa = dot(q, a), qb = dot(q, b);
+        const qx = v[m * 3], qy = v[m * 3 + 1], qz = v[m * 3 + 2], qa = qx * ax + qy * ay + qz * az, qb = qx * bx + qy * by + qz * bz;
         // Off the side of the line, or past one of its ends (which is all there is when it starts and ends at the same point)
-        const d = len < 1e-9 || qa < ab || qb < ab ? chord(Math.max(qa, qb)) : Math.abs(q[0] * nx + q[1] * ny + q[2] * nz) / len;
+        const d = len < 1e-9 || qa < ab || qb < ab ? Math.sqrt(Math.max(0, 2 - 2 * Math.max(qa, qb))) : Math.abs(qx * nx + qy * ny + qz * nz) / len;
         if (d > worst) { worst = d; at = m; }
       }
-      if (worst > tol) { keep[at] = 1; stack.push(i, at, at, j); }
+      // A point can't matter more than the one that split the line before it: it only exists once that one is kept
+      const mine = Math.min(worst, cap);
+      if (mine > floor) { out[at] = mine; stack.push(i, at, mine, at, j, mine); }
     }
-    return points.filter((_, i) => keep[i]);
+    return out;
+  }
+
+  const scores = vecs.map(score);
+
+  // How much of the globe a ring covers, near enough, and which way round it runs: the ring laid flat on
+  // the plane that touches the globe at its middle. Below zero when it runs clockwise seen from outside,
+  // which is how the map data draws the edge of a piece of land. d3.geoArea gives the exact figure but
+  // is slow: asked about every ring on the map, it holds the page up for a fifth of a second.
+  function flatArea(ring) {
+    const n = ring.length - 1, v = new Float64Array(n * 3);
+    let mx = 0, my = 0, mz = 0;
+    for (let i = 0; i < n; i++) { const q = vec(ring[i][0], ring[i][1]); v[i * 3] = q[0]; v[i * 3 + 1] = q[1]; v[i * 3 + 2] = q[2]; mx += q[0]; my += q[1]; mz += q[2]; }
+    const m = Math.hypot(mx, my, mz);
+    if (m < 1e-12) return 0;
+    mx /= m; my /= m; mz /= m;
+    // Two directions across the plane: u, and w a quarter turn anticlockwise from it seen from outside
+    let ux = -my, uy = mx, uz = 0;
+    if (Math.hypot(ux, uy) < 1e-6) { ux = 1; uy = 0; }
+    const ul = Math.hypot(ux, uy, uz); ux /= ul; uy /= ul;
+    const wx = my * uz - mz * uy, wy = mz * ux - mx * uz, wz = mx * uy - my * ux;
+    let twice = 0, px = v[(n - 1) * 3] * ux + v[(n - 1) * 3 + 1] * uy, py = v[(n - 1) * 3] * wx + v[(n - 1) * 3 + 1] * wy + v[(n - 1) * 3 + 2] * wz;
+    for (let i = 0; i < n; i++) {
+      const x = v[i * 3] * ux + v[i * 3 + 1] * uy, y = v[i * 3] * wx + v[i * 3 + 1] * wy + v[i * 3 + 2] * wz;
+      twice += px * y - x * py; px = x; py = y;
+    }
+    return twice / 2;
   }
 
   const thin = (tol) => {
-    const thinned = { type: "Topology", objects: topology.objects, arcs: arcs.map((arc, i) => thinArc(arc, vecs[i], tol)) };
+    const thinned = { type: "Topology", objects: topology.objects, arcs: arcs.map((arc, i) => { const mine = scores[i]; return arc.filter((_, j) => mine[j] > tol); }) };
     // An island smaller than the tolerance is left as a line or a sliver with no area. Those go: d3 can
-    // read a ring with nothing inside it as "everywhere but here" and flood the globe with it.
-    const least = tol * tol, size = (ring) => { const a = d3.geoArea({ type: "Polygon", coordinates: [ring] }); return Math.min(a, 4 * Math.PI - a); };
-    const sound = (ring) => ring.length >= 4 && size(ring) > least;
+    // read a ring with nothing inside it as "everywhere but here" and flood the globe with it. So does
+    // a piece of land whose edge has ended up running the wrong way round.
+    const least = tol * tol;
     return topojson.feature(thinned, topology.objects[object]).features.map((f) => {
-      const polygons = (f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates)
-        .filter((rings) => sound(rings[0]) && d3.geoArea({ type: "Polygon", coordinates: [rings[0]] }) < 6).map((rings) => rings.filter(sound));
+      const polygons = [];
+      for (const rings of f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates) {
+        if (rings[0].length < 4) continue;
+        const outer = flatArea(rings[0]);
+        if (outer >= -least) continue;
+        polygons.push(rings.filter((ring, i) => !i || (ring.length >= 4 && Math.abs(flatArea(ring)) > least)));
+      }
       return { type: "Feature", geometry: { type: "MultiPolygon", coordinates: polygons } };
     });
   };
@@ -64,46 +102,98 @@ function thinner(topology, object) {
   return { thin, parts };
 }
 
+// A shape's lines as points on the unit sphere (x, y, z one after another), for drawing on the globe
+// without d3. A stretch longer than `step` radians gets points added along it, so that drawing straight
+// from point to point stays within a fraction of a pixel of the curve the stretch makes on the globe.
+function onSphere(geometry, step) {
+  const lines = [], cosStep = Math.cos(step);
+  const add = (line, closed) => {
+    const n = closed ? line.length - 1 : line.length, out = [];
+    if (n < 2) return;
+    let a = vec(line[0][0], line[0][1]);
+    for (let i = 1; i <= (closed ? n : n - 1); i++) {
+      const b = vec(line[i % n][0], line[i % n][1]), cos = clamp(dot(a, b), -1, 1);
+      out.push(a[0], a[1], a[2]);
+      if (cos < cosStep) {
+        const angle = Math.acos(cos), pieces = Math.ceil(angle / step), sin = Math.sin(angle);
+        for (let j = 1; j < pieces; j++) {
+          const wa = Math.sin((1 - j / pieces) * angle) / sin, wb = Math.sin(j / pieces * angle) / sin;
+          out.push(a[0] * wa + b[0] * wb, a[1] * wa + b[1] * wb, a[2] * wa + b[2] * wb);
+        }
+      }
+      a = b;
+    }
+    if (!closed) out.push(a[0], a[1], a[2]);
+    lines.push({ pts: Float32Array.from(out), closed });
+  };
+  const c = geometry.coordinates;
+  if (geometry.type === "Polygon") for (const ring of c) add(ring, true);
+  else if (geometry.type === "MultiPolygon") for (const rings of c) for (const ring of rings) add(ring, true);
+  else if (geometry.type === "MultiLineString") for (const line of c) add(line, false);
+  else if (geometry.type === "LineString") add(c, false);
+  return lines;
+}
+
 // The same numbers every visit, so the stars don't jump about between page loads
 function seeded(seed) {
   return () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
 }
 
-// `features` are the shapes at full detail, in the order they come in `topology.objects[object]`
-window.createGlobe = function createGlobe({ wrap, base, over, topology, object, features, dots = [], pins = [], airports = [], labels = [], reducedMotion = false, on = {} }) {
+// `features` are the shapes at full detail, in the order they come in `topology.objects[object]`.
+// `detail` is how many pixels a degree must cover on screen before each finer level of detail is drawn.
+// A label gives its place as `lng` and `lat`, or as `at`, a function that returns them when first asked.
+window.createGlobe = function createGlobe({ wrap, base, over, topology, object, features, dots = [], pins = [], airports = [], labels = [], reducedMotion = false, detail = [40, 12, 4], on = {} }) {
   const B = base.getContext("2d"), O = over.getContext("2d");
   const pathB = d3.geoPath(null, B), pathO = d3.geoPath(null, O);
 
   // ---------- what is drawn ----------
 
-  // Three levels of detail: full, and two thinned for when a degree is under 40 and under 12 pixels on
-  // screen. The middle one is made a moment after the page has drawn, and full detail stands in until then.
-  const LOD_PPD = [40, 12];
-  const shapes = thinner(topology, object), far = shapes.thin(0.075 * RAD);
+  // Four levels of detail: full, and three thinned for when a degree is under 40, under 12 and under 4
+  // pixels on screen (a phone showing the whole globe is under 4). LOD_TOL is how far, in degrees, each
+  // level's lines may stray from the full ones: always under a pixel where the level is used. The second
+  // level is made a moment after the page has drawn, and full detail stands in until then.
+  // A fifth, looser still, is only for a small globe while it unrolls into the flat map.
+  const LOD_PPD = detail, LOD_TOL = [0, 0.02, 0.075, 0.24, 0.5], COARSEST = 3, UNROLLING = 4;
+  // The most pixels to a radian each level is drawn at, and so how long a stretch between two points
+  // may be (in radians) before its curve on screen would show as a straight line: a third of a pixel out
+  const LOD_SCALE = [32000, LOD_PPD[0] / RAD, LOD_PPD[1] / RAD, LOD_PPD[2] / RAD];
+  const LOD_STEP = LOD_SCALE.map((scale) => 2 * Math.sqrt(2 * 0.35 / scale));
+  const shapes = thinner(topology, object, LOD_TOL[1] * RAD);
+  const far = shapes.thin(LOD_TOL[2] * RAD), farthest = shapes.thin(LOD_TOL[3] * RAD);
   const nRaw = d3.geoNaturalEarth1Raw, oRaw = d3.geoOrthographicRaw;
+  // Something drawn on the map: its outline at each level (`lod`), and what trace() works out from that
+  // the first time each level is drawn, as points on the globe (`ball`) and on the flat map (`sheet`)
+  const drawable = (lod) => ({ lod, ball: [null, null, null, null], sheet: [null, null, null, null] });
   const feats = features.map((f, i) => {
     // The cap of the globe that holds the shape (to skip it when that is out of view), and the box that
     // holds it on the flat map
     const sum = [0, 0, 0], box = [[Infinity, Infinity], [-Infinity, -Infinity]];
-    for (const arc of shapes.parts[i]) for (const q of arc.vecs) { sum[0] += q[0]; sum[1] += q[1]; sum[2] += q[2]; }
+    for (const arc of shapes.parts[i]) { const q = arc.vecs; for (let j = 0; j < q.length; j += 3) { sum[0] += q[j]; sum[1] += q[j + 1]; sum[2] += q[j + 2]; } }
     const n = Math.hypot(sum[0], sum[1], sum[2]) || 1, v = [sum[0] / n, sum[1] / n, sum[2] / n];
     let low = 1;
     for (const arc of shapes.parts[i]) {
-      for (const q of arc.vecs) { const d = dot(q, v); if (d < low) low = d; }
+      const q = arc.vecs;
+      for (let j = 0; j < q.length; j += 3) { const d = q[j] * v[0] + q[j + 1] * v[1] + q[j + 2] * v[2]; if (d < low) low = d; }
       for (const [lng, lat] of arc.points) {
         const [x, y] = nRaw(lng * RAD, lat * RAD);
         if (x < box[0][0]) box[0][0] = x; if (x > box[1][0]) box[1][0] = x; if (-y < box[0][1]) box[0][1] = -y; if (-y > box[1][1]) box[1][1] = -y;
       }
     }
-    return { f, lod: [f, f, far[i]], v, r: Math.acos(clamp(low, -1, 1)) + 0.002, flat: box, key: "land", from: null, to: null, col: null, selected: false };
+    const r = Math.acos(clamp(low, -1, 1)) + 0.002;
+    // `front`: the shape is wholly on the near side of the globe when its middle is this far round or nearer
+    return { ...drawable([f, f, far[i], farthest[i]]), f, v, r, cosR: Math.cos(r), sinR: Math.sin(r), front: r < HALF - 0.02 ? Math.sin(r + 0.01) : 2, flat: box, key: "land", from: null, to: null, col: null, selected: false };
   });
   let level = 0;
-  setTimeout(() => { const mid = shapes.thin(0.02 * RAD); feats.forEach((s, i) => { s.lod[1] = mid[i]; }); invalidate(true); }, 700);
-  for (const list of [dots, pins, airports, labels]) for (const p of list) p.v = vec(p.lng, p.lat);
+  setTimeout(() => {
+    const mid = shapes.thin(LOD_TOL[1] * RAD);
+    feats.forEach((s, i) => { s.lod[1] = mid[i]; s.ball[1] = s.sheet[1] = null; });
+    invalidate(true);
+  }, 700);
+  for (const list of [dots, pins, airports]) for (const p of list) p.v = vec(p.lng, p.lat);
   labels.sort((a, b) => b.r - a.r);
   const stars = (() => { const rnd = seeded(7); return Array.from({ length: 170 }, () => ({ x: rnd(), y: rnd(), r: 0.4 + rnd() * 1.1, a: 0.25 + rnd() * 0.75 })); })();
-  const graticule = d3.geoGraticule10();
-  const SPHERE = { type: "Sphere" };
+  const lines10 = d3.geoGraticule10(), graticule = drawable([lines10, lines10, lines10, lines10]);
+  const SPHERE = { type: "Sphere" }, edge = drawable([SPHERE, SPHERE, SPHERE, SPHERE]);
 
   // ---------- the view ----------
 
@@ -119,7 +209,10 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
   const pFlat = d3.geoNaturalEarth1();
   const flatUnit = d3.geoNaturalEarth1().scale(1).translate([0, 0]);
   const pMorph = d3.geoProjection((l, p) => { const a = oRaw(l, p), b = nRaw(l, p); return [lerp(a[0], b[0], morphT), lerp(a[1], b[1], morphT)]; });
-  let proj = pGlobe, viewVec = [1, 0, 0], capCos = 0, scalePx = 100;
+  let proj = pGlobe, viewVec = [1, 0, 0], capCos = 0, capSin = 1, capAngle = HALF, scalePx = 100;
+  // The globe's own drawing (trace, below) needs which way is right and which is up on screen, as
+  // directions on the globe, and the flat map's needs where its middle falls on the canvas
+  let east = [0, 1, 0], north = [0, 0, 1], flatX = 0, flatY = 0;
 
   const kMaxFlat = () => K_MAX * geom.R / geom.S;
 
@@ -128,12 +221,15 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       scalePx = geom.R * view.k;
       proj = pGlobe.scale(scalePx).translate([geom.cx, geom.cy]).rotate([-view.lng, -view.lat]);
       viewVec = vec(view.lng, view.lat);
+      const l = view.lng * RAD, p = view.lat * RAD;
+      east = [-Math.sin(l), Math.cos(l), 0]; north = [-Math.sin(p) * Math.cos(l), -Math.sin(p) * Math.sin(l), Math.cos(p)];
       // Only the cap of the globe that can be on screen is worth drawing
       const reach = Math.max(Math.hypot(geom.cx, geom.cy), Math.hypot(W - geom.cx, geom.cy), Math.hypot(geom.cx, H - geom.cy), Math.hypot(W - geom.cx, H - geom.cy));
-      capCos = Math.cos(Math.asin(Math.min(1, reach / scalePx)));
+      capAngle = Math.asin(Math.min(1, reach / scalePx)); capCos = Math.cos(capAngle); capSin = Math.sin(capAngle);
     } else if (morph >= 1) {
       scalePx = geom.S * flat.k;
-      proj = pFlat.scale(scalePx).translate([geom.cx - flat.x * scalePx, geom.cy - flat.y * scalePx]);
+      flatX = geom.cx - flat.x * scalePx; flatY = geom.cy - flat.y * scalePx;
+      proj = pFlat.scale(scalePx).translate([flatX, flatY]);
       capCos = -2;
     } else {
       const e = d3.easeCubicInOut(morph);
@@ -144,9 +240,127 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       capCos = -2;
     }
     pathB.projection(proj); pathO.projection(proj);
-    // While the globe is unrolling nothing is culled and nobody is studying coastlines: draw the coarsest
+    // While the globe is unrolling nothing is culled and nobody is studying coastlines: draw it coarse
     const density = scalePx * RAD;
-    level = morph > 0 && morph < 1 ? 2 : density >= LOD_PPD[0] ? 0 : density >= LOD_PPD[1] ? 1 : 2;
+    level = morph > 0 && morph < 1 ? (density >= LOD_PPD[2] ? 2 : UNROLLING) : density >= LOD_PPD[0] ? 0 : density >= LOD_PPD[1] ? 1 : density >= LOD_PPD[2] ? 2 : COARSEST;
+  }
+
+  // ---------- putting shapes on the canvas ----------
+
+  // Adds a shape's outline to the path being built on canvas `c`. d3 can do this for any shape and any
+  // view, but it works every point out afresh with a good deal of trigonometry, and with the whole world
+  // to redraw on every frame of a spin that came to three frames' worth of time on a laptop and far more
+  // on a phone. So the two still views have their own drawing: the globe keeps each shape as points on a
+  // sphere, which a turn of the globe moves with a few multiplications each; the flat map keeps each
+  // shape already laid out flat, which panning and zooming only slide and scale. d3 is left with the
+  // second it takes the globe to unroll, at the coarsest level.
+  function trace(c, s) {
+    if (morph > 0 && morph < 1) return void (c === B ? pathB : pathO)(s.lod[level] || s.lod[COARSEST]);
+    if (morph >= 1) {
+      for (const line of s.sheet[level] || (s.sheet[level] = onSheet(s.lod[level], level))) {
+        const p = line.pts;
+        c.moveTo(flatX + p[0] * scalePx, flatY + p[1] * scalePx);
+        for (let i = 2; i < p.length; i += 2) c.lineTo(flatX + p[i] * scalePx, flatY + p[i + 1] * scalePx);
+        if (line.closed) c.closePath();
+      }
+      return;
+    }
+    if (s.lod[level] === SPHERE) return void c.arc(geom.cx, geom.cy, scalePx, 0, 2 * Math.PI);
+    const lines = s.ball[level] || (s.ball[level] = onSphere(s.lod[level].geometry || s.lod[level], LOD_STEP[level]));
+    const near = s.front != null && dot(s.v, viewVec) > s.front;
+    for (const line of lines) {
+      if (near) onBallNear(c, line.pts);
+      else if (line.closed) onBallRing(c, line.pts);
+      else onBallLine(c, line.pts);
+    }
+  }
+
+  // A shape laid out on the flat map, in the map's own units. d3 does this once for each shape and level:
+  // it cuts shapes at the map's left and right edges and curves the long straight stretches.
+  const tape = {
+    lines: [], pts: null,
+    moveTo(x, y) { this.pts = [x, y]; this.lines.push({ pts: this.pts, closed: false }); },
+    lineTo(x, y) { this.pts.push(x, y); },
+    closePath() { this.lines[this.lines.length - 1].closed = true; },
+  };
+  const recorders = LOD_SCALE.map((scale) => d3.geoPath(d3.geoNaturalEarth1().scale(scale).translate([0, 0]).precision(0.4), tape));
+  function onSheet(shape, lvl) {
+    tape.lines = [];
+    recorders[lvl](shape);
+    return tape.lines.map((line) => ({ pts: Float32Array.from(line.pts, (n) => n / LOD_SCALE[lvl]), closed: line.closed }));
+  }
+
+  // A ring that is wholly on the near side of the globe: every point goes straight to the canvas
+  function onBallNear(c, p) {
+    const cx = geom.cx, cy = geom.cy, e0 = east[0] * scalePx, e1 = east[1] * scalePx, n0 = north[0] * scalePx, n1 = north[1] * scalePx, n2 = north[2] * scalePx;
+    c.moveTo(cx + p[0] * e0 + p[1] * e1, cy - p[0] * n0 - p[1] * n1 - p[2] * n2);
+    for (let i = 3; i < p.length; i += 3) c.lineTo(cx + p[i] * e0 + p[i + 1] * e1, cy - p[i] * n0 - p[i + 1] * n1 - p[i + 2] * n2);
+    c.closePath();
+  }
+
+  // Every point of a line as it falls on the canvas, with how far it is towards the viewer (below zero
+  // is round the back). Returns where the first point on the near side is in `spots`, or -1.
+  let spots = new Float32Array(3 * 4096);
+  function place(p) {
+    if (spots.length < p.length) spots = new Float32Array(p.length * 2);
+    const cx = geom.cx, cy = geom.cy, e0 = east[0] * scalePx, e1 = east[1] * scalePx, n0 = north[0] * scalePx, n1 = north[1] * scalePx, n2 = north[2] * scalePx;
+    const v0 = viewVec[0], v1 = viewVec[1], v2 = viewVec[2];
+    let first = -1;
+    for (let i = 0; i < p.length; i += 3) {
+      const x = p[i], y = p[i + 1], z = p[i + 2], depth = x * v0 + y * v1 + z * v2;
+      spots[i] = cx + x * e0 + y * e1; spots[i + 1] = cy - x * n0 - y * n1 - z * n2; spots[i + 2] = depth;
+      if (first < 0 && depth >= 0) first = i;
+    }
+    return first;
+  }
+
+  // A ring that may run round the back of the globe. The part on the near side is drawn point by point.
+  // Where the ring goes over the edge, the path follows the edge of the globe round to where the ring
+  // comes back, turning as far and the same way as the hidden part of the ring does.
+  function onBallRing(c, p) {
+    const first = place(p), n = p.length, cx = geom.cx, cy = geom.cy;
+    if (first < 0) return;
+    let px = spots[first], py = spots[first + 1], pz = spots[first + 2], from = 0, was = 0, turned = 0;
+    c.moveTo(px, py);
+    for (let k = 3; k <= n; k += 3) {
+      const i = (first + k) % n, x = spots[i], y = spots[i + 1], z = spots[i + 2];
+      if (z >= 0) {
+        if (pz < 0) {
+          const t = pz / (pz - z), angle = Math.atan2(py + (y - py) * t - cy, px + (x - px) * t - cx);
+          turned += turn(angle - was);
+          if (Math.abs(turned) > 0.002) c.arc(cx, cy, scalePx, from, from + turned, turned < 0);
+          else c.lineTo(cx + scalePx * Math.cos(angle), cy + scalePx * Math.sin(angle));
+        }
+        if (k < n) c.lineTo(x, y);
+      } else {
+        if (pz >= 0) {
+          const t = pz / (pz - z);
+          from = was = Math.atan2(py + (y - py) * t - cy, px + (x - px) * t - cx); turned = 0;
+          c.lineTo(cx + scalePx * Math.cos(from), cy + scalePx * Math.sin(from));
+        }
+        const angle = Math.atan2(y - cy, x - cx);
+        turned += turn(angle - was); was = angle;
+      }
+      px = x; py = y; pz = z;
+    }
+    c.closePath();
+  }
+  const turn = (angle) => (angle > Math.PI ? angle - 2 * Math.PI : angle <= -Math.PI ? angle + 2 * Math.PI : angle);
+
+  // A line that is not a ring (the grid): only the parts on the near side, cut off at the globe's edge
+  function onBallLine(c, p) {
+    place(p);
+    const cx = geom.cx, cy = geom.cy;
+    const rim = (px, py, pz, x, y, z) => { const t = pz / (pz - z), dx = px + (x - px) * t - cx, dy = py + (y - py) * t - cy, k = scalePx / (Math.hypot(dx, dy) || 1); return [cx + dx * k, cy + dy * k]; };
+    let px = 0, py = 0, pz = -1, pen = false;
+    for (let i = 0; i < p.length; i += 3) {
+      const x = spots[i], y = spots[i + 1], z = spots[i + 2];
+      if (z >= 0) {
+        if (!pen) { if (i) { const q = rim(px, py, pz, x, y, z); c.moveTo(q[0], q[1]); c.lineTo(x, y); } else c.moveTo(x, y); pen = true; }
+        else c.lineTo(x, y);
+      } else if (pen) { const q = rim(px, py, pz, x, y, z); c.lineTo(q[0], q[1]); pen = false; }
+      px = x; py = y; pz = z;
+    }
   }
 
   // Screen pixels to one degree at the middle of the view: what decides when pins, airports and names appear
@@ -314,6 +528,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
   function setMode(next) {
     if (next === mode || morphAnim) return;
     stopMotion(); spinning = false; setHover(null);
+    if (!feats[0].lod[UNROLLING]) { const loose = shapes.thin(LOD_TOL[UNROLLING] * RAD); feats.forEach((s, i) => { s.lod[UNROLLING] = loose[i]; }); }
     if (next === "flat") {
       if (view.k > 1.4) { const p = nRaw(view.lng * RAD, view.lat * RAD); flat.x = p[0]; flat.y = -p[1]; flat.k = clamp(geom.R * view.k / geom.S, 1, kMaxFlat()); }
       else { flat.x = flat.y = 0; flat.k = 1; }
@@ -385,11 +600,14 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
 
     if (dirtyBase) { drawBase(); dirtyBase = false; dirtyOver = true; }
     if (dirtyOver || overMoving) { drawOver(now); dirtyOver = false; }
-    if (busy || overMoving) raf = requestAnimationFrame(frame);
+    // Only if nothing above has asked for the next frame already (panBy and zoomAt do). Asking twice
+    // draws twice next time, each of those asks twice again, and within a second of a flick or a zoom
+    // the map is being drawn hundreds of times a frame.
+    if ((busy || overMoving) && !raf) raf = requestAnimationFrame(frame);
   }
 
   function visible(s) {
-    if (morph <= 0) return dot(s.v, viewVec) > Math.cos(Math.min(Math.PI, Math.acos(capCos) + s.r));
+    if (morph <= 0) return capAngle + s.r >= Math.PI || dot(s.v, viewVec) > capCos * s.cosR - capSin * s.sinR;
     if (morph < 1) return true;
     const x0 = flat.x - geom.cx / scalePx, x1 = flat.x + (W - geom.cx) / scalePx, y0 = flat.y - geom.cy / scalePx, y1 = flat.y + (H - geom.cy) / scalePx;
     return s.flat[1][0] > x0 && s.flat[0][0] < x1 && s.flat[1][1] > y0 && s.flat[0][1] < y1;
@@ -423,18 +641,18 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       c.fillStyle = halo; c.beginPath(); c.arc(cx, cy, R * 1.2, 0, 7); c.fill();
     }
 
-    c.beginPath(); pathB(SPHERE); c.fillStyle = theme.oceanFlat; c.fill();
+    c.beginPath(); trace(c, edge); c.fillStyle = theme.oceanFlat; c.fill();
     if (round > 0) {
       const sea = c.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R * 1.05);
       sea.addColorStop(0, theme.oceanLit); sea.addColorStop(1, theme.oceanDeep);
       c.globalAlpha = round; c.fillStyle = sea; c.fill(); c.globalAlpha = 1;
     }
-    c.beginPath(); pathB(graticule); c.strokeStyle = theme.grid; c.lineWidth = 0.6; c.stroke();
+    c.beginPath(); trace(c, graticule); c.strokeStyle = theme.grid; c.lineWidth = 0.6; c.stroke();
 
     c.lineJoin = "round"; c.strokeStyle = theme.line; c.lineWidth = 0.7;
     for (const s of feats) {
       if (!visible(s)) continue;
-      c.beginPath(); pathB(s.lod[level]);
+      c.beginPath(); trace(c, s);
       c.fillStyle = `rgb(${s.col[0] | 0},${s.col[1] | 0},${s.col[2] | 0})`;
       c.fill(); c.stroke();
     }
@@ -470,6 +688,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     for (const l of labels) {
       l.on = false;
       if (!fits(l)) continue;
+      if (!l.v) { if (l.at) { const p = l.at(); l.lng = p.lng; l.lat = p.lat; } l.v = vec(l.lng, l.lat); }
       if (l.kids && l.kids.filter(fits).length * 2 >= l.kids.length) continue; // its states are named instead
       if (l.parent && l.parent.on) continue;
       let alpha = 1;
@@ -512,18 +731,18 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     // The selected country's outline, with a glow
     const chosen = feats.filter((s) => s.selected && visible(s));
     if (chosen.length) {
-      c.beginPath(); for (const s of chosen) pathO(s.lod[level]);
+      c.beginPath(); for (const s of chosen) trace(c, s);
       c.save(); c.shadowColor = theme.selected; c.shadowBlur = 16; c.strokeStyle = theme.edge; c.lineWidth = 1.6; c.stroke(); c.restore();
     }
     // What the pointer is over on the map, and what it is over in the list
     if (hover && hover.type === "country") {
-      c.beginPath(); for (const s of feats) if (s.f.country === hover.country && visible(s)) pathO(s.lod[level]);
+      c.beginPath(); for (const s of feats) if (s.f.country === hover.country && visible(s)) trace(c, s);
       c.fillStyle = theme.hoverFill; c.fill(); c.strokeStyle = theme.hoverLine; c.lineWidth = 1.4; c.stroke();
     }
     if (lit && lit.type === "country") {
       const beat = moving ? 0.5 + 0.5 * Math.sin(now / 260) : 1;
       const mine = feats.filter((s) => sameCountry(s, lit.id));
-      c.beginPath(); for (const s of mine) if (visible(s)) pathO(s.lod[level]);
+      c.beginPath(); for (const s of mine) if (visible(s)) trace(c, s);
       c.fillStyle = theme.hoverFill; c.fill();
       c.save(); c.shadowColor = theme.edge; c.shadowBlur = 6 + beat * 10; c.strokeStyle = theme.hoverLine; c.lineWidth = 1.6; c.stroke(); c.restore();
       // A country too small to see at this zoom gets a ring round it instead

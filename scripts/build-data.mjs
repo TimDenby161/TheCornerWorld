@@ -272,6 +272,8 @@ writeFileSync(new URL("data/countries.json", out), JSON.stringify(countries));
 const modules = new URL("../node_modules/", import.meta.url);
 copyFileSync(new URL("d3/dist/d3.min.js", modules), new URL("assets/lib/d3.min.js", out));
 copyFileSync(new URL("topojson-client/dist/topojson-client.min.js", modules), new URL("assets/lib/topojson-client.min.js", out));
+// Supabase's library, for accounts (docs/assets/account.js fetches it only when someone signs in)
+copyFileSync(new URL("@supabase/supabase-js/dist/umd/supabase.js", modules), new URL("assets/lib/supabase.js", out));
 
 const matched = new Set(countries.map((c) => c.key).filter(Boolean));
 const unmatched = geometries.filter((g) => !matched.has(featureKey(g))).map((g) => g.properties.name);

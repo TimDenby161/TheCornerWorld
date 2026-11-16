@@ -100,7 +100,7 @@ ${body}
 function guidePage(c, g) {
   const parts = [];
   const draft = g.status === "draft" ? `<span class="badge">Draft</span>` : "";
-  parts.push(`<div class="dest-head"><span class="flag big" aria-hidden="true">${c.flag}</span><div>
+  parts.push(`<div class="dest-head"><span class="flag big" aria-hidden="true">${esc(c.flag)}</span><div>
 <h1>${esc(c.name)} travel guide${draft}</h1>
 <p class="muted">${esc([c.subregion || c.region, c.capital && `Capital ${c.capital}`].filter(Boolean).join(" · "))}</p></div></div>`);
   if (g.summary) parts.push(`<p class="summary">${esc(g.summary)}</p>`);
@@ -174,14 +174,41 @@ writeFileSync(new URL("index.html", dir), page({
   body: `<h1>Travel guides</h1>
 <p class="lede">When to go, what it costs, where to stop and ready-made routes.</p>
 <ul class="cards">${list.map(({ c, g, slug }) => `<li><a class="card" href="${slug}/">
-<span class="card-title"><span class="flag" aria-hidden="true">${c.flag}</span>${esc(c.name)}${g.status === "draft" ? `<span class="badge">Draft</span>` : ""}</span>
+<span class="card-title"><span class="flag" aria-hidden="true">${esc(c.flag)}</span>${esc(c.name)}${g.status === "draft" ? `<span class="badge">Draft</span>` : ""}</span>
 <span class="card-text">${esc(g.summary || "")}</span></a></li>`).join("\n")}</ul>`,
+}));
+
+// What the site keeps about people who sign in. Accounts are docs/assets/account.js and supabase/migrations/:
+// if what they store changes, change this page with them.
+mkdirSync(new URL("privacy/", out), { recursive: true });
+writeFileSync(new URL("privacy/index.html", out), page({
+  up: "../", path: "privacy/",
+  title: `Privacy | ${NAME}`,
+  description: "What The Corner World keeps about you if you sign in, why, and how to delete it.",
+  index: true,
+  body: `<h1>Privacy</h1>
+<p class="lede">You can use the map, the guides and the trip planner without an account, and then we keep nothing about you. This page is about what happens if you sign in.</p>
+<h2 class="section">What we keep</h2>
+<ul class="tips">
+<li><b>From Google, when you sign in:</b> your name, your email address and the address of your profile picture. We never see your Google password.</li>
+<li><b>Your trip:</b> the trip you build on the map (its name, start date, number of travellers, stops and checklist), so it is there on your other devices.</li>
+<li><b>If we made a trip page for you:</b> the page, and the email addresses allowed to open it.</li>
+</ul>
+<p class="note">The choices you make on a trip page (what you have booked or paid, activities you add) stay in your browser and are not sent to us.</p>
+<h2 class="section">What we use it for</h2>
+<p class="note">To sign you in, to keep your trip, and to show your trip page to you and nobody else. We don't sell it, share it or use it for advertising, and the site has no tracking or analytics.</p>
+<h2 class="section">Where it is kept</h2>
+<p class="note">With Supabase, our database provider, on servers in Ireland. Signing in is handled by Google and Supabase. The site sets no cookies of its own: while you are signed in, a sign-in token is kept in your browser's storage, and it is removed when you sign out.</p>
+<h2 class="section">How long, and how to delete it</h2>
+<p class="note">Until you delete your account. On the map, open your account (top right) and choose Delete account: the account and the trip saved to it are deleted at once. A trip page we made for you is kept until you ask us to remove it.</p>
+<h2 class="section">Your rights</h2>
+<p class="note">You can ask for a copy of what we hold about you, or for it to be corrected or deleted${site.contactEmail ? `, by emailing <a href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>` : ""}. If you are unhappy with how we have handled it, you can complain to the Information Commissioner's Office (ico.org.uk).</p>`,
 }));
 
 // The sitemap needs full addresses, so it waits for `url` in site.json
 const live = list.filter(({ g }) => g.status !== "draft");
 if (base) {
-  const urls = ["", "guides/", ...live.map(({ slug }) => `guides/${slug}/`)];
+  const urls = ["", "guides/", "privacy/", ...live.map(({ slug }) => `guides/${slug}/`)];
   writeFileSync(new URL("sitemap.xml", out), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `<url><loc>${esc(base + u)}</loc></url>`).join("\n")}

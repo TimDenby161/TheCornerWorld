@@ -38,6 +38,7 @@ const ICONS = {
   down: "M6 9l6 6 6-6",
   close: "M18 6L6 18M6 6l12 12",
   spark: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z",
+  person: "M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0",
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -150,6 +151,7 @@ function saveTrip() {
   count.hidden = !trip.stops.length;
   drawTrip();
   paint();
+  if (syncing) queuePush();
 }
 
 function stopInfo(stop) {
@@ -414,12 +416,12 @@ function buildMap(world) {
   const ports = Object.entries(airports.airports).map(([code, a]) => ({ code, ...a }));
 
   // A name for every country and state with a shape. A country drawn as its states gives way to their
-  // names once there is room for them.
+  // names once there is room for them. Where a name goes is the middle of the country's shape, which
+  // takes a while to work out, so the globe asks (`at`) the first time it has room to write the name.
   const names = new Map();
   for (const c of countries) {
     if (!c.features.length && !c.parts.length) continue;
-    const at = frameOf(c);
-    names.set(c.id, { text: c.name.toUpperCase(), lng: at.lng, lat: at.lat, r: Math.sqrt(c.area / Math.PI) / 6371 });
+    names.set(c.id, { text: c.name.toUpperCase(), at: () => frameOf(c), r: Math.sqrt(c.area / Math.PI) / 6371 });
   }
   for (const c of countries) {
     if (!names.has(c.id) || c.parts.reduce((sum, part) => sum + part.area, 0) <= c.area / 2) continue;
@@ -1141,11 +1143,185 @@ function renderTripBody() {
       h("div", { class: "stat" }, h("span", { class: "stat-l", text: label }), h("span", { class: "stat-v", text: value }), h("span", { class: "stat-l", text: sub })))),
     pitch,
     h("div", { class: "actions" }, actions),
+    keptWhere(),
     h("h2", { class: "section", text: "Before you go" }),
     h("ul", { class: "checklist" }, CHECKLIST.map(([key, label]) => h("li", null, h("label", null,
       h("input", { type: "checkbox", checked: Boolean(trip.checks[key]), onchange: (e) => { if (e.target.checked) trip.checks[key] = true; else delete trip.checks[key]; saveTrip(); } }),
       h("span", { text: label })))))].filter(Boolean));
   disclose(body, body.querySelector(".checklist").previousSibling);
+}
+
+// ---------- the account ----------
+
+// Signing in (assets/account.js) keeps the trip with the visitor's account as well as in this browser,
+// so it is there on their other devices. The copy in the browser is still the one the page works from.
+const account = window.tcwAccount || { enabled: false, user: null, ready: Promise.resolve(), onChange() {} };
+const BASE_KEY = "tcw.trip.base";
+let syncing = null;      // the id of the account the trip is being kept with, once the two have been matched up
+let pushTimer = 0, pushFailed = false;
+
+// A trip as text, the same for the same trip however it was put together
+const tripText = (t) => JSON.stringify(cleanTrip(JSON.parse(JSON.stringify(t))));
+
+// The trip as it was when this browser and the account last agreed. Whichever side differs from it
+// since is the side that changed.
+function base(uid) {
+  try { const b = JSON.parse(localStorage.getItem(BASE_KEY)); return b && b.uid === uid ? b.text : null; } catch { return null; }
+}
+function setBase(uid, text) {
+  try { if (uid) localStorage.setItem(BASE_KEY, JSON.stringify({ uid, text })); else localStorage.removeItem(BASE_KEY); } catch { /* storage blocked */ }
+}
+
+function queuePush() {
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushTrip, 700);
+}
+
+async function pushTrip() {
+  clearTimeout(pushTimer); pushTimer = 0;
+  const uid = syncing, text = tripText(trip);
+  if (!uid || text === base(uid)) return;
+  try {
+    const { error } = await (await account.db()).from("trips").upsert({ user_id: uid, data: JSON.parse(text) });
+    if (error) throw error;
+    setBase(uid, text);
+    pushFailed = false;
+  } catch (err) {
+    console.warn("Saving the trip to the account:", err);
+    if (!pushFailed) toast("Couldn't save to your account just now. Your trip is safe in this browser.");
+    pushFailed = true;
+  }
+}
+
+function showTrip() {
+  if (state.tab === "trip") renderTrip();
+  else if (state.selected) renderDestination();
+}
+
+// Matches the trip in this browser up with the one in the account, when someone signs in or comes back
+async function syncTrip() {
+  const uid = account.user.id;
+  let theirs = null;
+  try {
+    const { data, error } = await (await account.db()).from("trips").select("data").eq("user_id", uid).maybeSingle();
+    if (error) throw error;
+    if (data) theirs = tripText(data.data);
+  } catch (err) {
+    console.warn("Reading the trip from the account:", err);
+    toast("Couldn't reach your account. Your trip is still saved in this browser.");
+    return;
+  }
+  if (!account.user || account.user.id !== uid) return; // signed out while that was fetched
+  const mine = tripText(trip), nothing = tripText(emptyTrip()), was = base(uid);
+  let take = "neither";
+  if (theirs == null) take = mine === nothing ? "neither" : "mine";
+  else if (theirs === mine) take = "neither";
+  else if (theirs === was) take = "mine";                      // only this browser has changed
+  else if (mine === was || mine === nothing) take = "theirs";  // only the account has changed
+  else take = await ask("Your account has a different trip from the one in this browser. Open the account's trip? It replaces the one here.", "Open the account's trip") ? "theirs" : "mine";
+  if (!account.user || account.user.id !== uid) return;
+  syncing = uid;
+  if (take === "theirs") {
+    stopTour();
+    trip = cleanTrip(JSON.parse(theirs));
+    setBase(uid, theirs);
+    saveTrip();
+    showTrip();
+    toast("Opened the trip saved to your account");
+  } else {
+    // Already the same (or both empty): note that they agree, and there is nothing to send
+    if (take === "neither") setBase(uid, mine);
+    await pushTrip();
+    showTrip();
+    if (theirs != null && take === "mine" && theirs !== was && !pushFailed) toast("Kept the trip in this browser, and saved it to your account");
+  }
+}
+
+// A line on the trip tab saying where the trip is kept
+function keptWhere() {
+  if (!account.enabled) return null;
+  if (account.user) return h("p", { class: "kept", text: `Saved to your account (${account.user.email}).` });
+  return h("p", { class: "kept" }, "Saved in this browser only. ",
+    h("button", { type: "button", class: "link", text: "Sign in to keep it on all your devices", onclick: signInBox }));
+}
+
+function dialog(...kids) {
+  const box = h("dialog", { class: "ask" }, kids);
+  box.addEventListener("close", () => box.remove());
+  document.body.append(box);
+  box.showModal();
+  return box;
+}
+
+function signInBox() {
+  const box = dialog(
+    h("p", { text: "Sign in to The Corner World" }),
+    h("p", { class: "fine", text: "Your trip is kept with your account, so it's there on your phone and your laptop. If we've made a trip page for you, signing in opens it." }),
+    h("p", { class: "fine" }, "We keep your name and email address from Google, and your trip. ", h("a", { href: "privacy/", text: "What we keep and why" }), "."),
+    h("div", { class: "actions" },
+      h("button", { type: "button", class: "small", text: "Cancel", onclick: () => box.close() }),
+      h("button", { type: "button", class: "primary", text: "Continue with Google", autofocus: true, onclick: async (e) => {
+        e.target.disabled = true;
+        try { await account.signIn(); } catch (err) { console.error(err); box.close(); toast("Couldn't start sign-in. Check your connection and try again."); }
+      } })));
+}
+
+function accountBox() {
+  const user = account.user;
+  const admin = h("a", { class: "small", href: "admin/", text: "Admin", hidden: true });
+  account.isAdmin().then((yes) => { admin.hidden = !yes; });
+  const box = dialog(
+    h("p", { text: user.name || user.email }),
+    user.name && h("p", { class: "fine", text: user.email }),
+    h("p", { class: "fine" }, "Your trip is saved to this account. ", h("a", { href: "privacy/", text: "What we keep and why" }), "."),
+    h("div", { class: "actions" }, h("a", { class: "small", href: "trip/", text: "My trip pages" }), admin),
+    h("div", { class: "actions" },
+      h("button", { type: "button", class: "small danger", text: "Delete account", onclick: async () => {
+        box.close();
+        if (!await ask("Delete your account? The trip saved to it is deleted too, and this can't be undone.", "Delete account", true)) return;
+        try { await account.remove(); toast("Your account has been deleted"); } catch (err) { console.error(err); toast("Couldn't delete the account. Try again in a moment."); }
+      } }),
+      h("button", { type: "button", class: "small", text: "Sign out", onclick: async () => {
+        box.close();
+        await pushTrip();
+        try { await account.signOut(); toast("Signed out"); } catch (err) { console.error(err); toast("Couldn't sign out. Try again in a moment."); }
+      } }),
+      h("button", { type: "button", class: "primary", text: "Done", autofocus: true, onclick: () => box.close() })));
+}
+
+function accountButton() {
+  const btn = $("#account-btn"), user = account.user;
+  btn.hidden = false;
+  btn.classList.toggle("in", Boolean(user));
+  btn.setAttribute("aria-label", user ? `Your account: ${user.email}` : "Sign in");
+  btn.replaceChildren(...(user ? [h("span", { class: "initial", text: (user.name || user.email || "?").trim().charAt(0).toUpperCase() })] : [icon("person"), h("span", { text: "Sign in" })]));
+  btn.onclick = user ? accountBox : signInBox;
+}
+
+// Shows the account button at once, and then, when it is known who is signed in, matches the trips up
+function accounts() {
+  if (!account.enabled) return;
+  accountButton();
+  account.onChange((user, before) => {
+    accountButton();
+    if (user) return void syncTrip();
+    if (!before) return;
+    // Signed out: the trip stays with the account and leaves this browser, which may not be theirs
+    clearTimeout(pushTimer);
+    syncing = null;
+    setBase(null);
+    stopTour();
+    trip = emptyTrip();
+    saveTrip();
+    showTrip();
+  });
+  account.ready.then(() => {
+    accountButton();
+    if (account.problem) toast("Sign-in didn't finish. Try again.");
+    if (account.user) syncTrip();
+  });
+  // A change made just before the page is put away still gets sent
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && pushTimer) pushTrip(); });
 }
 
 // ---------- start ----------
@@ -1215,7 +1391,9 @@ async function start() {
 
   $("#hint").textContent = matchMedia("(pointer: coarse)").matches ? "Drag to spin · Pinch to zoom · Tap a country" : "Drag to spin · Scroll to zoom · Click a country";
   document.body.classList.add("ready");
-  if (await openFromHash()) return;
+  const opened = await openFromHash();
+  accounts();
+  if (opened) return;
   // Nothing asked for: the globe arrives and turns slowly until it is touched
   if (await globe.arrive({ lng: 12, lat: 22 })) globe.spin(true);
 }

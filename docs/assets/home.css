@@ -7,7 +7,7 @@ body.home {
   --free-r: calc(var(--panel-w) + var(--gap) * 2); /* the right-hand edge of the part of the window the panel leaves clear */
   --ease: cubic-bezier(.2, .8, .2, 1);
   --glass: rgba(252, 252, 251, .84);
-  --glass-solid: rgba(252, 252, 251, .95); --glass-sheet: rgba(252, 252, 251, .94);
+  --glass-solid: rgba(252, 252, 251, .95); --glass-sheet: rgba(252, 252, 251, .94); --sheet-solid: #fbfcfb;
   --glass-line: rgba(11, 11, 11, .08);
   --strong-line: rgba(11, 11, 11, .2);
   --lift: 0 1px 2px rgba(11, 11, 11, .05), 0 10px 28px -12px rgba(11, 11, 11, .25);
@@ -27,7 +27,7 @@ body.home {
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) body.home {
     --glass: rgba(22, 23, 26, .86);
-    --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93);
+    --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93); --sheet-solid: #17181c;
     --glass-line: rgba(255, 255, 255, .10);
     --strong-line: rgba(255, 255, 255, .26);
     --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -12px rgba(0, 0, 0, .7);
@@ -46,7 +46,7 @@ body.home {
 /* Dark chosen with the Theme button (assets/theme.js sets data-theme) */
 :root[data-theme="dark"] body.home {
   --glass: rgba(22, 23, 26, .86);
-  --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93);
+  --glass-solid: rgba(24, 25, 28, .95); --glass-sheet: rgba(20, 21, 24, .93); --sheet-solid: #17181c;
   --glass-line: rgba(255, 255, 255, .10);
   --strong-line: rgba(255, 255, 255, .26);
   --lift: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -12px rgba(0, 0, 0, .7);
@@ -113,6 +113,12 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 }
 .links .round { width: 34px; padding: 0; }
 .links a:hover, .links .round:hover { background: var(--chip-bg); color: var(--text-primary); }
+/* The account button: "Sign in" with a figure, or the first letter of the name of whoever is signed in */
+.links .acct { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 10px; border: 0; border-radius: 999px; background: none; color: var(--text-secondary); font-weight: 600; font-size: 14px; white-space: nowrap; transition: background .15s, color .15s; }
+.links .acct:hover { background: var(--chip-bg); color: var(--text-primary); }
+.links .acct .ic { width: 16px; height: 16px; }
+.links .acct.in { padding: 0 4px; }
+.acct .initial { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--blue-btn); color: #fff; font-size: 13px; font-weight: 700; }
 .links a.accent { background: var(--text-primary); color: var(--surface-1); }
 .links a.accent:hover { background: var(--text-primary); color: var(--surface-1); filter: brightness(1.25); }
 
@@ -305,6 +311,14 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 .ask::backdrop { background: rgba(6, 10, 16, .5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .ask p { margin: 0; font-size: 16px; font-weight: 600; }
 .ask .actions { justify-content: flex-end; }
+.ask .fine { margin-top: 8px; font-size: 14px; font-weight: 400; line-height: 1.45; color: var(--text-secondary); }
+.ask .fine a, .kept .link { color: var(--blue); }
+.ask .actions { flex-wrap: wrap; margin-top: 16px; }
+.ask .actions + .actions { margin-top: 10px; }
+.ask a.small { text-decoration: none; color: inherit; }
+/* Where the trip is kept, under its buttons */
+.kept { margin: 12px 0 0; font-size: 13px; color: var(--text-muted); }
+.kept .link { padding: 0; border: 0; background: none; font: inherit; text-decoration: underline; }
 .home .toast { left: calc((100% - var(--free-r) + var(--gap)) / 2); bottom: calc(env(safe-area-inset-bottom) + 76px); padding: 10px 18px; font-weight: 600; box-shadow: var(--lift); animation: rise .3s var(--ease); }
 
 /* As the window narrows, the bottom row runs out of room: "Surprise me" moves to the left and the key goes
@@ -321,7 +335,11 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
   .home .brand { padding: 5px 14px 5px 6px; font-size: 15px; }
   .links a, .links .round { height: 32px; padding: 0 12px; }
   .links .round { padding: 0; width: 32px; }
-  .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h); border-radius: 24px 24px 0 0; border-bottom: 0; background: var(--glass-solid); transition: height .42s var(--ease); }
+  .links .acct { height: 32px; padding: 0 8px; }
+  .links .acct:not(.in) span { display: none; }
+  /* The sheet is solid here, with no blur behind it. As glass it was 95% solid, so the blur could hardly
+     be seen, yet a phone had to blur half the screen again on every frame the globe moved. */
+  .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h); border-radius: 24px 24px 0 0; border-bottom: 0; background: var(--sheet-solid); -webkit-backdrop-filter: none; backdrop-filter: none; transition: height .42s var(--ease); }
   .sheet-head { padding: 8px 12px 8px; touch-action: none; }
   .grip { display: block; width: 44px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--strong-line); }
   .panel { padding: 6px 16px calc(env(safe-area-inset-bottom) + 28px); }
@@ -349,7 +367,7 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
   :root:has(body.home) { background: #fff; }
   body.home { height: auto; overflow: visible; background: #fff; }
   .home *, .home *::before, .home *::after { animation: none !important; transition: none !important; }
-  .links, .tools, .cue, .legend, .home .tip, .sheet-head, .builder, #play, .stage::before, .back, .places .small, .itinerary .small { display: none !important; }
+  .links, .tools, .cue, .legend, .home .tip, .sheet-head, .builder, .kept, #play, .stage::before, .back, .places .small, .itinerary .small { display: none !important; }
   .topbar, .stage, .sheet { position: static; }
   .topbar { margin-bottom: 12px; }
   .stage { position: relative; height: 9cm; background: none; }

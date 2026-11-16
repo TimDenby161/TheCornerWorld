@@ -1,0 +1,19 @@
+/* The Corner World: admin/, where the owner manages client trip pages. Builds on styles.css. */
+.admin main { max-width: 760px; }
+.admin .new-trip { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 28px; }
+.admin input[type="text"], .admin input[type="email"] { flex: 1 1 220px; min-width: 0; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); }
+.admin input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.admin .trip { margin: 0 0 16px; padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-1); }
+.admin .trip h2 { margin: 0; font-size: 20px; }
+.admin .trip .meta { margin: 4px 0 0; font-size: 13px; color: var(--text-muted); }
+.admin .trip h3 { margin: 16px 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+.admin .people { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.admin .people li { display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 12px; border-radius: 999px; background: var(--chip-bg); font-size: 14px; }
+.admin .people button { width: 24px; height: 24px; border: 0; border-radius: 50%; background: none; color: var(--text-secondary); font-size: 16px; line-height: 1; }
+.admin .people button:hover { background: var(--border); color: var(--text-primary); }
+.admin .add { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.admin .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.admin .bar a.small { text-decoration: none; color: inherit; }
+.admin .bar .push { margin-left: auto; }
+.admin .none { color: var(--text-muted); font-size: 14px; }
+.admin input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
