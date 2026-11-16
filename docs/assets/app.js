@@ -3,6 +3,7 @@
 // Data: data/world.json (map shapes), data/countries.json (basic facts, both built by
 // scripts/build-data.mjs), data/guides.json (the hand-written guides) and data/site.json (settings).
 // Top 3 things to do in each country: data/activities.json (hand-written).
+// The weather month by month: data/weather.json (built by scripts/build-weather.mjs).
 // Journeys: data/legs.json (hand-written), data/distances.json and data/airports.json (both built).
 (function () {
 "use strict";
@@ -46,13 +47,16 @@ const $ = (sel) => document.querySelector(sel);
 const panel = $("#panel"), stage = $("#globe"), sheet = $("#sheet"), tip = $("#tip");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const phone = matchMedia("(max-width: 820px)");
+// The trip planner (My trip, "Add to my trip", ready-made routes to use) is switched off for now: the map is
+// for reading about places. Set this to true to bring it all back; the trip saved in a browser is kept meanwhile.
+const TRIP_PLANNER = false;
 
-let countries = [], byId = new Map(), guides = {}, activities = {}, legs = new Map(), distances = {}, airports = { airports: {}, places: {} }, site = { currency: "GBP", contactEmail: "", partners: [], planning: {} };
+let countries = [], byId = new Map(), guides = {}, activities = {}, weather = {}, legs = new Map(), distances = {}, airports = { airports: {}, places: {} }, site = { currency: "GBP", contactEmail: "", partners: [], planning: {} };
 let money = (n) => String(n);
 let trip = emptyTrip();
 let globe = null;
 const pinOf = new Map();
-const state = { tab: "discover", selected: null, place: null, query: "", month: 0, budget: 0, region: "", tags: new Set(), build: { ids: [], nights: 10 }, scroll: 0 };
+const state = { tab: "discover", info: "todo", selected: null, place: null, query: "", month: 0, budget: 0, region: "", tags: new Set(), build: { ids: [], nights: 10 }, scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -707,6 +711,7 @@ function select(id, opts = {}) {
   if (!state.selected && state.tab === "discover") state.scroll = panel.scrollTop;
   state.selected = id;
   state.place = opts.place || null;
+  if (state.place) state.info = "todo";
   const country = byId.get(id);
   const place = state.place && guides[id].places.find((p) => p.id === state.place);
   hideHint();
@@ -895,10 +900,31 @@ function adviceLine(c) {
     ": safety, entry rules and health. Guides are for ideas and planning, and things change, so check anything important before you go.");
 }
 
-function monthStrip(best) {
-  return h("div", { class: "months", role: "img", "aria-label": `Best months: ${monthRanges(best)}` },
-    MONTHS.map((m, i) => h("span", { class: best.includes(i + 1) ? "on" : "", text: m.charAt(0), title: MONTHS_LONG[i] })));
+// The weather tab: every month rated Great, Okay or Bad, with its average high and low and its rain.
+// A guide's best months are its Great ones (scripts/build-weather.mjs), and its note on them comes first.
+const RATING = { G: "Great", O: "Okay", B: "Bad" };
+function weatherTab(c, g) {
+  const w = weather[c.id], kids = [];
+  if (g?.bestMonths) kids.push(h("h2", { class: "section", text: "Best time to go" }),
+    h("p", { class: "note", text: [monthRanges(g.bestMonths) + ".", g.bestTimeNote].filter(Boolean).join(" ") }));
+  if (!w) return kids.length ? kids : [h("p", { class: "empty", text: `There are no weather figures for ${c.name} yet.` })];
+  const now = new Date().getMonth();
+  kids.push(
+    h("h2", { class: "section", text: "Month by month" }),
+    h("div", { class: "wx-strip", role: "img", "aria-label": RATING_ORDER.map((r) => `${RATING[r]}: ${monthRanges(w.m.flatMap((m, i) => (m[3] === r ? [i + 1] : []))) || "none"}`).join(". ") },
+      w.m.map((m, i) => h("span", { class: `wx-${m[3]}`, text: MONTHS[i].charAt(0), title: `${MONTHS_LONG[i]}: ${RATING[m[3]]}` }))),
+    h("p", { class: "wx-key", "aria-hidden": "true" }, RATING_ORDER.map((r) => h("span", null, h("i", { class: `wx-${r}` }), RATING[r]))),
+    h("table", { class: "wx" },
+      h("thead", null, h("tr", null, ["Month", "", "High / low", "Rain"].map((t) => h("th", { scope: "col", text: t })))),
+      h("tbody", null, w.m.map(([high, low, rain, r], i) => h("tr", { class: i === now ? "now" : "" },
+        h("th", { scope: "row", text: MONTHS_LONG[i] }),
+        h("td", null, h("span", { class: `wx-tag wx-${r}`, text: RATING[r] })),
+        h("td", { text: `${high}° / ${low}°` }),
+        h("td", { text: `${rain} mm` }))))),
+    h("p", { class: "note", text: `Averages for ${w.at || `the middle of ${c.name}`}, 2015–2024, from NASA POWER. Great: highs of 17–33 °C and not too wet. Bad: very cold, very hot or very wet. Mountains and coasts can differ a lot, so check the forecast nearer the time.` }));
+  return kids;
 }
+const RATING_ORDER = ["G", "O", "B"];
 
 function renderDestination() {
   const c = byId.get(state.selected), g = guides[c.id], whole = byId.get(c.within);
@@ -916,7 +942,7 @@ function renderDestination() {
       h("div", null,
         h("h1", null, c.name, g?.status === "draft" && h("span", { class: "badge", text: "Draft" })),
         h("p", { class: "muted", text: [whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region, c.capital && `Capital ${c.capital}`].filter(Boolean).join(" · ") }))),
-    h("div", { class: "actions" },
+    TRIP_PLANNER && h("div", { class: "actions" },
       h("button", { type: "button", class: "primary", onclick: () => addStop(c.id) }, icon("plus"), "Add to my trip"),
       placesIn(c.id).length > 0 && h("button", { type: "button", class: "small", text: "Build me a trip here", onclick: () => {
         state.build = { ids: [c.id], nights: g?.nights?.[0] || state.build.nights };
@@ -924,73 +950,82 @@ function renderDestination() {
       } })),
   ];
 
-  const top = activities[c.id];
-  if (top?.length) kids.push(h("h2", { class: "section", text: "Top 3 things to do" }), h("ol", { class: "top3" }, top.slice(0, 3).map((t) => h("li", { text: t }))));
+  // Three tabs: what there is to do, the weather month by month, and what to know before going
+  const INFO = [["todo", "Things to do"], ["weather", "Weather"], ["advice", "Travel advice"]];
+  kids.push(h("div", { class: "seg three info-tabs", role: "tablist", "aria-label": `About ${c.name}`, "data-on": INFO.findIndex(([key]) => key === state.info) },
+    INFO.map(([key, label]) => h("button", { type: "button", role: "tab", id: `info-${key}`, "aria-selected": String(state.info === key), "aria-controls": "info-body",
+      text: label, onclick: () => { if (state.info !== key) { state.info = key; render(); } } }))));
+  const body = [];
 
-  if (g) {
-    kids.push(h("p", { class: "summary", text: g.summary }));
-    if (g.bestMonths) kids.push(
-      h("h2", { class: "section", text: "Best time to go" }),
-      monthStrip(g.bestMonths),
-      h("p", { class: "note", text: [monthRanges(g.bestMonths) + ".", g.bestTimeNote].filter(Boolean).join(" ") }));
-    const stats = [
-      g.budgetPerDay && ["Budget", `About ${money(g.budgetPerDay)} a day`, "per person, before flights"],
-      g.nights && ["How long", `${g.nights[0]}–${g.nights[1]} nights`, "suggested stay"],
-    ].filter(Boolean);
-    if (stats.length) kids.push(h("div", { class: "stats" }, stats.map(([label, value, sub]) =>
-      h("div", { class: "stat" }, h("span", { class: "stat-l", text: label }), h("span", { class: "stat-v", text: value }), h("span", { class: "stat-l", text: sub })))));
-    if (g.tags?.length) kids.push(h("p", { class: "tags" }, g.tags.map((t) => h("span", { class: "tag", text: t }))));
+  if (state.info === "todo") {
+    const top = activities[c.id];
+    if (top?.length) body.push(h("h2", { class: "section", text: "Top 3 things to do" }), h("ol", { class: "top3" }, top.slice(0, 3).map((t) => h("li", { text: t }))));
 
-    if (g.places?.length) kids.push(
-      h("h2", { class: "section", text: "Places" }),
-      h("ul", { class: "places" }, g.places.map((p) => {
-        const pin = pinOf.get(`${c.id}/${p.id}`);
-        return h("li", { class: p.id === state.place ? "active" : "", "data-place": p.id,
-          onpointerenter: () => globe.light({ type: "place", pin }), onpointerleave: () => globe.light(null) },
-          h("div", null,
-            h("button", { type: "button", class: "link", text: p.name, onclick: () => select(c.id, { place: p.id }) }),
-            PLACE_TYPES[p.type] && h("span", { class: "muted", text: ` · ${PLACE_TYPES[p.type]}` }),
-            h("p", { text: p.blurb }),
-            bookRow(partnerLinks(c, p), p.links)),
-          h("button", { type: "button", class: "small", text: "Add", "aria-label": `Add ${p.name} to my trip`, onclick: () => addStop(c.id, p.id) }));
-      })));
+    if (g) {
+      body.push(h("p", { class: "summary", text: g.summary }));
+      if (g.tags?.length) body.push(h("p", { class: "tags" }, g.tags.map((t) => h("span", { class: "tag", text: t }))));
 
-    if (g.itineraries?.length) kids.push(
-      h("h2", { class: "section", text: "Ready-made itineraries" }),
-      ...g.itineraries.map((it) => {
-        // Pointing at an itinerary draws its route on the map
-        const show = () => globe.preview(it.stops.map((s) => g.places.find((p) => p.id === s.place)).filter(Boolean));
-        return h("div", { class: "itinerary", onpointerenter: show, onpointerleave: () => globe.preview(null), onfocusin: show, onfocusout: () => globe.preview(null) },
-          h("div", null,
-            h("strong", { text: it.name }),
-            h("p", { text: it.stops.map((s) => `${g.places.find((p) => p.id === s.place).name} ${s.nights}`).join(" → ") + " nights" })),
-          h("button", { type: "button", class: "small", text: "Use this", onclick: () => useItinerary(c.id, it) }));
-      }));
+      if (g.places?.length) body.push(
+        h("h2", { class: "section", text: "Places" }),
+        h("ul", { class: "places" }, g.places.map((p) => {
+          const pin = pinOf.get(`${c.id}/${p.id}`);
+          return h("li", { class: p.id === state.place ? "active" : "", "data-place": p.id,
+            onpointerenter: () => globe.light({ type: "place", pin }), onpointerleave: () => globe.light(null) },
+            h("div", null,
+              h("button", { type: "button", class: "link", text: p.name, onclick: () => select(c.id, { place: p.id }) }),
+              PLACE_TYPES[p.type] && h("span", { class: "muted", text: ` · ${PLACE_TYPES[p.type]}` }),
+              h("p", { text: p.blurb }),
+              bookRow(partnerLinks(c, p), p.links)),
+            TRIP_PLANNER && h("button", { type: "button", class: "small", text: "Add", "aria-label": `Add ${p.name} to my trip`, onclick: () => addStop(c.id, p.id) }));
+        })));
 
-    if (g.tips?.length) kids.push(h("h2", { class: "section", text: "Good to know" }), h("ul", { class: "tips" }, g.tips.map((t) => h("li", { text: t }))));
-  } else if (whole && guides[whole.id]) {
-    kids.push(h("p", { class: "empty" }, `There's no guide for ${c.name} on its own yet. It's covered by the `,
-      h("button", { type: "button", class: "link", text: `${whole.name} guide`, onclick: () => select(whole.id) }), "."));
+      if (g.itineraries?.length) body.push(
+        h("h2", { class: "section", text: TRIP_PLANNER ? "Ready-made itineraries" : "Suggested routes" }),
+        ...g.itineraries.map((it) => {
+          // Pointing at an itinerary draws its route on the map
+          const show = () => globe.preview(it.stops.map((s) => g.places.find((p) => p.id === s.place)).filter(Boolean));
+          return h("div", { class: "itinerary", tabindex: TRIP_PLANNER ? null : 0, onpointerenter: show, onpointerleave: () => globe.preview(null), onfocusin: show, onfocusout: () => globe.preview(null) },
+            h("div", null,
+              h("strong", { text: it.name }),
+              h("p", { text: it.stops.map((s) => `${g.places.find((p) => p.id === s.place).name} ${s.nights}`).join(" → ") + " nights" })),
+            TRIP_PLANNER && h("button", { type: "button", class: "small", text: "Use this", onclick: () => useItinerary(c.id, it) }));
+        }));
+    } else if (whole && guides[whole.id]) {
+      body.push(h("p", { class: "empty" }, `There's no guide for ${c.name} on its own yet. It's covered by the `,
+        h("button", { type: "button", class: "link", text: `${whole.name} guide`, onclick: () => select(whole.id) }), "."));
+    } else if (!top?.length) {
+      body.push(h("p", { class: "empty", text: `There's no guide for ${c.name} yet.` }));
+    }
+
+    if (c.parts.length) body.push(
+      h("h2", { class: "section", text: "Explore by area" }),
+      h("p", { class: "tags" }, c.parts.map((part) => h("button", { type: "button", class: "tag", text: part.name, onclick: () => select(part.id),
+        onpointerenter: () => globe.light({ type: "country", id: part.id, lng: part.lng, lat: part.lat }), onpointerleave: () => globe.light(null) }))));
+  } else if (state.info === "weather") {
+    body.push(...weatherTab(c, g));
   } else {
-    kids.push(h("p", { class: "empty", text: `There's no guide for ${c.name} yet. You can still add it to your trip.` }));
+    const advice = adviceLine(c);
+    if (advice) body.push(h("h2", { class: "section", text: "Before you go" }), advice);
+
+    const stats = [
+      g?.budgetPerDay && ["Budget", `About ${money(g.budgetPerDay)} a day`, "per person, before flights"],
+      g?.nights && ["How long", `${g.nights[0]}–${g.nights[1]} nights`, "suggested stay"],
+    ].filter(Boolean);
+    if (stats.length) body.push(h("div", { class: "stats" }, stats.map(([label, value, sub]) =>
+      h("div", { class: "stat" }, h("span", { class: "stat-l", text: label }), h("span", { class: "stat-v", text: value }), h("span", { class: "stat-l", text: sub })))));
+
+    if (g?.tips?.length) body.push(h("h2", { class: "section", text: "Good to know" }), h("ul", { class: "tips" }, g.tips.map((t) => h("li", { text: t }))));
+
+    body.push(
+      h("h2", { class: "section", text: "Facts" }),
+      h("dl", { class: "facts" }, facts.flatMap(([label, value]) => [h("dt", { text: label }), h("dd", { text: value })])));
+
+    const booking = bookRow(partnerLinks(c), g?.links);
+    if (booking) body.push(h("h2", { class: "section", text: "Book it" }), booking);
   }
 
-  if (c.parts.length) kids.push(
-    h("h2", { class: "section", text: "Explore by area" }),
-    h("p", { class: "tags" }, c.parts.map((part) => h("button", { type: "button", class: "tag", text: part.name, onclick: () => select(part.id),
-      onpointerenter: () => globe.light({ type: "country", id: part.id, lng: part.lng, lat: part.lat }), onpointerleave: () => globe.light(null) }))));
-
-  const booking = bookRow(partnerLinks(c), g?.links);
-  if (booking) kids.push(h("h2", { class: "section", text: "Book it" }), booking);
-
-  const advice = adviceLine(c);
-  if (advice) kids.push(h("h2", { class: "section", text: "Before you go" }), advice);
-
-  kids.push(
-    h("h2", { class: "section", text: "Facts" }),
-    h("dl", { class: "facts" }, facts.flatMap(([label, value]) => [h("dt", { text: label }), h("dd", { text: value })])),
-    credits());
-  panel.replaceChildren(...kids);
+  kids.push(h("div", { id: "info-body", role: "tabpanel", "aria-labelledby": `info-${state.info}` }, ...body), credits());
+  panel.replaceChildren(...kids.filter(Boolean));
   disclose(panel, panel.querySelector(".credits"));
   const active = panel.querySelector(".places .active");
   if (active) requestAnimationFrame(() => active.scrollIntoView({ block: "center" }));
@@ -1338,7 +1373,7 @@ function accounts() {
 // Opens whatever the address asks for: a shared trip or a country. True if it did.
 async function openFromHash() {
   const params = new URLSearchParams(location.hash.slice(1));
-  const shared = params.get("trip") && tripFromHash(params.get("trip"));
+  const shared = TRIP_PLANNER && params.get("trip") && tripFromHash(params.get("trip"));
   if (shared && shared.stops.length) {
     if (!trip.stops.length || await ask("Open the shared trip? It replaces the trip saved in this browser.", "Open it")) { trip = shared; saveTrip(); }
     history.replaceState(null, "", location.pathname);
@@ -1367,8 +1402,8 @@ async function start() {
   let world;
   try {
     let written;
-    [world, countries, guides, site, written, distances, airports, activities] = await Promise.all([load("world"), load("countries"), load("guides"), load("site"),
-      load("legs").catch(() => []), load("distances").catch(() => ({})), load("airports").catch(() => airports), load("activities").catch(() => ({}))]);
+    [world, countries, guides, site, written, distances, airports, activities, weather] = await Promise.all([load("world"), load("countries"), load("guides"), load("site"),
+      load("legs").catch(() => []), load("distances").catch(() => ({})), load("airports").catch(() => airports), load("activities").catch(() => ({})), load("weather").catch(() => ({}))]);
     for (const leg of written) legs.set([leg.from, leg.to].sort().join(" "), leg);
   } catch (err) {
     console.error(err);
@@ -1381,9 +1416,10 @@ async function start() {
   const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: site.currency || "GBP", maximumFractionDigits: 0 });
   money = (n) => currency.format(n);
 
-  try { trip = cleanTrip(JSON.parse(localStorage.getItem(TRIP_KEY))); } catch { trip = emptyTrip(); }
+  if (TRIP_PLANNER) try { trip = cleanTrip(JSON.parse(localStorage.getItem(TRIP_KEY))); } catch { trip = emptyTrip(); }
+  else document.body.classList.add("no-trip");
   buildMap(world);
-  saveTrip();
+  if (TRIP_PLANNER) saveTrip(); else paint();
   sheetDrag();
   setSnap("half", false);
   shortcuts();

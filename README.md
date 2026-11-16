@@ -59,6 +59,8 @@ Countries without a guide still open on the map with their basic facts, and can 
 
 Every country, state and island that opens on the map shows a "Top 3 things to do" list near the top of its panel, guide or not. The lists are in `docs/data/activities.json`, keyed by the same codes as the guides: three short lines each, written by hand. A code with no entry shows no list.
 
+A country's panel has three tabs: Things to do, Weather and Travel advice. The Weather tab rates every month Great, Okay or Bad, with the average high and low and the rain. The figures are in `docs/data/weather.json`, built by `npm run build:weather` from NASA POWER's daily readings for 2015–2024, corrected for height. A guide's best months always count as its Great ones. The rules for each rating are at the top of `scripts/build-weather.mjs`. The trip planner is switched off for now (`TRIP_PLANNER` in `docs/assets/app.js`).
+
 After changing a guide, run `npm run build:pages` (see Guide pages). After adding or moving places, run `npm run build:distances` and `npm run build:airports` first.
 
 ## The trip builder

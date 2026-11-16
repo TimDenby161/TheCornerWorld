@@ -180,6 +180,34 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 .sheet-head { flex: none; padding: 14px 16px 10px; border-bottom: 1px solid transparent; transition: border-color .2s; }
 .sheet.scrolled .sheet-head { border-bottom-color: var(--glass-line); }
 .grip { display: none; }
+/* With the trip planner off there is only Discover, so the tabs go, and on a computer the whole head with them */
+.no-trip #tabs, .no-trip .legend .trip, .no-trip .legend .trip + span { display: none; }
+.no-trip .sheet-head { display: none; }
+/* A country's two tabs: Things to do and Travel advice */
+.info-tabs { margin: 16px 0 4px; }
+.info-tabs + #info-body > .section:first-child { margin-top: 18px; }
+/* The two-way switch with three ways */
+.seg.three::before { width: calc((100% - 8px) / 3); }
+.seg.three[data-on="1"]::before { transform: translateX(100%); }
+.seg.three[data-on="2"]::before { transform: translateX(200%); }
+.seg.three button { padding: 0 8px; }
+/* The weather tab: Great, Okay and Bad */
+.wx-G { background: var(--aqua-strong); color: #fff; }
+.wx-O { background: var(--warn-bg); color: var(--warn-text); }
+.wx-B { background: color-mix(in srgb, var(--critical-text) 16%, transparent); color: var(--critical-text); }
+.wx-strip { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.wx-strip span { text-align: center; padding: 7px 0; border-radius: 8px; font-size: 12px; font-weight: 650; }
+.wx-key { display: flex; gap: 14px; margin: 8px 0 4px; font-size: 12.5px; color: var(--text-secondary); }
+.wx-key span { display: inline-flex; align-items: center; gap: 6px; }
+.wx-key i { width: 10px; height: 10px; border-radius: 3px; }
+table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.wx th, .wx td { padding: 7px 4px; text-align: left; border-bottom: 1px solid var(--border); }
+.wx thead th { padding-top: 0; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.wx tbody th { font-weight: 600; }
+.wx td:nth-child(3), .wx td:nth-child(4), .wx thead th:nth-child(3), .wx thead th:nth-child(4) { text-align: right; }
+.wx td:nth-child(4) { color: var(--text-secondary); }
+.wx tr.now th::after { content: " · now"; font-weight: 400; color: var(--text-muted); }
+.wx-tag { display: inline-block; min-width: 52px; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 650; text-align: center; }
 .panel { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 22px calc(env(safe-area-inset-bottom) + 28px); outline: none; scrollbar-width: thin; scrollbar-color: var(--strong-line) transparent; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
 .panel.swap > * { animation: rise .5s var(--ease) backwards; }
@@ -342,6 +370,7 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
   .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h); border-radius: 24px 24px 0 0; border-bottom: 0; background: var(--sheet-solid); -webkit-backdrop-filter: none; backdrop-filter: none; transition: height .42s var(--ease); }
   .sheet-head { padding: 8px 12px 8px; touch-action: none; }
   .grip { display: block; width: 44px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--strong-line); }
+  .no-trip .sheet-head { display: block; padding-bottom: 2px; }
   .panel { padding: 6px 16px calc(env(safe-area-inset-bottom) + 28px); }
   .home .panel h1.hero { font-size: 34px; }
   .legend, .zoom, .hint { display: none; }
