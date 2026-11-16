@@ -10,6 +10,7 @@ const guides = read("guides"), site = read("site"), airports = read("airports");
 const byId = new Map(read("countries").map((c) => [c.id, c]));
 
 const NAME = "The Corner World";
+const accountsOn = Boolean(site.accounts?.url); // sign-in is on (see npm run accounts)
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DISCLOSURE = "Some links earn The Corner World a commission if you book, at no extra cost to you.";
@@ -184,23 +185,36 @@ mkdirSync(new URL("privacy/", out), { recursive: true });
 writeFileSync(new URL("privacy/index.html", out), page({
   up: "../", path: "privacy/",
   title: `Privacy | ${NAME}`,
-  description: "What The Corner World keeps about you if you sign in, why, and how to delete it.",
+  description: "What The Corner World keeps about you, why, and how to have it deleted.",
   index: true,
   body: `<h1>Privacy</h1>
-<p class="lede">You can use the map, the guides and the trip planner without an account, and then we keep nothing about you. This page is about what happens if you sign in.</p>
-<h2 class="section">What we keep</h2>
+<p class="lede">You can use the map, the guides and the trip planner without telling us anything: a trip you build stays in your own browser. This page is about what happens if you ask us to plan a trip, pay us, or join our emails${accountsOn ? ", or sign in" : ""}.</p>
+<h2 class="section">If you ask us to plan a trip</h2>
+<ul class="tips">
+<li><b>Your brief:</b> the form on our planning page opens your own email app, so what you send reaches us as an email: your name, your email address and the details of your trip. We keep it, and our emails with you, to plan your trip and make the changes you ask for.</li>
+<li><b>Your trip page:</b> we publish it on this site locked with a password that only you are sent. Without the password it can't be read, even by someone who finds the file.</li>
+<li><b>Paying:</b> payments are handled by Stripe. We see your name, email address and what you paid, never your card details.</li>
+</ul>
+<p class="note">We keep briefs and trip pages until you ask us to remove them, and payment records for six years, as UK tax law requires.</p>
+<h2 class="section">If you join our emails</h2>
+<p class="note">Our mailing list is kept by Kit (kit.com), whose servers are in the United States. We hold your email address (and your name, if you give it) and use it only to send you our emails. Every email has a link to unsubscribe, which removes you at once.</p>
+`
+  // Sign-in (accounts in data/site.json) is described only while it is on
+  + (accountsOn ? `
+<h2 class="section">If you sign in: what we keep</h2>
 <ul class="tips">
 <li><b>From Google, when you sign in:</b> your name, your email address and the address of your profile picture. We never see your Google password.</li>
 <li><b>Your trip:</b> the trip you build on the map (its name, start date, number of travellers, stops and checklist), so it is there on your other devices.</li>
 <li><b>If we made a trip page for you:</b> the page, and the email addresses allowed to open it.</li>
 </ul>
 <p class="note">The choices you make on a trip page (what you have booked or paid, activities you add) stay in your browser and are not sent to us.</p>
-<h2 class="section">What we use it for</h2>
+<h2 class="section">If you sign in: what we use it for</h2>
 <p class="note">To sign you in, to keep your trip, and to show your trip page to you and nobody else. We don't sell it, share it or use it for advertising, and the site has no tracking or analytics.</p>
-<h2 class="section">Where it is kept</h2>
+<h2 class="section">If you sign in: where it is kept</h2>
 <p class="note">With Supabase, our database provider, on servers in Ireland. Signing in is handled by Google and Supabase. The site sets no cookies of its own: while you are signed in, a sign-in token is kept in your browser's storage, and it is removed when you sign out.</p>
-<h2 class="section">How long, and how to delete it</h2>
+<h2 class="section">If you sign in: how long, and how to delete it</h2>
 <p class="note">Until you delete your account. On the map, open your account (top right) and choose Delete account: the account and the trip saved to it are deleted at once. A trip page we made for you is kept until you ask us to remove it.</p>
+` : "") + `
 <h2 class="section">Your rights</h2>
 <p class="note">You can ask for a copy of what we hold about you, or for it to be corrected or deleted${site.contactEmail ? `, by emailing <a href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>` : ""}. If you are unhappy with how we have handled it, you can complain to the Information Commissioner's Office (ico.org.uk).</p>`,
 }));
