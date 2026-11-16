@@ -29,7 +29,7 @@ npm run check           # looks for mistakes; changes nothing
 - `docs/assets/app.js` is the guides, the filters and the trip planner. It tells the globe what to colour and hears what was clicked.
 - `docs/assets/home.css` is the page's look. The map's colours are the `--g-*` values at the top, one set for light and one for dark. The dark set is written out twice, as in `styles.css`.
 
-On the map a visitor can drag to spin, scroll or pinch to zoom, click a country, place or airport, and switch between the globe and a flat map. "Surprise me" spins to a guide at random (one that matches the filters, if any are on). Pointing at a guide in the list turns the globe to it. In My trip, "Play route" flies along the stops in order, and a stop can be dragged to a new position with a mouse.
+On the map a visitor can drag to spin, scroll or pinch to zoom, click a country or place, and switch between the globe and a flat map. "Surprise me" spins to a guide at random (one that matches the filters, if any are on). Pointing at a guide in the list turns the globe to it. In My trip, "Play route" flies along the stops in order, and a stop can be dragged to a new position with a mouse.
 
 The map is drawn at four levels of detail so that it moves smoothly: full detail close in, and three thinned copies of the shapes from further out (the coarsest is what a phone shows of the whole globe). The copies are made in the browser from `world.json` as the page loads, so nothing needs rebuilding when the map data changes.
 
@@ -54,6 +54,10 @@ All the travel content lives in `docs/data/guides.json`. Each entry is keyed by 
 | `tips` | The "Good to know" list. |
 
 Countries without a guide still open on the map with their basic facts, and can still be added to a trip.
+
+## Top 3 things to do
+
+Every country, state and island that opens on the map shows a "Top 3 things to do" list near the top of its panel, guide or not. The lists are in `docs/data/activities.json`, keyed by the same codes as the guides: three short lines each, written by hand. A code with no entry shows no list.
 
 After changing a guide, run `npm run build:pages` (see Guide pages). After adding or moving places, run `npm run build:distances` and `npm run build:airports` first.
 
@@ -93,9 +97,7 @@ Where no journey is written, the site uses the driving time from that file. Fail
 
 `docs/data/airports.json` holds two things: every airport in the world with scheduled flights and a three-letter code (about 4,000), and the airports for each place, which are the nearest with scheduled flights and the nearest large one if that is another. `npm run build:airports` rebuilds it from [OurAirports](https://ourairports.com/data/); run it after adding or moving places, and now and then to pick up new and closed airports. Distances to an airport are straight lines.
 
-Every airport is on the map as a small diamond. They come into view as the map is zoomed in: large airports first, then medium ones, then airstrips. Pointing at one, or tapping it, gives its name and code. How far in each size appears is `AIRPORT_PPD` in `docs/assets/globe.js`.
-
-A place's airports are shown under it in a guide and on the guide pages. In a trip:
+Airports are not drawn on the map. A place's airports are listed under it on the guide pages. In a trip:
 
 - An estimated flight is timed between the two places' airports and names them: "Amman (AMM) to Hanoi (HAN)". It is still an estimate. The site does not know which airlines fly where, so it cannot say whether the flight is direct or exists at all.
 - Every journey by plane, written or estimated, gets a "Search flights" link, which opens a Google Flights search between the two airports on the day of travel.

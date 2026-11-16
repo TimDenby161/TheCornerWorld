@@ -180,6 +180,10 @@ ul.cards, ul.rows, ul.places, ol.stops, ul.checklist { list-style: none; margin:
 .places p, .itinerary p { margin: 2px 0 0; color: var(--text-secondary); font-size: 14px; }
 .tips { margin: 0; padding-left: 18px; color: var(--text-secondary); }
 .tips li + li { margin-top: 4px; }
+.top3 { margin: 0; padding-left: 22px; }
+.top3 li { padding-left: 2px; }
+.top3 li + li { margin-top: 6px; }
+.top3 li::marker { color: var(--text-secondary); font-weight: 600; }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-size: 14px; }
 .facts dt { color: var(--text-muted); }
 .facts dd { margin: 0; }

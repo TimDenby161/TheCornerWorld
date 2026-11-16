@@ -2,6 +2,7 @@
 // The globe itself (drawing, dragging, zooming) is assets/globe.js.
 // Data: data/world.json (map shapes), data/countries.json (basic facts, both built by
 // scripts/build-data.mjs), data/guides.json (the hand-written guides) and data/site.json (settings).
+// Top 3 things to do in each country: data/activities.json (hand-written).
 // Journeys: data/legs.json (hand-written), data/distances.json and data/airports.json (both built).
 (function () {
 "use strict";
@@ -46,7 +47,7 @@ const panel = $("#panel"), stage = $("#globe"), sheet = $("#sheet"), tip = $("#t
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const phone = matchMedia("(max-width: 820px)");
 
-let countries = [], byId = new Map(), guides = {}, legs = new Map(), distances = {}, airports = { airports: {}, places: {} }, site = { currency: "GBP", contactEmail: "", partners: [], planning: {} };
+let countries = [], byId = new Map(), guides = {}, activities = {}, legs = new Map(), distances = {}, airports = { airports: {}, places: {} }, site = { currency: "GBP", contactEmail: "", partners: [], planning: {} };
 let money = (n) => String(n);
 let trip = emptyTrip();
 let globe = null;
@@ -191,12 +192,6 @@ function airportsFor(id, place) {
   return (airports.places[`${id}/${place}`] || []).map(([code, km]) => ({ code, km, ...airports.airports[code] }));
 }
 
-// "Airports: Queen Alia International Airport (AMM) 26 km · Marka International Airport (ADJ) 6 km"
-// scripts/build-pages.mjs does the same for the guide pages.
-function airportsText(id, place) {
-  const list = airportsFor(id, place);
-  return list.length ? `${list.length > 1 ? "Airports" : "Airport"}: ${list.map((a) => `${a.name} (${a.code}) ${a.km.toLocaleString("en-GB")} km`).join(" · ")}` : "";
-}
 
 // How to get from one stop to the next: { by, hours, km, note }. Journeys written in data/legs.json come first.
 // Next is the driving time worked out from the roads (data/distances.json, for places within 500 km). Anything
@@ -413,7 +408,6 @@ function buildMap(world) {
   const dots = countries.filter((c) => c.capital && !c.parts.length && (!c.features.length || c.area < 2500)).map((c) => ({ country: c, lng: c.lng, lat: c.lat }));
   const pins = Object.entries(guides).filter(([id]) => byId.has(id)).flatMap(([id, guide]) => (guide.places || []).map((place, order) => ({ id, place, order, name: place.name, lng: place.lng, lat: place.lat })));
   for (const pin of pins) pinOf.set(`${pin.id}/${pin.place.id}`, pin);
-  const ports = Object.entries(airports.airports).map(([code, a]) => ({ code, ...a }));
 
   // A name for every country and state with a shape. A country drawn as its states gives way to their
   // names once there is room for them. Where a name goes is the middle of the country's shape, which
@@ -431,18 +425,16 @@ function buildMap(world) {
   }
 
   globe = createGlobe({
-    wrap: stage, base: $("#map-base"), over: $("#map-over"), topology: world, object: "countries", features, dots, pins, airports: ports, labels: [...names.values()], reducedMotion,
+    wrap: stage, base: $("#map-base"), over: $("#map-over"), topology: world, object: "countries", features, dots, pins, labels: [...names.values()], reducedMotion,
     on: {
       pick(target) {
         if (!target) return;
         if (target.type === "country") select(target.country.id);
         else if (target.type === "place") select(target.pin.id, { place: target.pin.place.id });
-        else if (target.type === "airport") { const a = target.airport; toast(`${a.name} (${a.code})${a.city && !a.name.includes(a.city) ? `, ${a.city}` : ""}`); }
         else if (target.type === "stop") { if (state.tab !== "trip") showTab("trip"); flash(`.stops li[data-i="${target.index}"]`); }
       },
       hover: showTip,
       interact() { hideHint(); stopTour(); },
-      view(v) { $("#key-airport").hidden = v.ppd < 20; },
     },
   });
 
@@ -932,6 +924,9 @@ function renderDestination() {
       } })),
   ];
 
+  const top = activities[c.id];
+  if (top?.length) kids.push(h("h2", { class: "section", text: "Top 3 things to do" }), h("ol", { class: "top3" }, top.slice(0, 3).map((t) => h("li", { text: t }))));
+
   if (g) {
     kids.push(h("p", { class: "summary", text: g.summary }));
     if (g.bestMonths) kids.push(
@@ -956,7 +951,6 @@ function renderDestination() {
             h("button", { type: "button", class: "link", text: p.name, onclick: () => select(c.id, { place: p.id }) }),
             PLACE_TYPES[p.type] && h("span", { class: "muted", text: ` · ${PLACE_TYPES[p.type]}` }),
             h("p", { text: p.blurb }),
-            airportsText(c.id, p.id) && h("p", { class: "muted", text: airportsText(c.id, p.id) }),
             bookRow(partnerLinks(c, p), p.links)),
           h("button", { type: "button", class: "small", text: "Add", "aria-label": `Add ${p.name} to my trip`, onclick: () => addStop(c.id, p.id) }));
       })));
@@ -1373,8 +1367,8 @@ async function start() {
   let world;
   try {
     let written;
-    [world, countries, guides, site, written, distances, airports] = await Promise.all([load("world"), load("countries"), load("guides"), load("site"),
-      load("legs").catch(() => []), load("distances").catch(() => ({})), load("airports").catch(() => airports)]);
+    [world, countries, guides, site, written, distances, airports, activities] = await Promise.all([load("world"), load("countries"), load("guides"), load("site"),
+      load("legs").catch(() => []), load("distances").catch(() => ({})), load("airports").catch(() => airports), load("activities").catch(() => ({}))]);
     for (const leg of written) legs.set([leg.from, leg.to].sort().join(" "), leg);
   } catch (err) {
     console.error(err);
