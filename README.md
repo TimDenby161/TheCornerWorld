@@ -1,6 +1,6 @@
 # The Corner World
 
-An interactive globe with destination guides and a trip planner. A static site in `docs/`, built the same way as The Corner FC: no outside requests, ready for GitHub Pages. The usual build step is `npm run build:pages` after editing a guide.
+An interactive globe with destination guides and a trip planner, at https://thecornerworld.com/. A static site in `docs/`, served by GitHub Pages from the `main` branch: no outside requests. The domain is registered with GoDaddy, whose DNS points it at GitHub (four A records for `@` to 185.199.108–111.153, and `www` as a CNAME to `timdenby161.github.io`); `docs/CNAME` names it, and the repository's Pages settings enforce HTTPS. The site's address is `url` in `docs/data/site.json`. The usual build step is `npm run build:pages` after editing a guide.
 
 ## Run it
 
@@ -155,19 +155,19 @@ A browser can be made to send anything, so nothing in `docs/` decides who may se
 
 Two limits worth knowing:
 
-- The session is kept in the browser's storage, which every page on `timdenby161.github.io` shares, including your other GitHub Pages sites. A script running on any of them could read it. Putting this site on its own domain removes that.
+- The session is kept in the browser's storage for thecornerworld.com. The site has its own domain, so no other site (including your other GitHub Pages sites on `timdenby161.github.io`) can read it.
 - A client's trip page needs a connection to open, since it comes from the database each time. The choices they make on it are still saved on their device.
 
 ### Switching it on
 
 1. **Make the Supabase project.** Name it The Corner World, in **West EU (Ireland)**: the privacy page says Ireland. The free plan allows two active projects, so pause one or move to a paid plan.
 2. **Create its tables and rules.** `supabase link --project-ref <the project's ref>` and then `supabase db push`. Linking also makes the copy on this computer use the same Postgres version as the real project.
-3. **Make a Google sign-in client.** In Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID → Web application. Authorised JavaScript origin: `https://timdenby161.github.io`. Authorised redirect URI: `https://<ref>.supabase.co/auth/v1/callback`. On the consent screen give the site's name, your email, and `https://timdenby161.github.io/TheCornerWorld/privacy/` as the privacy policy; then publish it, or only the test users you list can sign in.
+3. **Make a Google sign-in client.** In Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID → Web application. Authorised JavaScript origin: `https://thecornerworld.com`. Authorised redirect URI: `https://<ref>.supabase.co/auth/v1/callback`. On the consent screen give the site's name, your email, and `https://thecornerworld.com/privacy/` as the privacy policy; then publish it, or only the test users you list can sign in.
 4. **Tell Supabase about it**, in the dashboard under Authentication:
    - Providers → Google: on, with the client ID and client secret from step 3.
    - Providers → Email: **off**. (Sign-in is Google only. A trip page opens for whoever proves they own an address, and Google is what proves it.)
    - Anonymous sign-ins: off. "Allow new users to sign up": on.
-   - URL Configuration → Site URL: `https://timdenby161.github.io/TheCornerWorld/`. Redirect URLs: `https://timdenby161.github.io/TheCornerWorld/trip/` and `https://timdenby161.github.io/TheCornerWorld/admin/`. No wildcards.
+   - URL Configuration → Site URL: `https://thecornerworld.com/`. Redirect URLs: `https://thecornerworld.com/trip/` and `https://thecornerworld.com/admin/`. No wildcards.
 5. **Tell the site about the project.** `npm run accounts -- https://<ref>.supabase.co <publishable key>` (the key is under Project Settings → API keys and starts `sb_publishable_`). Set `contactEmail` in `docs/data/site.json` too, so the privacy page says how to reach you, then `npm run build:pages`, `npm run check`, commit and push.
 6. **Make yourself the admin.** Sign in on the site once, then in the Supabase SQL editor: `insert into private.admins (user_id) select id from auth.users where email = '<your Google address>';`
 7. **Ask Supabase to check it.** Dashboard → Advisors → Security should list nothing.
@@ -176,7 +176,7 @@ Two limits worth knowing:
 
 ### Client trip pages
 
-Once accounts are on, a client's page is published at `admin/` rather than written into `docs/c/`: make the trip, add the client's email address (the one on their Google account), and choose the finished `trip.html` from `business/clients/<slug>/`. Send the client `https://timdenby161.github.io/TheCornerWorld/trip/`: they sign in and their page opens. To change a page, publish the new file over the old one. To take someone's access away, remove their address.
+Once accounts are on, a client's page is published at `admin/` rather than written into `docs/c/`: make the trip, add the client's email address (the one on their Google account), and choose the finished `trip.html` from `business/clients/<slug>/`. Send the client `https://thecornerworld.com/trip/`: they sign in and their page opens. To change a page, publish the new file over the old one. To take someone's access away, remove their address.
 
 ### Working on it
 
