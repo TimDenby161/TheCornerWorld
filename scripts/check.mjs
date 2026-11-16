@@ -8,7 +8,8 @@
 //   - the copies of D3, topojson and Supabase's library in docs/assets/lib/ differ from the ones npm installed;
 //   - a data file or script doesn't parse;
 //   - a page points at an old version of its scripts or styles (see scripts/stamp.mjs);
-//   - a client's trip page could be listed by a search engine or would pass its address on to other sites.
+//   - a client's trip page isn't locked with a password (scripts/lock.mjs), could be listed by a search
+//     engine, or would pass its address on to other sites.
 // It warns, without failing, about things only you can decide.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -22,6 +23,7 @@ const root = fileURLToPath(new URL("../", import.meta.url)), docs = join(root, "
 const failures = [], warnings = [];
 const name = (file) => relative(root, file);
 const fail = (file, message) => failures.push(`${name(file)}: ${message}`);
+const isClient = (file) => /^c[\\/]/.test(relative(docs, file)); // a client's trip page, in docs/c/
 
 const files = (dir, ends) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
   entry.isDirectory() ? files(join(dir, entry.name), ends) : ends.some((end) => entry.name.endsWith(end)) ? [join(dir, entry.name)] : []);
@@ -38,8 +40,10 @@ for (const page of all) {
   else {
     const rule = (key) => policy.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${key} `)) || "";
     if (rule("default-src") !== "default-src 'self'") fail(page, "the policy's default-src must be 'self' alone");
-    // trip/ runs a client's trip page from memory once the database has handed it over, which needs blob:
-    const scripts = relative(docs, page) === join("trip", "index.html") ? "script-src 'self' blob:" : "script-src 'self'";
+    // trip/ and a locked client page (docs/c/) run a trip page's script from memory once it has been
+    // handed over or unscrambled, which needs blob:
+    const fromMemory = relative(docs, page) === join("trip", "index.html") || isClient(page);
+    const scripts = fromMemory ? "script-src 'self' blob:" : "script-src 'self'";
     if (rule("script-src") !== scripts) fail(page, `the policy's script-src must be exactly ${scripts.slice(11)}: no inline script, no eval, no other sites`);
     // A page with sign-in may talk to the Supabase project; every other page, to this site alone
     const signIn = /<script\b[^>]*\bsrc="[^"]*account\.js/.test(html);
@@ -62,16 +66,27 @@ for (const page of all) {
 
 // ---------- client trip pages ----------
 
-const clientPages = all.filter((page) => relative(docs, page).startsWith(`c${"/"}`) || relative(docs, page).startsWith("c\\"));
+// The repository is public, so a client's trip may be in docs/c/ only locked with a password
+// (scripts/lock.mjs): each folder holds the unlock page and trip.lock, and nothing readable.
+const clientPages = all.filter(isClient);
 for (const page of clientPages) {
   const html = readFileSync(page, "utf8");
   if (!/<meta name="robots" content="[^"]*noindex/.test(html)) fail(page, "a client's page must ask search engines not to list it (meta robots noindex)");
   if (!/<meta name="referrer" content="no-referrer"/.test(html)) fail(page, "a client's page must not pass its address to sites it links to (meta referrer no-referrer)");
 }
-if (clientPages.length) {
-  const slugs = [...new Set(clientPages.map((page) => relative(docs, page).split(/[\\/]/)[1]))];
-  warnings.push(`${slugs.length} client trip page(s) in docs/c/. While the GitHub repository is public, anyone can list that folder there and open every page: the links are only private if the repository is.`);
-  for (const slug of slugs) if (!/^[a-z0-9]{10,}-/.test(slug)) warnings.push(`docs/c/${slug}: the random part of the address is short enough to guess. Use 10 or more letters and digits.`);
+const clientDir = join(docs, "c");
+if (existsSync(clientDir)) {
+  for (const entry of readdirSync(clientDir, { withFileTypes: true })) {
+    const dir = join(clientDir, entry.name);
+    if (!entry.isDirectory()) { fail(dir, "only locked trip folders belong in docs/c/"); continue; }
+    const inside = readdirSync(dir).sort().join(" ");
+    if (inside !== "index.html trip.lock") { fail(dir, `a client's trip must be locked: the folder should hold index.html and trip.lock only, not ${inside || "nothing"}. Run: npm run lock -- ${entry.name}`); continue; }
+    if (!/<script src="\.\.\/\.\.\/assets\/unlock\.js[?"]/.test(readFileSync(join(dir, "index.html"), "utf8"))) fail(join(dir, "index.html"), `isn't the unlock page. Run: npm run lock -- ${entry.name}`);
+    try {
+      const locked = JSON.parse(readFileSync(join(dir, "trip.lock"), "utf8"));
+      if (locked.v !== 1 || !locked.salt || !locked.iv || !locked.data || !(locked.iterations >= 600000)) throw new Error("not a trip.lock that scripts/lock.mjs made");
+    } catch (err) { fail(join(dir, "trip.lock"), `${err.message}. Run: npm run lock -- ${entry.name}`); }
+  }
 }
 
 // ---------- nothing private in the published site ----------

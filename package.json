@@ -10,6 +10,7 @@
     "build:version": "node scripts/stamp.mjs",
     "check": "node scripts/check.mjs && node scripts/test-globe.mjs",
     "accounts": "node scripts/accounts.mjs",
+    "lock": "node scripts/lock.mjs",
     "db:start": "supabase start -x studio,postgres-meta,imgproxy,vector,logflare,realtime,storage-api,edge-runtime,mailpit,supavisor",
     "db:stop": "supabase stop",
     "test:db": "supabase test db",
