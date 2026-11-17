@@ -13,7 +13,7 @@ const PLACES = [
     blurb:"Your first night with Option A.",
     days:[["Day 1","Sat 27 Feb"],["Day 2","Sun 28 Feb"]],
     ev:[
-      [0,"06:00","16:55","Flight from Gatwick","flight","Leaves 10:55 UK time, lands 16:55","","£190 for 2 + 33,000 Avios","11h"],
+      [0,"06:00","16:55","Flight from Gatwick","flight","BA, direct · leaves 10:55 UK time, lands 16:55","","£1,000 for 2","11h"],
       [0,"17:00","18:00","Immigration + bags","other","Have your digital FMM form ready","","Free"],
       [0,"18:15","18:45","ADO bus to downtown","bus","Airport → ADO Centro","","£15 for 2"],
       [1,"09:00","10:45","ADO bus to Valladolid","bus","","","£27 for 2","2h45"],
@@ -29,7 +29,7 @@ const PLACES = [
     blurb:"Colonial town between two great Maya sites.",
     days:[["Arrive","Sat 27 Feb","","B"],["Day 1","Sun 28 Feb"],["Day 2","Mon 1 Mar"],["Day 3","Tue 2 Mar"]],
     ev:[
-      [0,"06:00","16:55","Flight from Gatwick","flight","10:55 UK time – 16:55 Cancún time","","£190 for 2 + 33,000 Avios","11h"],
+      [0,"06:00","16:55","Flight from Gatwick","flight","BA, direct · 10:55 UK time – 16:55 Cancún time","","£1,000 for 2","11h"],
       [0,"17:00","19:15","Free time at the airport","food","","","£20 for 2","2h 15"],
       [0,"19:30","20:55","ADO bus direct from the airport","bus","Backups at 20:30 and 21:30","","MXN 900 (£36) for 2","2h25"],
       [1,"09:00","10:45","Bus from Cancún","bus","","a","£27 for 2","2h45"],
@@ -195,7 +195,6 @@ const durOf = e => e[8] || fmtDur(toMin(e[2]) - toMin(e[1]));
 const gbp = n => { const v = Math.round(n * 100) / 100; return "£" + v.toLocaleString("en-GB", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
 const shortPrice = p => {
   if (!p) return "";
-  if (/Avios/.test(p)) return "£190 + Avios";
   const eq = p.match(/= £([\d.,]+) for 2/); if (eq) return "£" + eq[1];
   const just = p.match(/^£([\d.,]+) for 2$/); if (just) return "£" + just[1];
   if (/^Free – /.test(p)) return "Free–" + (p.match(/\(£([^)]+)\)/) || ["",""])[1].replace(/^/,"£");
@@ -300,7 +299,7 @@ function fillOptionCosts(){
   if (ea) ea.innerHTML = `<b>£${a}</b> ${a > b ? "£" + d + " more" : a < b ? "£" + d + " less" : ""}`;
   if (eb) eb.innerHTML = `<b>£${b}</b> ${b < a ? "£" + d + " less" : b > a ? "£" + d + " more" : ""}`;
 }
-const FLIGHTS = 1180, EXTRAS = 75.5, BUDGET = 3313;
+const FLIGHTS = 1990, EXTRAS = 128, BUDGET = 4500;
 // How much is already paid: items marked "Booked + paid"
 const priceNum = str => { if (!str) return 0; const m = str.match(/= £([\d.,]+) for 2/) || str.match(/\(£([\d.,]+)\) for 2/) || str.match(/£([\d.,]+)/); return m ? parseFloat(m[1].replace(/,/g, "")) : 0; };
 const isPaid = k => stOf(k) === "paid";
@@ -319,7 +318,7 @@ function renderSummary(){
   vis.forEach(p => p.ev.forEach(e => { const k = evStKey(p, e); if (k) owner[k] = p.name; }));
   const rows = vis.map((p, i) => ({ i, name: p.title || p.name, sub: `${costOf(p).hotel[2]} · ${tierOf(p)} hotel · ${placed(p).filter(x => !x.a.meal).length} activities`, v: placeSum(p), pd: paidOf(p, owner) }));
   const total = FLIGHTS + EXTRAS + rows.reduce((a, r) => a + r.v, 0);
-  const fPaid = (isPaid("flight1") ? 190 : 0) + (isPaid("flight2") ? 990 : 0);
+  const fPaid = (isPaid("flight1") ? 1000 : 0) + (isPaid("flight2") ? 990 : 0);
   const paidTotal = fPaid + rows.reduce((a, r) => a + r.pd, 0);
   document.getElementById("sum-paid").textContent = gbp(paidTotal);
   fillItinerary();
@@ -329,9 +328,9 @@ function renderSummary(){
   bel.className = "budget " + (diff > 0 ? "over" : "under");
   bel.innerHTML = `Budget <b class="mono">${gbp(BUDGET)}</b> · <b class="mono">${gbp(Math.abs(diff))}</b> ${diff > 0 ? "over" : "under"}`;
   document.getElementById("sum-rows").innerHTML =
-    `<tr><th>Flights<small>Flight 1: LGW to CUN · £190 · 33,000 Avios · £779 saved</small><small>Flight 2: GUA to LHR via ATL · £990</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
+    `<tr><th>Flights<small>Flight 1: LGW to CUN · BA direct · £1,000</small><small>Flight 2: GUA to LHR via ATL · £990</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
     rows.map(r => `<tr class="place-row" data-go="p${r.i}"><th><span class="num">${String(r.i + 1).padStart(2, "0")}</span><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="mono">${gbp(r.v)}</td></tr>`).join("") +
-    `<tr><th>Fees and extras<small><span title="US travel authorisation, needed for the Atlanta connection on the way home. One traveller already had one." style="text-decoration:underline dotted;cursor:help">ESTA x1 - £30</span></small><small><span title="Quintana Roo state tourist tax, paid online per person before leaving Mexico (covers Cancún and Bacalar). About MXN 290 (£11.50) each. Pay only on visitax.gob.mx and keep the QR receipt to show at the airport or border." style="text-decoration:underline dotted;cursor:help">Visitax x2 - £23</span></small><small><span title="Belize £7 + Latin America 15 days £15.50 (covers Mexico and Guatemala)" style="text-decoration:underline dotted;cursor:help">eSIMs x1 - £22.50</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
+    `<tr><th>Fees and extras<small><span title="US travel authorisation, needed for the Atlanta connection on the way home. US$40 (£30) each." style="text-decoration:underline dotted;cursor:help">ESTA x2 - £60</span></small><small><span title="Quintana Roo state tourist tax, paid online per person before leaving Mexico (covers Cancún and Bacalar). About MXN 290 (£11.50) each. Pay only on visitax.gob.mx and keep the QR receipt to show at the airport or border." style="text-decoration:underline dotted;cursor:help">Visitax x2 - £23</span></small><small><span title="Each: Belize £7 + Latin America 15 days £15.50 (covers Mexico and Guatemala)" style="text-decoration:underline dotted;cursor:help">eSIMs x2 - £45</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
     `<tr class="tot"><th>Total for 2</th><td class="mono">${gbp(total)}</td></tr>`;
   document.querySelectorAll("#sum-rows .place-row").forEach(tr => tr.onclick = () => document.getElementById(tr.dataset.go)?.scrollIntoView({ behavior: "smooth" }));
 }

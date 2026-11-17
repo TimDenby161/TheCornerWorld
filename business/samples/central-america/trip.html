@@ -445,24 +445,10 @@ span.st{cursor:default}
     </div>
     <div class="hl-strip" id="hl-strip" aria-label="Highlights"></div>
     <ol class="itin" id="itin" aria-label="Day by day"></ol>
-    <div class="opt-cards compact" role="radiogroup" aria-label="First night option">
-      <button type="button" class="opt-card" role="radio" data-opt="A" id="opt-a">
-        <span class="opt-tag">Option A</span>
-        <b>Night in Cancún</b>
-        <span>Bus to Valladolid Sun 09:00, arrive 10:45</span>
-        <span class="opt-cost" data-cost="A"></span>
-      </button>
-      <button type="button" class="opt-card" role="radio" data-opt="B" id="opt-b">
-        <span class="opt-tag">Option B</span>
-        <b>Straight to Valladolid</b>
-        <span>Direct ADO from the airport 19:30, arrive 20:55</span>
-        <span class="opt-cost" data-cost="B"></span>
-      </button>
-    </div>
     <p class="hint"><span class="hint-desk">Press <kbd>↓</kbd> for the next slide, <kbd>↑</kbd> to go back.</span></p>
   </div>
   <div class="cost">
-    <div class="eyebrow">Rough cost for 2 people · <span id="sum-opt">Option A</span></div>
+    <div class="eyebrow">Rough cost for 2 people<span id="sum-opt" hidden></span></div>
     <div class="tot-row"><div class="total mono" id="sum-total">£0</div><div class="paid-top"><span>Paid</span><b class="mono" id="sum-paid">£0</b></div><div class="budget" id="sum-budget"></div></div>
     <p class="pp" id="sum-pp"></p>
     <table class="cost-t"><tbody id="sum-rows"></tbody></table>
@@ -492,7 +478,8 @@ span.st{cursor:default}
     <h2>Book now</h2>
     <ol>
       <li>Flight home: KL7597 + KL6195 via Atlanta, £990 for two</li>
-      <li>ESTA for the Atlanta connection, US$40 (£30). One of the two already had one</li>
+      <li>Flight out: BA Gatwick → Cancún, Sat 27 Feb, about £1,000 for 2 (<a href="https://www.google.com/travel/flights?q=Flights%20from%20LGW%20to%20CUN%20on%202027-02-27%20one%20way" target="_blank" rel="noopener">search</a>)</li>
+      <li>ESTAs for the Atlanta connection, US$40 (£30) each</li>
       <li>Flores → Guatemala City flight</li>
       <li>Chetumal → Caye Caulker ferry: Water Jets, Wed 3 Mar 10:00</li>
       <li><a href="https://www.getyourguide.com/en-gb/antigua-guatemala-l1619/antigua-overnight-volcano-acatenango-hiking-adventure-t137984/" target="_blank" rel="noopener">Acatenango tour (GetYourGuide)</a></li>
@@ -502,7 +489,7 @@ span.st{cursor:default}
   <div class="card">
     <h2>Check closer to the time</h2>
     <ul>
-      <li>Option B: book the 19:30 ADO from Cancún airport when it goes on sale (about 30 days before)</li>
+      <li>Book the 19:30 ADO from Cancún airport when it goes on sale (about 30 days before)</li>
       <li>Valladolid → Bacalar bus time</li>
       <li>Caye Caulker → Flores shuttle times</li>
       <li>Flores → Guatemala City flight times for a Sunday</li>
@@ -526,7 +513,7 @@ const PLACES = [
     blurb:"Your first night with Option A.",
     days:[["Day 1","Sat 27 Feb"],["Day 2","Sun 28 Feb"]],
     ev:[
-      [0,"06:00","16:55","Flight from Gatwick","flight","Leaves 10:55 UK time, lands 16:55","","£190 for 2 + 33,000 Avios","11h"],
+      [0,"06:00","16:55","Flight from Gatwick","flight","BA, direct · leaves 10:55 UK time, lands 16:55","","£1,000 for 2","11h"],
       [0,"17:00","18:00","Immigration + bags","other","Have your digital FMM form ready","","Free"],
       [0,"18:15","18:45","ADO bus to downtown","bus","Airport → ADO Centro","","£15 for 2"],
       [1,"09:00","10:45","ADO bus to Valladolid","bus","","","£27 for 2","2h45"],
@@ -542,7 +529,7 @@ const PLACES = [
     blurb:"Colonial town between two great Maya sites.",
     days:[["Arrive","Sat 27 Feb","","B"],["Day 1","Sun 28 Feb"],["Day 2","Mon 1 Mar"],["Day 3","Tue 2 Mar"]],
     ev:[
-      [0,"06:00","16:55","Flight from Gatwick","flight","10:55 UK time – 16:55 Cancún time","","£190 for 2 + 33,000 Avios","11h"],
+      [0,"06:00","16:55","Flight from Gatwick","flight","BA, direct · 10:55 UK time – 16:55 Cancún time","","£1,000 for 2","11h"],
       [0,"17:00","19:15","Free time at the airport","food","","","£20 for 2","2h 15"],
       [0,"19:30","20:55","ADO bus direct from the airport","bus","Backups at 20:30 and 21:30","","MXN 900 (£36) for 2","2h25"],
       [1,"09:00","10:45","Bus from Cancún","bus","","a","£27 for 2","2h45"],
@@ -708,7 +695,6 @@ const durOf = e => e[8] || fmtDur(toMin(e[2]) - toMin(e[1]));
 const gbp = n => { const v = Math.round(n * 100) / 100; return "£" + v.toLocaleString("en-GB", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
 const shortPrice = p => {
   if (!p) return "";
-  if (/Avios/.test(p)) return "£190 + Avios";
   const eq = p.match(/= £([\d.,]+) for 2/); if (eq) return "£" + eq[1];
   const just = p.match(/^£([\d.,]+) for 2$/); if (just) return "£" + just[1];
   if (/^Free – /.test(p)) return "Free–" + (p.match(/\(£([^)]+)\)/) || ["",""])[1].replace(/^/,"£");
@@ -749,7 +735,8 @@ document.addEventListener("click", ev => {
   document.querySelector(`[data-st="${CSS.escape(k)}"]`)?.focus();
 }, true);
 
-let OPT = store.get("firstNight", "A"); if (OPT !== "A" && OPT !== "B") OPT = "A";
+// The sample is fixed on Option B (straight from Cancún airport to Valladolid); the A/B choice is not shown
+const OPT = "B";
 const pick = v => (v && typeof v === "object" && !Array.isArray(v)) ? v[OPT] : v;
 const inOpt = e => !e[6] || e[6].toUpperCase() === OPT;
 const visDays = (p, opt = OPT) => p.days.map((d, i) => i).filter(i => !p.days[i][3] || p.days[i][3] === opt);
@@ -812,7 +799,7 @@ function fillOptionCosts(){
   if (ea) ea.innerHTML = `<b>£${a}</b> ${a > b ? "£" + d + " more" : a < b ? "£" + d + " less" : ""}`;
   if (eb) eb.innerHTML = `<b>£${b}</b> ${b < a ? "£" + d + " less" : b > a ? "£" + d + " more" : ""}`;
 }
-const FLIGHTS = 1180, EXTRAS = 75.5, BUDGET = 3313;
+const FLIGHTS = 1990, EXTRAS = 128, BUDGET = 4500;
 // How much is already paid: items marked "Booked + paid"
 const priceNum = str => { if (!str) return 0; const m = str.match(/= £([\d.,]+) for 2/) || str.match(/\(£([\d.,]+)\) for 2/) || str.match(/£([\d.,]+)/); return m ? parseFloat(m[1].replace(/,/g, "")) : 0; };
 const isPaid = k => stOf(k) === "paid";
@@ -831,10 +818,9 @@ function renderSummary(){
   vis.forEach(p => p.ev.forEach(e => { const k = evStKey(p, e); if (k) owner[k] = p.name; }));
   const rows = vis.map((p, i) => ({ i, name: p.title || p.name, sub: `${costOf(p).hotel[2]} · ${tierOf(p)} hotel · ${placed(p).filter(x => !x.a.meal).length} activities`, v: placeSum(p), pd: paidOf(p, owner) }));
   const total = FLIGHTS + EXTRAS + rows.reduce((a, r) => a + r.v, 0);
-  const fPaid = (isPaid("flight1") ? 190 : 0) + (isPaid("flight2") ? 990 : 0);
+  const fPaid = (isPaid("flight1") ? 1000 : 0) + (isPaid("flight2") ? 990 : 0);
   const paidTotal = fPaid + rows.reduce((a, r) => a + r.pd, 0);
   document.getElementById("sum-paid").textContent = gbp(paidTotal);
-  document.getElementById("sum-opt").textContent = "Option " + OPT;
   fillItinerary();
   document.getElementById("sum-total").textContent = gbp(total);
   document.getElementById("sum-pp").textContent = `About ${gbp(Math.round(total / 2))} each.`;
@@ -842,9 +828,9 @@ function renderSummary(){
   bel.className = "budget " + (diff > 0 ? "over" : "under");
   bel.innerHTML = `Budget <b class="mono">${gbp(BUDGET)}</b> · <b class="mono">${gbp(Math.abs(diff))}</b> ${diff > 0 ? "over" : "under"}`;
   document.getElementById("sum-rows").innerHTML =
-    `<tr><th>Flights<small>Flight 1: LGW to CUN · £190 · 33,000 Avios · £779 saved</small><small>Flight 2: GUA to LHR via ATL · £990</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
+    `<tr><th>Flights<small>Flight 1: LGW to CUN · BA direct · £1,000</small><small>Flight 2: GUA to LHR via ATL · £990</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
     rows.map(r => `<tr class="place-row" data-go="p${r.i}"><th><span class="num">${String(r.i + 1).padStart(2, "0")}</span><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="mono">${gbp(r.v)}</td></tr>`).join("") +
-    `<tr><th>Fees and extras<small><span title="US travel authorisation, needed for the Atlanta connection on the way home. One traveller already had one." style="text-decoration:underline dotted;cursor:help">ESTA x1 - £30</span></small><small><span title="Quintana Roo state tourist tax, paid online per person before leaving Mexico (covers Cancún and Bacalar). About MXN 290 (£11.50) each. Pay only on visitax.gob.mx and keep the QR receipt to show at the airport or border." style="text-decoration:underline dotted;cursor:help">Visitax x2 - £23</span></small><small><span title="Belize £7 + Latin America 15 days £15.50 (covers Mexico and Guatemala)" style="text-decoration:underline dotted;cursor:help">eSIMs x1 - £22.50</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
+    `<tr><th>Fees and extras<small><span title="US travel authorisation, needed for the Atlanta connection on the way home. US$40 (£30) each." style="text-decoration:underline dotted;cursor:help">ESTA x2 - £60</span></small><small><span title="Quintana Roo state tourist tax, paid online per person before leaving Mexico (covers Cancún and Bacalar). About MXN 290 (£11.50) each. Pay only on visitax.gob.mx and keep the QR receipt to show at the airport or border." style="text-decoration:underline dotted;cursor:help">Visitax x2 - £23</span></small><small><span title="Each: Belize £7 + Latin America 15 days £15.50 (covers Mexico and Guatemala)" style="text-decoration:underline dotted;cursor:help">eSIMs x2 - £45</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
     `<tr class="tot"><th>Total for 2</th><td class="mono">${gbp(total)}</td></tr>`;
   document.querySelectorAll("#sum-rows .place-row").forEach(tr => tr.onclick = () => document.getElementById(tr.dataset.go)?.scrollIntoView({ behavior: "smooth" }));
 }
@@ -1247,10 +1233,6 @@ function fillHighlights(){
   el.innerHTML = HIGHLIGHTS.map(([name, place, x]) => `<figure class="hl"><svg viewBox="${x} 0 330 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${widen(SCENES[place])}</svg><figcaption>${esc(name)}</figcaption></figure>`).join("");
 }
 fillHighlights(); render(); renderSummary(); fillOptionCosts(); fillStatic();
-document.querySelectorAll(".opt-card").forEach(b => b.addEventListener("click", () => {
-  OPT = b.dataset.opt; store.set("firstNight", OPT);
-  render(); fit(); renderSummary(); fillOptionCosts();
-}));
 function fit(){
   let changed = false;
   root.querySelectorAll(".place").forEach(sec => {
@@ -1297,7 +1279,6 @@ addEventListener("keydown", e => {
     STATUS = d.status && typeof d.status === "object" ? { ...d.status } : {};
     HOTEL = d.hotels && typeof d.hotels === "object" ? { ...d.hotels } : {};
     MEALP = d.mealPrices && typeof d.mealPrices === "object" ? JSON.parse(JSON.stringify(d.mealPrices)) : {};
-    if (d.firstNight === "A" || d.firstNight === "B") OPT = d.firstNight;
     localSet("plan_v2", PLAN); localSet("status", STATUS); localSet("hotels", HOTEL); localSet("mealPrices", MEALP); localSet("firstNight", OPT);
     if (!drag) { refresh(); fillStatic(); }
   };
