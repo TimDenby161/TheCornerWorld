@@ -728,7 +728,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     }
     // What the pointer is over on the map, and what it is over in the list
     if (hover && hover.type === "country") {
-      c.beginPath(); for (const s of feats) if (s.f.country === hover.country && visible(s)) trace(c, s);
+      c.beginPath(); for (const s of feats) if (sameCountry(s, hover.country.id) && visible(s)) trace(c, s);
       c.fillStyle = theme.hoverFill; c.fill(); c.strokeStyle = theme.hoverLine; c.lineWidth = 1.4; c.stroke();
     }
     if (lit && lit.type === "country") {
@@ -758,12 +758,52 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       c.globalAlpha = 1;
       hits.push({ x: q[0], y: q[1], r: close ? 9 : 4.5, target: { type: "country", country: d.country } });
     }
+    drawPins(c);
+  }
+
+  // The cities of the country on show: a pin each, named where the names don't collide. The list comes in
+  // order of importance, so the bigger names win; the chosen city and the one the pointer is over always do.
+  let pins = [], pinOn = null;
+  function drawPins(c) {
+    if (!pins.length) return;
+    const shown = [];
+    for (const p of pins) { const q = spot(p, 12); if (q) shown.push([p, q]); }
+    const first = (p) => (p.id === pinOn ? 2 : hover?.type === "city" && hover.city === p ? 1 : 0);
+    shown.sort((a, b) => first(b[0]) - first(a[0]));
+    c.font = `600 11px ${FONT}`; c.textAlign = "left"; c.textBaseline = "middle";
+    const placed = [];
+    for (const [p, q] of shown) {
+      const big = first(p) > 0, r = big ? 5.5 : 4;
+      placed.push([q[0] - r, q[1] - r, q[0] + r, q[1] + r]);
+    }
+    const names = [];
+    for (const [p, q] of shown) {
+      const big = first(p) > 0;
+      p.w ??= c.measureText(p.name).width;
+      const box = [q[0] + 7, q[1] - 8, q[0] + 11 + p.w, q[1] + 8];
+      if (!big && placed.some((o) => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])) continue;
+      placed.push(box); names.push([p, q]);
+    }
+    for (const [p, q] of [...shown].reverse()) {
+      const big = first(p) > 0;
+      c.beginPath(); c.arc(q[0], q[1], big ? 5.5 : 4, 0, 7);
+      c.fillStyle = theme.ink; c.fill();
+      c.strokeStyle = theme.paper; c.lineWidth = 2; c.stroke();
+      // The chosen city wears a ring
+      if (p.id === pinOn) { c.beginPath(); c.arc(q[0], q[1], 10, 0, 7); c.strokeStyle = theme.ink; c.lineWidth = 2; c.stroke(); }
+      hits.push({ x: q[0], y: q[1], r: 11, target: { type: "city", city: p } });
+    }
+    c.lineJoin = "round";
+    for (const [p, q] of names) {
+      c.strokeStyle = theme.paper; c.lineWidth = 3; c.strokeText(p.name, q[0] + 9, q[1]);
+      c.fillStyle = theme.ink; c.fillText(p.name, q[0] + 9, q[1]);
+    }
   }
 
   // ---------- the pointer ----------
 
   // What is at this point of the canvas: a small country's dot, or failing that the country
-  function pick(x, y) {
+  function find(x, y) {
     if (morph > 0 && morph < 1) return null;
     for (let i = hits.length - 1; i >= 0; i--) { const hit = hits[i]; if ((hit.x - x) ** 2 + (hit.y - y) ** 2 <= hit.r ** 2) return hit.target; }
     if (morph <= 0 && Math.hypot(x - geom.cx, y - geom.cy) >= scalePx) return null;
@@ -773,8 +813,10 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     for (const s of feats) if (s.f.country && dot(s.v, at) >= Math.cos(s.r) && d3.geoContains(s.lod[level], g)) return { type: "country", country: s.f.country };
     return null;
   }
+  // The page can stand a whole country in for one of its states (`on.target`)
+  function pick(x, y) { const t = find(x, y); return t && on.target ? on.target(t) : t; }
 
-  const same = (a, b) => a === b || Boolean(a && b && a.type === b.type && a.country === b.country);
+  const same = (a, b) => a === b || Boolean(a && b && a.type === b.type && a.country === b.country && a.city === b.city);
   function setHover(target, x, y) {
     if (!same(target, hover)) { hover = target; invalidate(false); }
     over.classList.toggle("can-click", Boolean(target));
@@ -891,6 +933,12 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     light(target) {
       if (target === lit || (target && lit && target.type === lit.type && target.id === lit.id)) return;
       lit = target; invalidate(false);
+    },
+    // The cities to pin, [{ id, name, lng, lat }] in order of importance, and the id of the chosen one
+    pins(list, chosen = null) {
+      pins = list || []; pinOn = chosen;
+      for (const p of pins) p.v ??= vec(p.lng, p.lat);
+      invalidate(false);
     },
     get k() { return mode === "flat" ? flat.k : view.k; },
     home() { return mode === "flat" ? flyTo({ lng: 0, lat: 0, k: 1 }) : flyTo({ lng: view.lng, lat: 18, k: 1 }); },

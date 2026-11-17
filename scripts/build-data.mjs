@@ -26,6 +26,7 @@ const extras = [
   },
   // Parts of a country, which take the country's other facts. A "group" is shown with the country's name and can be
   // searched for. The codes are made up, except for the Azores, Madeira, Sardinia, Sicily and Corsica.
+  { cca3: "MY-PM", ccn3: "MY-PM", name: { common: "Peninsular Malaysia" }, capital: ["Kuala Lumpur"], latlng: [4.2, 102], area: 132265, within: "MYS" },
   { cca3: "MY-EM", ccn3: "MY-EM", name: { common: "Malaysian Borneo" }, capital: [], latlng: [3.2, 114.6], area: 198447, within: "MYS" },
   { cca3: "ES-MLL", ccn3: "ES-MLL", name: { common: "Mallorca" }, capital: ["Palma"], latlng: [39.6, 2.95], area: 3640, within: "ESP", group: "Balearic Islands" },
   { cca3: "ES-IBZ", ccn3: "ES-IBZ", name: { common: "Ibiza" }, capital: ["Ibiza Town"], latlng: [38.98, 1.43], area: 572, within: "ESP", group: "Balearic Islands" },
@@ -92,7 +93,8 @@ const splits = [
   ["554", "TKL", [-173, -10, -171, -8]], // New Zealand: Tokelau
   ["Indian Ocean Ter.", "CXR", [105.4, -10.7, 105.9, -10.3]], // Christmas Island
   ["Indian Ocean Ter.", "CCK", [96.6, -12.4, 97.1, -11.6]], // Cocos (Keeling) Islands
-  ["458", "MY-EM", [108, 0, 120, 8]], // Malaysia: its part of Borneo
+  ["458", "MY-EM", [108, 0, 120, 8]], // Malaysia: its part of Borneo, and the peninsula
+  ["458", "MY-PM", [98, 0.5, 106, 7.5]],
   ["724", "ES-MLL", [2.2, 39.2, 3.6, 40]], // Spain: Mallorca and Ibiza
   ["724", "ES-IBZ", [1.1, 38.8, 1.7, 39.15]],
   ["724", "ES-TEN", [-16.95, 27.95, -16.1, 28.6]], // Spain: the Canary Islands, one by one
@@ -124,9 +126,12 @@ for (const [parentKey, cca3, ...boxes] of splits) {
   geometries.push(shape);
   if (!(place.area > 0)) place.area = Math.round(geoArea(feature(world, shape)) * 6371 ** 2); // one record has no area
 }
-// A shape split up entirely is replaced by its parts, and so is its country record
-const replaced = new Set(geometries.filter((g) => g.type === "MultiPolygon" && !g.arcs.length).map(featureKey));
-for (const key of replaced) geometries.splice(geometries.findIndex((g) => featureKey(g) === key), 1);
+// A shape split up entirely is replaced by its parts, and so is its country record, unless the parts are the
+// country's own (Malaysia: the peninsula and Borneo), when the country keeps its entry as Australia does
+const emptied = geometries.filter((g) => g.type === "MultiPolygon" && !g.arcs.length).map(featureKey);
+for (const key of emptied) geometries.splice(geometries.findIndex((g) => featureKey(g) === key), 1);
+const ownParts = new Set(extras.filter((x) => x.within).map((x) => all.find((c) => c.cca3 === x.within)?.ccn3));
+const replaced = new Set(emptied.filter((key) => !ownParts.has(key)));
 
 // Countries listed state by state. The country keeps its entry and its guide, but on the map its states are
 // the shapes to pick. The outlines are in scripts/states/ (see fetch-states.mjs). Each state is named here with

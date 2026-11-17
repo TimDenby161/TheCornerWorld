@@ -24,7 +24,7 @@ const written = JSON.parse(readFileSync(new URL("weather-points.json", import.me
 const CITIES = {
   "US-AK": ["Anchorage", 61.22, -149.9], "CA-ON": ["Toronto", 43.65, -79.38], "CA-QC": ["Montréal", 45.5, -73.57],
   "CA-NT": ["Yellowknife", 62.45, -114.37], "CA-NU": ["Iqaluit", 63.75, -68.52], "CA-BC": ["Vancouver", 49.28, -123.12],
-  "AU-WA": ["Perth", -31.95, 115.86], "AU-QLD": ["Brisbane", -27.47, 153.03], "AU-NT": ["Darwin", -12.46, 130.84],
+  "AU-WA": ["Perth", -31.95, 115.86], "AU-QLD": ["Brisbane", -27.47, 153.03], "AU-NT": ["Darwin", -12.46, 130.84], "MY-PM": ["Kuala Lumpur", 3.14, 101.69],
   GRL: ["Nuuk", 64.18, -51.72], MNG: ["Ulaanbaatar", 47.92, 106.92], SAU: ["Riyadh", 24.71, 46.68], IRN: ["Isfahan", 32.65, 51.67],
   DZA: ["Algiers", 36.75, 3.06], LBY: ["Tripoli", 32.89, 13.19], ETH: ["Addis Ababa", 9.03, 38.74], COD: ["Kinshasa", -4.32, 15.31],
   AGO: ["Luanda", -8.84, 13.23], SDN: ["Khartoum", 15.5, 32.56], TCD: ["N'Djamena", 12.13, 15.06], NER: ["Niamey", 13.51, 2.11],

@@ -3,6 +3,7 @@
 // Data: data/world.json (map shapes), data/countries.json (basic facts, both built by
 // scripts/build-data.mjs) and data/site.json (settings).
 // Top 3 things to do in each country: data/activities.json (hand-written).
+// The main cities for visitors in each country, each with its top 3: data/cities.json (hand-written).
 // The weather month by month: data/weather.json (built by scripts/build-weather.mjs).
 // Scores out of 10 for each country: data/ratings.json (hand-written, or with npm run rate).
 (function () {
@@ -27,6 +28,9 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const phone = matchMedia("(max-width: 820px)");
 
 let countries = [], byId = new Map(), ratings = { categories: [], scores: {} }, activities = {}, weather = {}, site = { partners: [] };
+// Cities by country id: [{ id, name, lat, lng, todo, country }], in order of importance, and every city by id
+let cities = {};
+const cityById = new Map();
 
 // A country's scores: { parts: [food, activities, budget, family, safety], likes: [beaches, history, wildlife,
 // hiking, relax], overall } with overall the average of six numbers, to one decimal place: the five parts
@@ -68,7 +72,7 @@ function scoreBadge(score, colour) {
   return badge;
 }
 let globe = null;
-const state = { info: "todo", selected: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
+const state = { info: "todo", selected: null, city: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -119,8 +123,8 @@ const DISCLOSURE = "Some links earn The Corner World a commission if you book, a
 
 // The partners in site.json as links for a country, with the {gaps} in their addresses filled in. There are
 // no dates or travellers to give them.
-function partnerLinks(country) {
-  const fill = { place: country.name, country: country.name, checkin: "", checkout: "", travellers: "" };
+function partnerLinks(country, place = country.name) {
+  const fill = { place, country: country.name, checkin: "", checkout: "", travellers: "" };
   return (site.partners || []).map((p) => ({
     label: p.label,
     url: String(p.url || "").replace(/\{(\w+)\}/g, (gap, key) => (key in fill ? encodeURIComponent(fill[key]) : gap)),
@@ -144,10 +148,13 @@ function disclose(box, before) {
 // Where to point the map to take in a country: the middle of its largest landmass and the angle across it
 // (in radians), so far-off territories don't pull the view out to the whole world.
 // A country is framed to fill about 80% of the free map: its outline's circle is padded by a tenth, so near 1 (the circle overstates most shapes)
+// Malaysia is two halves with the sea between, so its size alone frames only one of them
+const FRAMES = { MYS: { lng: 109.6, lat: 3.6, r: 0.16, fill: 1 } };
 function frameOf(country) {
   if (country.frame) return country.frame;
+  if (FRAMES[country.id]) return (country.frame = FRAMES[country.id]);
   // A country drawn mostly as its states is framed by its size, as is one too small for a shape
-  const spread = country.parts.reduce((sum, part) => sum + part.area, 0) > country.area / 2;
+  const spread = drawnAsStates(country);
   const bySize = { lng: country.lng, lat: country.lat, r: clamp(Math.sqrt(country.area / Math.PI) / 6371 * 1.8, 0.004, 1.3), fill: 1 };
   if (!country.features.length || spread) return (country.frame = bySize);
   const polygons = country.features.flatMap((f) => f.geometry.type === "MultiPolygon"
@@ -160,6 +167,15 @@ function frameOf(country) {
   const middle = d3.geoCentroid(main);
   const r = Math.max(...main.coordinates[0].map((point) => d3.geoDistance(middle, point)));
   return (country.frame = { lng: middle[0], lat: middle[1], r: Math.max(r * 1.1, 0.004), fill: 1 });
+}
+
+// A country drawn mostly as its states (Australia, the USA, Canada...): a click on one of its states opens the
+// country first, and only once inside it does a click open the state
+const drawnAsStates = (c) => Boolean(c) && c.parts.reduce((sum, part) => sum + part.area, 0) > c.area / 2;
+const inside = (whole) => state.selected === whole.id || byId.get(state.selected)?.within === whole.id;
+function wholeFirst(target) {
+  const whole = target?.type === "country" && byId.get(target.country.within);
+  return whole && drawnAsStates(whole) && !inside(whole) ? { type: "country", country: whole } : target;
 }
 
 function buildMap(world) {
@@ -191,7 +207,11 @@ function buildMap(world) {
   globe = createGlobe({
     wrap: stage, base: $("#map-base"), over: $("#map-over"), topology: world, object: "countries", features, dots, labels: [...names.values()], reducedMotion,
     on: {
-      pick(target) { if (target?.type === "country") select(target.country.id); },
+      target: wholeFirst,
+      pick(target) {
+        if (target?.type === "city") selectCity(target.city.id);
+        else if (target?.type === "country") select(target.country.id);
+      },
       hover: showTip,
       interact: hideHint,
     },
@@ -213,14 +233,14 @@ function buildMap(world) {
 // The card that follows the pointer over the map: the country, its score, and what a click will do
 let tipKey = "";
 function showTip(target, x, y) {
-  const key = target ? `c${target.country.id}` : "";
+  const key = !target ? "" : target.type === "city" ? `t${target.city.id}` : `c${target.country.id}`;
   if (key !== tipKey) {
     tipKey = key;
     for (const el of panel.querySelectorAll(".lit")) el.classList.remove("lit");
     if (!target) { tip.hidden = true; return; }
-    tip.replaceChildren(...tipLines(target));
+    tip.replaceChildren(...(target.type === "city" ? cityTipLines(target.city) : tipLines(target)));
     tip.hidden = false;
-    panel.querySelector(`[data-id="${target.country.id}"]`)?.classList.add("lit");
+    panel.querySelector(target.type === "city" ? `[data-city="${target.city.id}"]` : `[data-id="${target.country.id}"]`)?.classList.add("lit");
   }
   if (!target) return;
   const box = stage.getBoundingClientRect(), right = phone.matches ? box.width : sheet.getBoundingClientRect().left - box.left;
@@ -239,6 +259,15 @@ function tipLines(target) {
     scoreOf(c) && h("p", { class: "tip-score" }, scoreBadge(scoreOf(c), scoreScale()(scoreOf(c).overall)), " out of 10"),
     h("p", { class: "tip-go", text: "See the scores" }),
   ].filter(Boolean);
+}
+
+function cityTipLines(city) {
+  const c = city.country;
+  return [
+    h("p", { class: "tip-title" }, h("span", { class: "flag", text: c.flag, "aria-hidden": "true" }), city.name),
+    h("p", { class: "tip-sub", text: c.name }),
+    h("p", { class: "tip-go", text: "See the top 3 things to do" }),
+  ];
 }
 
 let hinted = false;
@@ -281,6 +310,43 @@ function paint() {
     selected: (f) => Boolean(f.country) && either(f.country, picked),
     dot: (d) => fill(d.country),
   });
+  // The cities of the country on show (or of the country a state on show is part of)
+  const c = byId.get(state.selected);
+  globe.pins(c ? cities[c.within] || cities[c.id] || [] : [], state.city);
+}
+
+// ---------- cities ----------
+
+const slug = (name) => name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// The cities to list for a country or state: all of a country's, or those inside a state's outline
+function citiesIn(c) {
+  if (!c.within) return cities[c.id] || [];
+  return (cities[c.within] || []).filter((city) => c.features.some((f) => d3.geoContains(f, [city.lng, city.lat])));
+}
+
+// Opens a city: the map moves in on it, and the panel shows its top 3. The country stays selected
+// under it, so going back returns to the country (or to the state the city was opened from).
+function selectCity(id) {
+  const city = cityById.get(id);
+  if (!city) return;
+  const on = byId.get(state.selected);
+  if (!on || (on.id !== city.country.id && on.within !== city.country.id)) {
+    if (!state.selected) state.scroll = panel.scrollTop;
+    state.selected = city.country.id;
+  }
+  state.city = id;
+  hideHint();
+  globe.flyTo({ lng: city.lng, lat: city.lat, r: 0.08 });
+  history.replaceState(null, "", `#c=${state.selected}&city=${id}`);
+  paint();
+  render();
+  if (phone.matches && snap !== "half") setSnap("half");
+}
+
+// A row of buttons, one for each city, that open them
+function cityTags(list) {
+  return h("p", { class: "tags" }, list.map((city) => h("button", { type: "button", class: "tag", "data-city": city.id, text: city.name, onclick: () => selectCity(city.id) })));
 }
 
 // Pointing at a destination in a list lights it up on the map at once. If the pointer rests there, the map
@@ -326,7 +392,7 @@ async function surprise() {
   const label = $("#surprise-text"), said = label.textContent, button = $("#surprise");
   button.classList.add("rolling");
   const roll = setInterval(() => { const c = byId.get(pool[Math.floor(Math.random() * pool.length)]); label.textContent = `${c.flag} ${c.name}`; }, 95);
-  if (state.selected) { state.selected = null; paint(); render(); }
+  if (state.selected) { state.selected = state.city = null; paint(); render(); }
   const landed = await globe.flyTo(frameOf(byId.get(id)), { spins: 1 });
   clearInterval(roll);
   spinning = false;
@@ -399,6 +465,7 @@ function sheetDrag() {
 function select(id, opts = {}) {
   if (!state.selected) state.scroll = panel.scrollTop;
   state.selected = id;
+  state.city = null;
   hideHint();
   if (!opts.arrived) globe.flyTo(frameOf(byId.get(id)));
   history.replaceState(null, "", `#c=${id}`);
@@ -407,8 +474,17 @@ function select(id, opts = {}) {
   if (phone.matches && snap !== "half") setSnap("half");
 }
 
+// Back from a state goes to its country; back from a country goes to them all
+function goBack() {
+  if (state.city) return select(state.selected);
+  const whole = byId.get(byId.get(state.selected)?.within);
+  if (whole && drawnAsStates(whole)) select(whole.id);
+  else clearSelection();
+}
+
 function clearSelection() {
   state.selected = null;
+  state.city = null;
   history.replaceState(null, "", location.pathname);
   globe.light(null);
   if (globe.k > 2.4) globe.home();
@@ -419,7 +495,8 @@ function clearSelection() {
 
 function render() {
   tipKey = ""; tip.hidden = true;
-  if (state.selected) renderDestination();
+  if (state.city) renderCity();
+  else if (state.selected) renderDestination();
   else renderDiscover();
   panel.scrollTop = 0;
   panel.classList.remove("swap"); void panel.offsetWidth; panel.classList.add("swap");
@@ -580,7 +657,7 @@ function renderDestination() {
   ].filter(([, value]) => value);
 
   const kids = [
-    h("button", { type: "button", class: "back", onclick: clearSelection }, icon("back"), "All countries"),
+    h("button", { type: "button", class: "back", onclick: goBack }, icon("back"), whole && drawnAsStates(whole) ? whole.name : "All countries"),
     h("div", { class: "dest-head" },
       h("span", { class: "flag big", text: c.flag, "aria-hidden": "true" }),
       h("div", null,
@@ -610,6 +687,9 @@ function renderDestination() {
 
     if (!score && !top?.length) body.push(h("p", { class: "empty", text: `There's nothing on ${c.name} yet.` }));
 
+    const here = citiesIn(c);
+    if (here.length) body.push(h("h2", { class: "section", text: "Cities" }), cityTags(here));
+
     if (c.parts.length) body.push(
       h("h2", { class: "section", text: "Explore by area" }),
       h("p", { class: "tags" }, c.parts.map((part) => h("button", { type: "button", class: "tag", text: part.name, onclick: () => select(part.id),
@@ -633,12 +713,39 @@ function renderDestination() {
   disclose(panel, panel.querySelector(".credits"));
 }
 
+// A city: its top 3 things to do, and the country's other cities to go on to
+function renderCity() {
+  const city = cityById.get(state.city), c = city.country, on = byId.get(state.selected);
+  const others = (cities[c.id] || []).filter((x) => x !== city);
+  const body = [
+    h("h2", { class: "section", text: "Top 3 things to do" }),
+    h("ol", { class: "top3" }, city.todo.slice(0, 3).map((t) => h("li", { text: t }))),
+  ];
+  if (others.length) body.push(h("h2", { class: "section", text: `More cities in ${c.name}` }), cityTags(others));
+  const booking = bookRow(partnerLinks(c, city.name));
+  if (booking) body.push(h("h2", { class: "section", text: "Book it" }), booking);
+  panel.replaceChildren(
+    h("button", { type: "button", class: "back", onclick: goBack }, icon("back"), on.name),
+    h("div", { class: "dest-head" },
+      h("span", { class: "flag big", text: c.flag, "aria-hidden": "true" }),
+      h("div", null,
+        h("h1", null, city.name),
+        h("p", { class: "muted", text: on.id === c.id ? c.name : `${on.name}, ${c.name}` }))),
+    ...body,
+    credits());
+  disclose(panel, panel.querySelector(".credits"));
+}
+
 // ---------- start ----------
 
 // Opens the country the address asks for, if any (#c=JPN). True if it did.
 function openFromHash() {
   const params = new URLSearchParams(location.hash.slice(1));
-  if (byId.has(params.get("c"))) { select(params.get("c")); return true; }
+  if (byId.has(params.get("c"))) {
+    select(params.get("c"));
+    if (cityById.has(params.get("city"))) selectCity(params.get("city"));
+    return true;
+  }
   render();
   return false;
 }
@@ -649,9 +756,9 @@ function shortcuts() {
     const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName);
     if (e.key === "/" && !typing) {
       e.preventDefault();
-      if (state.selected) { state.selected = null; paint(); render(); }
+      if (state.selected) { state.selected = state.city = null; paint(); render(); }
       $("#search")?.focus();
-    } else if (e.key === "Escape" && !typing && state.selected) clearSelection();
+    } else if (e.key === "Escape" && !typing && state.selected) goBack();
   });
 }
 
@@ -659,8 +766,8 @@ async function start() {
   const load = (name) => fetch(`data/${name}.json`).then((r) => { if (!r.ok) throw new Error(`${name}: ${r.status}`); return r.json(); });
   let world;
   try {
-    [world, countries, site, activities, weather, ratings] = await Promise.all([load("world"), load("countries"), load("site"),
-      load("activities").catch(() => ({})), load("weather").catch(() => ({})), load("ratings").catch(() => ratings)]);
+    [world, countries, site, activities, cities, weather, ratings] = await Promise.all([load("world"), load("countries"), load("site"),
+      load("activities").catch(() => ({})), load("cities").catch(() => ({})), load("weather").catch(() => ({})), load("ratings").catch(() => ratings)]);
   } catch (err) {
     console.error(err);
     panel.replaceChildren(h("p", { class: "empty", text: "The map data didn't load. Check your connection and reload the page." }));
@@ -669,6 +776,10 @@ async function start() {
   }
   for (const c of countries) { c.features = []; c.parts = []; byId.set(c.id, c); }
   for (const c of countries) byId.get(c.within)?.parts.push(c); // a country's states
+  for (const [id, list] of Object.entries(cities)) {
+    if (!byId.has(id)) { delete cities[id]; continue; }
+    for (const city of list) { city.id = `${id.toLowerCase()}-${slug(city.name)}`; city.country = byId.get(id); cityById.set(city.id, city); }
+  }
   buildMap(world);
   paint();
   sheetDrag();

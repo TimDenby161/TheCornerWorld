@@ -1,0 +1,841 @@
+{
+"CHN": [
+  {"name":"Beijing","lat":39.9,"lng":116.4,"todo":["Walk the Great Wall at Mutianyu","Explore the Forbidden City and Tiananmen Square","Eat Peking duck and wander the hutongs"]},
+  {"name":"Shanghai","lat":31.23,"lng":121.47,"todo":["Stroll the Bund at night facing Pudong's skyline","See the Yu Garden and the old town","Ride up the Shanghai Tower"]},
+  {"name":"Xi'an","lat":34.34,"lng":108.94,"todo":["See the Terracotta Army","Cycle the top of the Ming city wall","Eat your way down the Muslim Quarter"]},
+  {"name":"Chengdu","lat":30.57,"lng":104.07,"todo":["See giant pandas at the Chengdu Research Base","Eat Sichuan hotpot","Make a day trip to the Leshan Giant Buddha"]},
+  {"name":"Chongqing","lat":29.56,"lng":106.55,"todo":["Watch Hongyadong light up over the river","Ride the Yangtze River cable car","Cruise the Three Gorges"]},
+  {"name":"Guilin","lat":25.27,"lng":110.29,"todo":["Cruise the Li River to Yangshuo","Cycle the karst country around Yangshuo","Walk the Longji rice terraces"]},
+  {"name":"Hangzhou","lat":30.27,"lng":120.16,"todo":["Cycle round West Lake","Drink Longjing tea in the plantations","See Lingyin Temple's carved grottoes"]},
+  {"name":"Suzhou","lat":31.3,"lng":120.59,"todo":["Wander the Humble Administrator's Garden","Take a boat through the canals of Pingjiang Road","Visit the water town of Tongli"]},
+  {"name":"Zhangjiajie","lat":29.12,"lng":110.48,"todo":["Hike among the sandstone pillars of the national park","Walk the glass bridge over the Grand Canyon","Ride the Tianmen Mountain cable car"]},
+  {"name":"Lijiang","lat":26.87,"lng":100.23,"todo":["Get lost in the old town's canals","See Jade Dragon Snow Mountain","Hike Tiger Leaping Gorge"]},
+  {"name":"Kunming","lat":25.04,"lng":102.71,"todo":["Walk the Stone Forest","Watch black-headed gulls at Green Lake in winter","Ride the Western Hills"]},
+  {"name":"Dali","lat":25.6,"lng":100.27,"todo":["Cycle round Erhai Lake","See the Three Pagodas","Walk the walled old town"]},
+  {"name":"Guangzhou","lat":23.13,"lng":113.26,"todo":["Eat dim sum for breakfast","Ride up the Canton Tower","Walk Shamian Island's colonial streets"]},
+  {"name":"Lhasa","lat":29.65,"lng":91.17,"todo":["Tour the Potala Palace","Walk the kora round the Jokhang Temple","Watch monks debate at Sera Monastery"]},
+  {"name":"Harbin","lat":45.8,"lng":126.53,"todo":["See the Ice and Snow Festival in January","Walk Central Street's Russian buildings","Visit the Siberian Tiger Park"]},
+  {"name":"Huangshan","lat":29.71,"lng":118.34,"todo":["Climb Huangshan for sunrise above the clouds","See the Hui villages of Hongcun and Xidi","Stay a night on the mountain"]},
+  {"name":"Qingdao","lat":36.07,"lng":120.38,"todo":["Drink Tsingtao at the brewery museum","Walk the German-era old town","Hike Mount Lao by the sea"]},
+  {"name":"Xiamen","lat":24.48,"lng":118.09,"todo":["Walk car-free Gulangyu island","See Nanputuo Temple","Visit the round Hakka tulou earth houses"]},
+  {"name":"Sanya","lat":18.25,"lng":109.51,"todo":["Lie on Yalong Bay's beaches","Dive or snorkel off Wuzhizhou Island","Climb to the Nanshan Guanyin statue"]},
+  {"name":"Pingyao","lat":37.2,"lng":112.18,"todo":["Walk the walls of the old town","See the first banks of China at Rishengchang","Sleep in a courtyard house"]},
+  {"name":"Luoyang","lat":34.62,"lng":112.45,"todo":["See the Longmen Grottoes","Visit the White Horse Temple","Make a trip to Shaolin Temple"]},
+  {"name":"Datong","lat":40.08,"lng":113.3,"todo":["See the Yungang Grottoes","Visit the Hanging Temple on its cliff","Walk the rebuilt city walls"]},
+  {"name":"Dunhuang","lat":40.14,"lng":94.66,"todo":["See the cave paintings of Mogao","Ride a camel up the Singing Sand Dunes","Visit Crescent Lake in the desert"]},
+  {"name":"Kashgar","lat":39.47,"lng":75.99,"todo":["Wander the old town","Visit the Sunday livestock market","Drive the Karakoram Highway to Karakul Lake"]}
+],
+"HKG": [
+  {"name":"Hong Kong Island","lat":22.28,"lng":114.16,"todo":["Ride the Peak Tram to Victoria Peak","Cross the harbour on the Star Ferry","Hike the Dragon's Back to Shek O"]},
+  {"name":"Kowloon","lat":22.32,"lng":114.17,"todo":["Shop the Temple Street night market","Watch the Symphony of Lights from Tsim Sha Tsui","Eat dim sum in Mong Kok"]},
+  {"name":"Lantau","lat":22.25,"lng":113.91,"todo":["See the Big Buddha at Ngong Ping","Ride the glass-floored Ngong Ping cable car","Visit the stilt-house village of Tai O"]}
+],
+"JPN": [
+  {"name":"Tokyo","lat":35.68,"lng":139.69,"todo":["Cross the Shibuya scramble and see Shinjuku by night","Visit Senso-ji in Asakusa","Eat at the Tsukiji outer market"]},
+  {"name":"Kyoto","lat":35.01,"lng":135.77,"todo":["Walk the red gates of Fushimi Inari","Wander Gion and the Higashiyama lanes","See the Arashiyama bamboo grove"]},
+  {"name":"Osaka","lat":34.69,"lng":135.5,"todo":["Eat street food in Dotonbori","See Osaka Castle","Spend a day at Universal Studios"]},
+  {"name":"Nara","lat":34.69,"lng":135.8,"todo":["Meet the deer of Nara Park","See the Great Buddha at Todai-ji","Walk the lantern paths of Kasuga Taisha"]},
+  {"name":"Hiroshima","lat":34.39,"lng":132.46,"todo":["Visit the Peace Memorial Park and museum","Take the ferry to Miyajima's floating torii","Eat Hiroshima-style okonomiyaki"]},
+  {"name":"Hakone","lat":35.23,"lng":139.11,"todo":["See Mount Fuji across Lake Ashi","Soak in an onsen at a ryokan","Ride the ropeway over Owakudani"]},
+  {"name":"Kanazawa","lat":36.56,"lng":136.66,"todo":["Walk Kenroku-en garden","Wander the geisha district of Higashi Chaya","See the 21st Century Museum"]},
+  {"name":"Takayama","lat":36.15,"lng":137.25,"todo":["Walk the old merchant streets","Visit the thatched village of Shirakawa-go","Eat Hida beef"]},
+  {"name":"Nikko","lat":36.75,"lng":139.6,"todo":["See the gilded Toshogu Shrine","Walk to Kegon Falls","Hike round Lake Chuzenji"]},
+  {"name":"Sapporo","lat":43.06,"lng":141.35,"todo":["See the Snow Festival in February","Ski the powder at Niseko","Eat miso ramen in Ramen Alley"]},
+  {"name":"Fukuoka","lat":33.59,"lng":130.4,"todo":["Eat tonkotsu ramen at the yatai stalls","Visit Dazaifu Tenmangu","Walk Ohori Park"]},
+  {"name":"Okinawa","lat":26.21,"lng":127.68,"todo":["Snorkel the Kerama Islands","See the Churaumi Aquarium","Walk Shuri Castle"]}
+],
+"KOR": [
+  {"name":"Seoul","lat":37.57,"lng":126.98,"todo":["Tour Gyeongbokgung Palace in a hanbok","Wander Bukchon Hanok Village","Eat at Gwangjang Market"]},
+  {"name":"Busan","lat":35.18,"lng":129.08,"todo":["Walk the painted Gamcheon Culture Village","See Haedong Yonggungsa temple by the sea","Eat at Jagalchi fish market"]},
+  {"name":"Gyeongju","lat":35.86,"lng":129.22,"todo":["See Bulguksa Temple and Seokguram Grotto","Walk the royal tombs of Daereungwon","See Donggung Palace lit up at night"]},
+  {"name":"Jeju","lat":33.5,"lng":126.53,"todo":["Climb Hallasan","Watch sunrise from Seongsan Ilchulbong","Walk the lava tube of Manjanggul"]}
+],
+"TWN": [
+  {"name":"Taipei","lat":25.03,"lng":121.57,"todo":["Ride up Taipei 101","Eat at Shilin night market","See the National Palace Museum"]},
+  {"name":"Jiufen","lat":25.11,"lng":121.84,"todo":["Walk the lantern-lit old street","Drink tea above the sea","Release a sky lantern at Shifen"]},
+  {"name":"Taroko","lat":24.16,"lng":121.62,"todo":["Hike the marble cliffs of Taroko Gorge","Walk the Shakadang Trail","Drive the Central Cross-Island Highway"]},
+  {"name":"Tainan","lat":22.99,"lng":120.2,"todo":["Eat your way through the old capital","See Anping Fort","Visit Chihkan Tower"]},
+  {"name":"Sun Moon Lake","lat":23.86,"lng":120.92,"todo":["Cycle round the lake","Ride the ropeway","Visit Wenwu Temple"]}
+],
+"MNG": [
+  {"name":"Ulaanbaatar","lat":47.92,"lng":106.92,"todo":["See Gandan Monastery","Visit the Chinggis Khaan statue complex","Watch a throat-singing show"]},
+  {"name":"Terelj","lat":47.98,"lng":107.46,"todo":["Sleep in a ger in Gorkhi-Terelj National Park","Ride horses through the valley","Climb to Turtle Rock"]},
+  {"name":"Kharkhorin","lat":47.2,"lng":102.83,"todo":["See Erdene Zuu Monastery","Visit the ruins of the old Mongol capital","Ride into the Orkhon Valley"]},
+  {"name":"Gobi Desert","lat":43.57,"lng":104.43,"todo":["Climb the Khongoryn Els dunes","See the Flaming Cliffs of Bayanzag","Walk the ice of Yolyn Am gorge"]}
+],
+"VNM": [
+  {"name":"Hanoi","lat":21.03,"lng":105.85,"todo":["Wander the Old Quarter","Eat bun cha and pho on the street","See the Temple of Literature"]},
+  {"name":"Ha Long Bay","lat":20.91,"lng":107.18,"todo":["Sleep on a junk in the bay","Kayak through the limestone karsts","Explore Sung Sot cave"]},
+  {"name":"Ninh Binh","lat":20.25,"lng":105.97,"todo":["Row through the caves of Trang An","Climb Hang Mua for the view","Cycle round Tam Coc"]},
+  {"name":"Sa Pa","lat":22.34,"lng":103.84,"todo":["Trek the rice terraces to hill-tribe villages","Ride up Fansipan","Visit the Bac Ha market"]},
+  {"name":"Hue","lat":16.46,"lng":107.59,"todo":["Explore the Imperial City","See the royal tombs by the Perfume River","Ride the Hai Van Pass to Hoi An"]},
+  {"name":"Hoi An","lat":15.88,"lng":108.33,"todo":["Walk the lantern-lit old town","Have clothes made by a tailor","Cycle to An Bang beach"]},
+  {"name":"Da Nang","lat":16.05,"lng":108.2,"todo":["Walk the Golden Bridge at Ba Na Hills","See the Marble Mountains","Swim at My Khe beach"]},
+  {"name":"Ho Chi Minh City","lat":10.78,"lng":106.7,"todo":["See the War Remnants Museum","Crawl through the Cu Chi tunnels","Eat at Ben Thanh market"]},
+  {"name":"Mekong Delta","lat":10.03,"lng":105.78,"todo":["Boat to the Cai Rang floating market","Cycle the orchards and canals","Stay in a homestay"]},
+  {"name":"Phu Quoc","lat":10.23,"lng":103.96,"todo":["Lie on Sao Beach","Snorkel the An Thoi islands","Ride the long sea cable car"]}
+],
+"THA": [
+  {"name":"Bangkok","lat":13.76,"lng":100.5,"todo":["See the Grand Palace and Wat Pho","Ride a longtail boat on the khlongs","Eat street food in Chinatown"]},
+  {"name":"Chiang Mai","lat":18.79,"lng":98.99,"todo":["Visit Doi Suthep temple","Spend a day at an ethical elephant sanctuary","Shop the Sunday walking street"]},
+  {"name":"Chiang Rai","lat":19.91,"lng":99.84,"todo":["See the White Temple","Visit the Blue Temple","Go to the Golden Triangle"]},
+  {"name":"Pai","lat":19.36,"lng":98.44,"todo":["Watch sunset at Pai Canyon","Swim in the hot springs","Ride the mountain roads by scooter"]},
+  {"name":"Ayutthaya","lat":14.35,"lng":100.57,"todo":["Cycle the temple ruins","See the Buddha head in the tree roots at Wat Mahathat","Take a boat round the island"]},
+  {"name":"Phuket","lat":7.88,"lng":98.39,"todo":["Sail to Phang Nga Bay","Walk Phuket Old Town","Lie on Kata beach"]},
+  {"name":"Krabi","lat":8.09,"lng":98.91,"todo":["Climb or swim at Railay","Island-hop to the Hong Islands","Climb the Tiger Cave Temple"]},
+  {"name":"Koh Phi Phi","lat":7.74,"lng":98.78,"todo":["Boat to Maya Bay","Snorkel with blacktip reef sharks","Climb to the viewpoint"]},
+  {"name":"Koh Samui","lat":9.51,"lng":100.01,"todo":["Kayak Ang Thong Marine Park","See Big Buddha","Go to the Full Moon Party on Koh Phangan"]},
+  {"name":"Koh Tao","lat":10.1,"lng":99.84,"todo":["Learn to dive","Snorkel off Koh Nang Yuan","Watch sunset at Sairee Beach"]},
+  {"name":"Kanchanaburi","lat":14.02,"lng":99.53,"todo":["Walk the Bridge on the River Kwai","Swim in the tiers of Erawan Falls","Ride the Death Railway"]}
+],
+"KHM": [
+  {"name":"Siem Reap","lat":13.36,"lng":103.86,"todo":["See sunrise over Angkor Wat","Explore Ta Prohm and the Bayon","Boat to the floating villages of Tonle Sap"]},
+  {"name":"Phnom Penh","lat":11.56,"lng":104.93,"todo":["Visit the Royal Palace","Learn the history at Tuol Sleng and the Killing Fields","Eat at the riverside"]},
+  {"name":"Kampot","lat":10.61,"lng":104.18,"todo":["Kayak the river","Tour a pepper farm","Ride up Bokor Mountain"]},
+  {"name":"Koh Rong","lat":10.71,"lng":103.24,"todo":["Swim with glowing plankton","Lie on Long Set beach","Snorkel the reefs"]}
+],
+"LAO": [
+  {"name":"Luang Prabang","lat":19.89,"lng":102.13,"todo":["Watch the monks' alms round at dawn","Swim at Kuang Si Falls","Climb Mount Phousi for sunset"]},
+  {"name":"Vang Vieng","lat":18.92,"lng":102.45,"todo":["Kayak or tube the Nam Song","Swim the Blue Lagoons","Balloon over the karsts"]},
+  {"name":"Vientiane","lat":17.97,"lng":102.63,"todo":["See Pha That Luang","Climb the Patuxai","Visit Buddha Park"]},
+  {"name":"4000 Islands","lat":14.12,"lng":105.86,"todo":["Cycle Don Det and Don Khon","See Khone Phapheng Falls","Look for Irrawaddy dolphins"]}
+],
+"MYS": [
+  {"name":"Kuala Lumpur","lat":3.14,"lng":101.69,"todo":["Walk the Petronas Towers skybridge","Climb to the Batu Caves","Eat at Jalan Alor"]},
+  {"name":"Penang","lat":5.41,"lng":100.33,"todo":["Hunt the street art of George Town","Eat at the hawker stalls","Ride the funicular up Penang Hill"]},
+  {"name":"Malacca","lat":2.19,"lng":102.25,"todo":["Walk Jonker Street","See the Dutch Square","Take the river cruise"]},
+  {"name":"Cameron Highlands","lat":4.47,"lng":101.38,"todo":["Tour the BOH tea plantations","Hike the Mossy Forest","Pick strawberries"]},
+  {"name":"Langkawi","lat":6.35,"lng":99.8,"todo":["Walk the Sky Bridge","Kayak the mangroves","Lie on Pantai Cenang"]},
+  {"name":"Kota Kinabalu","lat":5.98,"lng":116.07,"todo":["Climb Mount Kinabalu","Snorkel the islands of Tunku Abdul Rahman Park","Watch sunset at the night market"]},
+  {"name":"Sandakan","lat":5.84,"lng":118.12,"todo":["See orangutans at Sepilok","Cruise the Kinabatangan River","Visit the turtle islands"]},
+  {"name":"Kuching","lat":1.55,"lng":110.34,"todo":["See orangutans at Semenggoh","Hike Bako National Park","Walk the waterfront"]}
+],
+"IDN": [
+  {"name":"Ubud","lat":-8.51,"lng":115.26,"todo":["Walk the Tegallalang rice terraces","See the Sacred Monkey Forest","Watch a Kecak fire dance"]},
+  {"name":"Seminyak","lat":-8.69,"lng":115.17,"todo":["Watch sunset at the beach clubs","Surf at Canggu","See Tanah Lot temple at sunset"]},
+  {"name":"Uluwatu","lat":-8.83,"lng":115.09,"todo":["See the cliff temple and its Kecak dance","Surf the reef breaks","Swim at Padang Padang"]},
+  {"name":"Nusa Penida","lat":-8.73,"lng":115.54,"todo":["See Kelingking Beach","Snorkel with manta rays","Swim at Crystal Bay"]},
+  {"name":"Gili Islands","lat":-8.35,"lng":116.04,"todo":["Snorkel with turtles","Cycle round car-free Gili Trawangan","Dive the reefs"]},
+  {"name":"Lombok","lat":-8.58,"lng":116.12,"todo":["Climb Mount Rinjani","Surf Kuta Lombok","See Sendang Gile waterfall"]},
+  {"name":"Yogyakarta","lat":-7.8,"lng":110.36,"todo":["Watch sunrise at Borobudur","See the Prambanan temples","Visit the Kraton palace"]},
+  {"name":"Mount Bromo","lat":-7.94,"lng":112.95,"todo":["Watch sunrise over the crater","Cross the sea of sand","See the blue fire at Ijen"]},
+  {"name":"Jakarta","lat":-6.21,"lng":106.85,"todo":["Walk the old Dutch town of Kota Tua","See the National Monument","Visit Istiqlal Mosque"]},
+  {"name":"Labuan Bajo","lat":-8.49,"lng":119.89,"todo":["See Komodo dragons","Walk Padar Island","Snorkel Pink Beach"]},
+  {"name":"Raja Ampat","lat":-0.23,"lng":130.52,"todo":["Dive the richest reefs on earth","Climb Piaynemo for the view","Stay in a homestay over the water"]}
+],
+"PHL": [
+  {"name":"Manila","lat":14.6,"lng":120.98,"todo":["Walk the walls of Intramuros","Ride a jeepney","Eat in Binondo"]},
+  {"name":"El Nido","lat":11.18,"lng":119.39,"todo":["Island-hop the Bacuit archipelago","Kayak the Big Lagoon","Watch sunset at Las Cabanas"]},
+  {"name":"Coron","lat":12,"lng":120.2,"todo":["Swim in Kayangan Lake","Dive the Japanese wrecks","Soak in Maquinit hot springs"]},
+  {"name":"Boracay","lat":11.97,"lng":121.92,"todo":["Lie on White Beach","Sail a paraw at sunset","Kitesurf at Bulabog"]},
+  {"name":"Cebu","lat":10.32,"lng":123.89,"todo":["Swim with sardines at Moalboal","Canyon at Kawasan Falls","See Magellan's Cross"]},
+  {"name":"Bohol","lat":9.85,"lng":124.14,"todo":["See the Chocolate Hills","Meet the tarsiers","Cruise the Loboc River"]},
+  {"name":"Siargao","lat":9.86,"lng":126.05,"todo":["Surf Cloud 9","Island-hop to Naked Island","Swim in Sugba Lagoon"]},
+  {"name":"Banaue","lat":16.92,"lng":121.06,"todo":["Walk the Batad rice terraces","See the hanging coffins of Sagada","Hike to Tappiya Falls"]}
+],
+"MMR": [
+  {"name":"Bagan","lat":21.17,"lng":94.86,"todo":["Watch sunrise over the temples by balloon","Cycle the temple plain","See Ananda Temple"]},
+  {"name":"Yangon","lat":16.84,"lng":96.17,"todo":["See Shwedagon Pagoda at dusk","Ride the circle train","Eat mohinga for breakfast"]},
+  {"name":"Mandalay","lat":21.96,"lng":96.08,"todo":["Walk U Bein Bridge at sunset","Climb Mandalay Hill","Visit the old capitals of Inwa and Mingun"]},
+  {"name":"Inle Lake","lat":20.55,"lng":96.92,"todo":["Watch the leg-rowing fishermen","Visit the floating markets","Trek from Kalaw"]}
+],
+"IND": [
+  {"name":"Delhi","lat":28.61,"lng":77.21,"todo":["See the Red Fort and Jama Masjid","Ride a rickshaw through Chandni Chowk","Visit Humayun's Tomb and Qutub Minar"]},
+  {"name":"Agra","lat":27.18,"lng":78.04,"todo":["See the Taj Mahal at sunrise","Explore Agra Fort","Visit Fatehpur Sikri"]},
+  {"name":"Jaipur","lat":26.91,"lng":75.79,"todo":["Explore Amber Fort","See the Hawa Mahal","Shop the bazaars of the Pink City"]},
+  {"name":"Udaipur","lat":24.59,"lng":73.71,"todo":["Boat on Lake Pichola at sunset","Tour the City Palace","Visit Kumbhalgarh Fort"]},
+  {"name":"Jodhpur","lat":26.24,"lng":73.02,"todo":["Explore Mehrangarh Fort","Wander the blue city","See Jaswant Thada"]},
+  {"name":"Jaisalmer","lat":26.92,"lng":70.91,"todo":["Sleep in the Thar desert under the stars","Walk the living fort","See the carved havelis"]},
+  {"name":"Varanasi","lat":25.32,"lng":82.97,"todo":["Watch the Ganga aarti at Dashashwamedh Ghat","Take a dawn boat along the ghats","Visit Sarnath"]},
+  {"name":"Mumbai","lat":19.08,"lng":72.88,"todo":["See the Gateway of India","Walk Marine Drive at sunset","Take the boat to the Elephanta Caves"]},
+  {"name":"Goa","lat":15.5,"lng":73.83,"todo":["Lie on Palolem beach","Walk Old Goa's churches","Tour a spice plantation"]},
+  {"name":"Kochi","lat":9.93,"lng":76.27,"todo":["See the Chinese fishing nets","Watch a Kathakali performance","Walk Fort Kochi and Jew Town"]},
+  {"name":"Alleppey","lat":9.5,"lng":76.34,"todo":["Sleep on a houseboat in the backwaters","Canoe the narrow canals","Lie on Marari beach"]},
+  {"name":"Munnar","lat":10.09,"lng":77.06,"todo":["Walk the tea estates","Look for Nilgiri tahr at Eravikulam","Visit the tea museum"]},
+  {"name":"Rishikesh","lat":30.09,"lng":78.27,"todo":["Do yoga by the Ganges","Raft the river","Watch the aarti at Triveni Ghat"]},
+  {"name":"Amritsar","lat":31.63,"lng":74.87,"todo":["See the Golden Temple","Watch the Wagah border ceremony","Eat at the langar"]},
+  {"name":"Leh","lat":34.15,"lng":77.58,"todo":["Drive to Pangong Lake","See the monasteries of Thiksey and Hemis","Cross the Khardung La"]},
+  {"name":"Darjeeling","lat":27.04,"lng":88.26,"todo":["Watch sunrise over Kanchenjunga from Tiger Hill","Ride the toy train","Tour a tea estate"]},
+  {"name":"Hampi","lat":15.34,"lng":76.46,"todo":["Explore the ruins of Vijayanagara","Watch sunset from Matanga Hill","Cross the river in a coracle"]},
+  {"name":"Kolkata","lat":22.57,"lng":88.36,"todo":["See the Victoria Memorial","Walk Howrah Bridge and the flower market","Eat street food on Park Street"]},
+  {"name":"Mysore","lat":12.3,"lng":76.64,"todo":["See Mysore Palace lit up","Climb Chamundi Hill","Shop Devaraja Market"]},
+  {"name":"Khajuraho","lat":24.85,"lng":79.92,"todo":["See the carved temples","Watch the sound and light show","Visit Panna National Park"]}
+],
+"LKA": [
+  {"name":"Colombo","lat":6.93,"lng":79.86,"todo":["Walk Galle Face Green at sunset","Visit Gangaramaya Temple","Eat at the Pettah market"]},
+  {"name":"Kandy","lat":7.29,"lng":80.63,"todo":["See the Temple of the Tooth","Walk the Royal Botanic Gardens","Watch a Kandyan dance"]},
+  {"name":"Sigiriya","lat":7.96,"lng":80.76,"todo":["Climb Lion Rock","Climb Pidurangala for the view of it","See the Dambulla cave temples"]},
+  {"name":"Ella","lat":6.87,"lng":81.05,"todo":["Ride the train from Kandy","See the Nine Arch Bridge","Climb Little Adam's Peak"]},
+  {"name":"Galle","lat":6.03,"lng":80.22,"todo":["Walk the walls of Galle Fort","Watch the stilt fishermen","Lie on Unawatuna beach"]},
+  {"name":"Mirissa","lat":5.95,"lng":80.46,"todo":["Go whale watching","Climb Coconut Tree Hill","Surf at Weligama"]}
+],
+"NPL": [
+  {"name":"Kathmandu","lat":27.72,"lng":85.32,"todo":["See Durbar Square and the Swayambhunath stupa","Walk round Boudhanath","Visit Bhaktapur"]},
+  {"name":"Pokhara","lat":28.21,"lng":83.99,"todo":["Paddle Phewa Lake","Watch sunrise over the Annapurnas from Sarangkot","Paraglide over the valley"]},
+  {"name":"Chitwan","lat":27.53,"lng":84.35,"todo":["Look for rhinos on a jungle walk","Canoe the Rapti River","Visit a Tharu village"]},
+  {"name":"Lumbini","lat":27.48,"lng":83.28,"todo":["See the birthplace of the Buddha","Walk the monastic zone","Visit the Maya Devi Temple"]}
+],
+"BTN": [
+  {"name":"Paro","lat":27.43,"lng":89.42,"todo":["Hike to Tiger's Nest","Visit Paro Dzong","See the National Museum"]},
+  {"name":"Thimphu","lat":27.47,"lng":89.64,"todo":["See the Buddha Dordenma","Visit Tashichho Dzong","Walk the weekend market"]},
+  {"name":"Punakha","lat":27.59,"lng":89.86,"todo":["See Punakha Dzong at the river fork","Cross the suspension bridge","Hike to Chimi Lhakhang"]}
+],
+"MDV": [
+  {"name":"Malé","lat":4.18,"lng":73.51,"todo":["Walk the fish market","See the Old Friday Mosque","Take a seaplane to a resort atoll"]},
+  {"name":"Maafushi","lat":3.94,"lng":73.49,"todo":["Snorkel with turtles","Take a sandbank trip","Dive with sharks"]},
+  {"name":"Ari Atoll","lat":3.86,"lng":72.83,"todo":["Swim with whale sharks","Dive with manta rays","Stay in an overwater villa"]}
+],
+"ARE": [
+  {"name":"Dubai","lat":25.2,"lng":55.27,"todo":["Ride up the Burj Khalifa","Ride a 4x4 into the desert at sunset","Cross the creek by abra to the souks"]},
+  {"name":"Abu Dhabi","lat":24.45,"lng":54.38,"todo":["See the Sheikh Zayed Grand Mosque","Visit the Louvre Abu Dhabi","Spend a day at Ferrari World"]},
+  {"name":"Ras Al Khaimah","lat":25.79,"lng":55.94,"todo":["Ride the world's longest zipline on Jebel Jais","Drive the mountain road","Lie on the beaches"]}
+],
+"OMN": [
+  {"name":"Muscat","lat":23.59,"lng":58.41,"todo":["See the Sultan Qaboos Grand Mosque","Wander Mutrah Souq","Swim at Bimmah Sinkhole"]},
+  {"name":"Nizwa","lat":22.93,"lng":57.53,"todo":["See Nizwa Fort and its Friday goat market","Hike Jebel Shams and the Grand Canyon","Visit Jabrin Castle"]},
+  {"name":"Wahiba Sands","lat":22.48,"lng":58.73,"todo":["Sleep in a desert camp","Swim in Wadi Bani Khalid","Walk Wadi Shab"]},
+  {"name":"Salalah","lat":17.02,"lng":54.09,"todo":["See the green khareef season","Visit the frankincense sites","Lie on Al Mughsail beach"]}
+],
+"JOR": [
+  {"name":"Petra","lat":30.33,"lng":35.44,"todo":["Walk the Siq to the Treasury","Climb to the Monastery","See Petra by Night"]},
+  {"name":"Wadi Rum","lat":29.58,"lng":35.42,"todo":["Ride a jeep across the desert","Sleep in a Bedouin camp","Climb a red sandstone arch"]},
+  {"name":"Amman","lat":31.95,"lng":35.93,"todo":["Climb to the Citadel","See the Roman Theatre","Visit Jerash"]},
+  {"name":"Dead Sea","lat":31.56,"lng":35.56,"todo":["Float in the Dead Sea","Hike the Wadi Mujib siq","See Mount Nebo"]},
+  {"name":"Aqaba","lat":29.53,"lng":35.01,"todo":["Snorkel the Red Sea reefs","Dive the sunken tank and plane","Ride a glass-bottom boat"]}
+],
+"ISR": [
+  {"name":"Jerusalem","lat":31.77,"lng":35.21,"todo":["Walk the Old City's four quarters","See the Western Wall and Church of the Holy Sepulchre","Visit Yad Vashem"]},
+  {"name":"Tel Aviv","lat":32.09,"lng":34.78,"todo":["Lie on the city beaches","Walk old Jaffa","Eat at Carmel Market"]},
+  {"name":"Haifa","lat":32.79,"lng":34.99,"todo":["See the Baha'i Gardens","Visit Acre's old city","Ride the cable car to Stella Maris"]},
+  {"name":"Masada","lat":31.32,"lng":35.35,"todo":["Climb Masada for sunrise","Float in the Dead Sea","Hike Ein Gedi"]}
+],
+"TUR": [
+  {"name":"Istanbul","lat":41.01,"lng":28.98,"todo":["See Hagia Sophia and the Blue Mosque","Cruise the Bosphorus","Get lost in the Grand Bazaar"]},
+  {"name":"Cappadocia","lat":38.64,"lng":34.83,"todo":["Ride a hot-air balloon at sunrise","Hike the Rose and Red valleys","Explore the underground city of Derinkuyu"]},
+  {"name":"Pamukkale","lat":37.92,"lng":29.12,"todo":["Walk the white travertine terraces","Swim in Cleopatra's Pool","See the ruins of Hierapolis"]},
+  {"name":"Ephesus","lat":37.94,"lng":27.34,"todo":["Walk the ruins of Ephesus","See the Library of Celsus","Visit the village of Şirince"]},
+  {"name":"Antalya","lat":36.9,"lng":30.7,"todo":["Wander the old town of Kaleiçi","See the theatre at Aspendos","Swim at Konyaaltı"]},
+  {"name":"Fethiye","lat":36.62,"lng":29.12,"todo":["Paraglide over Ölüdeniz","Walk part of the Lycian Way","Take a boat trip to the Twelve Islands"]},
+  {"name":"Bodrum","lat":37.03,"lng":27.43,"todo":["See Bodrum Castle","Take a boat to the coves","Watch sunset in the windmills"]},
+  {"name":"Kaş","lat":36.2,"lng":29.64,"todo":["Kayak over the sunken city of Kekova","Dive the clear water","Lie on Kaputaş beach"]},
+  {"name":"Trabzon","lat":41,"lng":39.72,"todo":["See Sumela Monastery on its cliff","Visit Uzungöl lake","See Hagia Sophia of Trabzon"]}
+],
+"IRN": [
+  {"name":"Isfahan","lat":32.65,"lng":51.67,"todo":["See Naqsh-e Jahan Square","Walk the Si-o-se Pol bridge at night","Visit the Vank Cathedral"]},
+  {"name":"Shiraz","lat":29.59,"lng":52.58,"todo":["See the Pink Mosque in the morning light","Visit Persepolis","Walk the Eram Garden"]},
+  {"name":"Yazd","lat":31.9,"lng":54.37,"todo":["Wander the mud-brick old city","See the Fire Temple","Climb the Towers of Silence"]},
+  {"name":"Tehran","lat":35.69,"lng":51.39,"todo":["See the Golestan Palace","Visit the National Jewellery Museum","Walk the Grand Bazaar"]},
+  {"name":"Kashan","lat":33.98,"lng":51.44,"todo":["See the merchant houses","Walk the Fin Garden","Visit the village of Abyaneh"]}
+],
+"UZB": [
+  {"name":"Samarkand","lat":39.65,"lng":66.96,"todo":["See the Registan","Walk the Shah-i-Zinda necropolis","Visit the Gur-e-Amir"]},
+  {"name":"Bukhara","lat":39.77,"lng":64.42,"todo":["Wander the old town round Lyabi-Hauz","See the Kalyan Minaret","Visit the Ark fortress"]},
+  {"name":"Khiva","lat":41.38,"lng":60.36,"todo":["Walk inside the walls of Itchan Kala","Climb the Islam Khoja Minaret","See the desert fortresses of Khorezm"]},
+  {"name":"Tashkent","lat":41.3,"lng":69.24,"todo":["Ride the ornate metro","Shop Chorsu Bazaar","See the Hazrati Imam complex"]}
+],
+"GEO": [
+  {"name":"Tbilisi","lat":41.72,"lng":44.79,"todo":["Soak in the sulphur baths","Ride the cable car to Narikala Fortress","Walk the old town"]},
+  {"name":"Kazbegi","lat":42.66,"lng":44.64,"todo":["Hike to Gergeti Trinity Church","Drive the Georgian Military Road","Walk the Truso Valley"]},
+  {"name":"Kakheti","lat":41.62,"lng":45.92,"todo":["Taste qvevri wine in Sighnaghi","See Alaverdi Monastery","Visit Telavi"]},
+  {"name":"Batumi","lat":41.64,"lng":41.64,"todo":["Walk the seafront boulevard","See the Botanical Garden","Eat Adjarian khachapuri"]},
+  {"name":"Mestia","lat":43.05,"lng":42.73,"todo":["See Svaneti's defensive towers","Hike to Ushguli","Walk to the Chalaadi Glacier"]}
+],
+"ARM": [
+  {"name":"Yerevan","lat":40.18,"lng":44.51,"todo":["Climb the Cascade","See Mount Ararat from the city","Visit the Matenadaran"]},
+  {"name":"Dilijan","lat":40.74,"lng":44.86,"todo":["Walk the forested national park","See Haghartsin Monastery","Visit Lake Sevan"]},
+  {"name":"Goris","lat":39.51,"lng":46.34,"todo":["Ride the Wings of Tatev cable car","See Tatev Monastery","Explore old Khndzoresk"]}
+],
+"AZE": [
+  {"name":"Baku","lat":40.41,"lng":49.87,"todo":["Walk the walled old city","See the Flame Towers at night","Visit the Heydar Aliyev Center"]},
+  {"name":"Sheki","lat":41.19,"lng":47.17,"todo":["See the Palace of the Shaki Khans","Sleep in a caravanserai","Eat piti"]},
+  {"name":"Gobustan","lat":40.1,"lng":49.39,"todo":["See the rock carvings","Visit the mud volcanoes","See the burning hillside of Yanar Dag"]}
+],
+"PAK": [
+  {"name":"Lahore","lat":31.55,"lng":74.34,"todo":["See the Badshahi Mosque and Lahore Fort","Watch the Wagah border ceremony","Eat on Food Street"]},
+  {"name":"Hunza","lat":36.32,"lng":74.65,"todo":["See Baltit and Altit forts","Drive the Karakoram Highway to Attabad Lake","Walk the Passu suspension bridge"]},
+  {"name":"Islamabad","lat":33.68,"lng":73.05,"todo":["See the Faisal Mosque","Walk the Margalla Hills","Visit the Pakistan Monument"]},
+  {"name":"Skardu","lat":35.3,"lng":75.63,"todo":["See the Deosai Plains","Visit Shangrila Resort","Trek towards K2"]}
+],
+"SAU": [
+  {"name":"AlUla","lat":26.61,"lng":37.92,"todo":["See the Nabataean tombs of Hegra","Visit the mirrored Maraya","Walk the old town"]},
+  {"name":"Riyadh","lat":24.71,"lng":46.68,"todo":["See the old Diriyah","Walk the Edge of the World cliffs","Visit Masmak Fortress"]},
+  {"name":"Jeddah","lat":21.49,"lng":39.19,"todo":["Wander the old town of Al-Balad","Walk the Corniche","Dive the Red Sea"]}
+],
+"QAT": [
+  {"name":"Doha","lat":25.29,"lng":51.53,"todo":["See the Museum of Islamic Art","Wander Souq Waqif","Visit the National Museum"]},
+  {"name":"Khor Al Udaid","lat":24.62,"lng":51.35,"todo":["Drive the dunes to the Inland Sea","Camp in the desert","Swim where the sea meets the sand"]}
+],
+"GBR": [
+  {"name":"London","lat":51.51,"lng":-0.13,"todo":["See the Tower of London and Tower Bridge","Spend a day in the British Museum","Walk the South Bank from Westminster to Borough Market"]},
+  {"name":"Edinburgh","lat":55.95,"lng":-3.19,"todo":["Climb Arthur's Seat","Walk the Royal Mile to the castle","See the Fringe in August"]},
+  {"name":"Bath","lat":51.38,"lng":-2.36,"todo":["See the Roman Baths","Soak in the rooftop pool at Thermae Bath Spa","Walk the Royal Crescent"]},
+  {"name":"York","lat":53.96,"lng":-1.08,"todo":["See York Minster","Walk the city walls","Wander the Shambles"]},
+  {"name":"Oxford","lat":51.75,"lng":-1.26,"todo":["Tour the colleges and the Bodleian Library","Punt on the Cherwell","Climb the tower of St Mary's"]},
+  {"name":"Cambridge","lat":52.21,"lng":0.12,"todo":["Punt along the Backs","Hear evensong at King's College Chapel","See the Fitzwilliam Museum"]},
+  {"name":"Liverpool","lat":53.41,"lng":-2.98,"todo":["Walk the Royal Albert Dock","Go to The Beatles Story and the Cavern Club","See a match at Anfield"]},
+  {"name":"Manchester","lat":53.48,"lng":-2.24,"todo":["See a match at Old Trafford or the Etihad","Walk the Northern Quarter","Visit the Science and Industry Museum"]},
+  {"name":"Glasgow","lat":55.86,"lng":-4.25,"todo":["See the Kelvingrove Art Gallery","Visit the Mackintosh buildings","Hear live music in a bar"]},
+  {"name":"Inverness","lat":57.48,"lng":-4.22,"todo":["Look for Nessie on Loch Ness","See Culloden battlefield","Drive the North Coast 500"]},
+  {"name":"Isle of Skye","lat":57.27,"lng":-6.22,"todo":["Walk to the Old Man of Storr","Swim the Fairy Pools","See the Quiraing"]},
+  {"name":"Lake District","lat":54.43,"lng":-2.96,"todo":["Climb Scafell Pike or Helvellyn","Take a boat on Windermere","Visit Beatrix Potter's Hill Top"]},
+  {"name":"Cornwall","lat":50.26,"lng":-5.05,"todo":["See the Minack Theatre","Surf at Newquay","Walk the coast path to Land's End"]},
+  {"name":"Cardiff","lat":51.48,"lng":-3.18,"todo":["Tour Cardiff Castle","Walk Cardiff Bay","Drive to the Brecon Beacons"]},
+  {"name":"Snowdonia","lat":53.07,"lng":-4.08,"todo":["Climb Snowdon or ride its railway","Walk round Conwy's castle and walls","Visit Portmeirion"]},
+  {"name":"Belfast","lat":54.6,"lng":-5.93,"todo":["See Titanic Belfast","Drive the Causeway Coast to the Giant's Causeway","Take a black-cab tour of the murals"]}
+],
+"IRL": [
+  {"name":"Dublin","lat":53.35,"lng":-6.26,"todo":["See the Book of Kells at Trinity College","Tour the Guinness Storehouse","Hear music in a Temple Bar pub"]},
+  {"name":"Galway","lat":53.27,"lng":-9.05,"todo":["Hear trad music in the Latin Quarter","See the Cliffs of Moher","Take the ferry to the Aran Islands"]},
+  {"name":"Killarney","lat":52.06,"lng":-9.51,"todo":["Drive the Ring of Kerry","Cycle the Gap of Dunloe","Visit Muckross House"]},
+  {"name":"Cork","lat":51.9,"lng":-8.47,"todo":["Eat at the English Market","Kiss the Blarney Stone","Visit Cobh, the Titanic's last stop"]},
+  {"name":"Dingle","lat":52.14,"lng":-10.27,"todo":["Drive Slea Head","Go out to the Blasket Islands","Hear music in the pubs"]}
+],
+"FRA": [
+  {"name":"Paris","lat":48.86,"lng":2.35,"todo":["Go up the Eiffel Tower","See the Louvre and the Musée d'Orsay","Walk Montmartre to the Sacré-Cœur"]},
+  {"name":"Nice","lat":43.7,"lng":7.27,"todo":["Walk the Promenade des Anglais","Wander Vieux Nice and its market","Day-trip to Monaco and Èze"]},
+  {"name":"Lyon","lat":45.76,"lng":4.84,"todo":["Eat in a bouchon","Walk the traboules of Vieux Lyon","Climb to Fourvière"]},
+  {"name":"Bordeaux","lat":44.84,"lng":-0.58,"todo":["Taste wine in Saint-Émilion","See the Water Mirror","Visit the Cité du Vin"]},
+  {"name":"Marseille","lat":43.3,"lng":5.37,"todo":["Hike or boat to the Calanques","Climb to Notre-Dame de la Garde","Eat bouillabaisse at the Old Port"]},
+  {"name":"Avignon","lat":43.95,"lng":4.81,"todo":["See the Palais des Papes","Visit the Pont du Gard","See the lavender fields in July"]},
+  {"name":"Strasbourg","lat":48.57,"lng":7.75,"todo":["Walk Petite France","See the cathedral","Go to the Christmas market"]},
+  {"name":"Annecy","lat":45.9,"lng":6.13,"todo":["Walk the canals of the old town","Swim or cycle round the lake","Day-trip to Chamonix and Mont Blanc"]},
+  {"name":"Chamonix","lat":45.92,"lng":6.87,"todo":["Ride up the Aiguille du Midi","See the Mer de Glace","Ski or hike under Mont Blanc"]},
+  {"name":"Mont-Saint-Michel","lat":48.64,"lng":-1.51,"todo":["Walk out to the abbey","Cross the bay at low tide","See the D-Day beaches of Normandy"]},
+  {"name":"Loire Valley","lat":47.41,"lng":1,"todo":["See Chambord and Chenonceau","Cycle between the châteaux","Taste wine in Vouvray"]},
+  {"name":"Carcassonne","lat":43.21,"lng":2.35,"todo":["Walk the medieval walled city","Cruise the Canal du Midi","See the Cathar castles"]},
+  {"name":"Colmar","lat":48.08,"lng":7.36,"todo":["Walk Little Venice","Drive the Alsace wine route","Visit Riquewihr"]},
+  {"name":"Ajaccio","lat":41.92,"lng":8.74,"todo":["Visit Napoleon's birthplace","Hike the Calanques de Piana","Swim at Palombaggia"]}
+],
+"ESP": [
+  {"name":"Barcelona","lat":41.39,"lng":2.17,"todo":["See the Sagrada Família","Walk Park Güell","Wander the Gothic Quarter and La Boqueria"]},
+  {"name":"Madrid","lat":40.42,"lng":-3.7,"todo":["See the Prado","Walk Retiro Park","Eat tapas in La Latina"]},
+  {"name":"Seville","lat":37.39,"lng":-5.98,"todo":["See the Alcázar","Climb the Giralda","Watch flamenco in Triana"]},
+  {"name":"Granada","lat":37.18,"lng":-3.6,"todo":["See the Alhambra","Watch sunset from the Mirador de San Nicolás","Eat free tapas"]},
+  {"name":"Córdoba","lat":37.88,"lng":-4.78,"todo":["See the Mezquita","Walk the Roman bridge","Visit the patios in May"]},
+  {"name":"Valencia","lat":39.47,"lng":-0.38,"todo":["See the City of Arts and Sciences","Eat paella","Cycle the Turia gardens"]},
+  {"name":"Málaga","lat":36.72,"lng":-4.42,"todo":["See the Picasso Museum","Climb to the Alcazaba","Walk the Caminito del Rey"]},
+  {"name":"San Sebastián","lat":43.32,"lng":-1.98,"todo":["Eat pintxos in the old town","Swim at La Concha","Ride the funicular up Monte Igueldo"]},
+  {"name":"Bilbao","lat":43.26,"lng":-2.93,"todo":["See the Guggenheim","Visit San Juan de Gaztelugatxe","Eat pintxos in the Casco Viejo"]},
+  {"name":"Toledo","lat":39.86,"lng":-4.02,"todo":["Walk the old city","See the cathedral","Visit El Greco's works"]},
+  {"name":"Ronda","lat":36.74,"lng":-5.17,"todo":["Cross the Puente Nuevo over the gorge","Visit the white villages","See the old bullring"]},
+  {"name":"Santiago de Compostela","lat":42.88,"lng":-8.54,"todo":["See the cathedral","Walk the end of the Camino","Eat pulpo a la gallega"]},
+  {"name":"Palma","lat":39.57,"lng":2.65,"todo":["See the cathedral","Drive the Serra de Tramuntana","Swim at Caló des Moro"]},
+  {"name":"Ibiza Town","lat":38.91,"lng":1.43,"todo":["Walk Dalt Vila","Watch sunset at Café del Mar","Swim at Cala Comte"]},
+  {"name":"Tenerife","lat":28.29,"lng":-16.63,"todo":["Ride the cable car up Teide","Watch whales off Los Gigantes","Walk the Anaga mountains"]},
+  {"name":"Gran Canaria","lat":27.92,"lng":-15.55,"todo":["Walk the Maspalomas dunes","Hike to Roque Nublo","Wander Vegueta in Las Palmas"]},
+  {"name":"Lanzarote","lat":29.04,"lng":-13.63,"todo":["See Timanfaya's volcanoes","Visit César Manrique's houses","Swim at Papagayo"]}
+],
+"PRT": [
+  {"name":"Lisbon","lat":38.72,"lng":-9.14,"todo":["Ride tram 28 through Alfama","See Belém tower and the monastery","Eat pastéis de nata"]},
+  {"name":"Porto","lat":41.15,"lng":-8.61,"todo":["Taste port in the cellars of Gaia","Walk the Ribeira","Cruise the Douro Valley"]},
+  {"name":"Sintra","lat":38.8,"lng":-9.39,"todo":["See the Pena Palace","Explore the Quinta da Regaleira","Walk to Cabo da Roca"]},
+  {"name":"Lagos","lat":37.1,"lng":-8.67,"todo":["Kayak to the Ponta da Piedade caves","See the Benagil sea cave","Lie on Praia do Camilo"]},
+  {"name":"Évora","lat":38.57,"lng":-7.91,"todo":["See the Roman temple","Visit the Chapel of Bones","Taste Alentejo wine"]},
+  {"name":"Coimbra","lat":40.21,"lng":-8.43,"todo":["See the university's Joanina Library","Hear Coimbra fado","Walk the old town"]},
+  {"name":"Funchal","lat":32.65,"lng":-16.91,"todo":["Ride the cable car and toboggan down","Walk a levada","Watch sunrise on Pico do Arieiro"]},
+  {"name":"Ponta Delgada","lat":37.74,"lng":-25.67,"todo":["See the crater lakes of Sete Cidades","Soak in Furnas hot springs","Go whale watching"]}
+],
+"ITA": [
+  {"name":"Rome","lat":41.9,"lng":12.5,"todo":["See the Colosseum and the Forum","Visit the Vatican and the Sistine Chapel","Throw a coin in the Trevi Fountain"]},
+  {"name":"Florence","lat":43.77,"lng":11.26,"todo":["See the Duomo and climb Brunelleschi's dome","Visit the Uffizi","Watch sunset from Piazzale Michelangelo"]},
+  {"name":"Venice","lat":45.44,"lng":12.32,"todo":["Ride a gondola","See St Mark's Basilica and the Doge's Palace","Visit Burano and Murano"]},
+  {"name":"Milan","lat":45.46,"lng":9.19,"todo":["Climb onto the Duomo roof","See The Last Supper","Day-trip to Lake Como"]},
+  {"name":"Naples","lat":40.85,"lng":14.27,"todo":["Eat pizza where it was invented","Walk Pompeii","Climb Vesuvius"]},
+  {"name":"Amalfi","lat":40.63,"lng":14.6,"todo":["Drive the Amalfi Coast","Walk the Path of the Gods","Wander Positano"]},
+  {"name":"Cinque Terre","lat":44.13,"lng":9.71,"todo":["Hike between the five villages","Swim at Monterosso","Watch sunset at Manarola"]},
+  {"name":"Pisa","lat":43.72,"lng":10.4,"todo":["See the Leaning Tower","Visit Lucca's walls","Walk the Piazza dei Miracoli"]},
+  {"name":"Siena","lat":43.32,"lng":11.33,"todo":["See the Piazza del Campo","Visit the cathedral","Drive the Val d'Orcia"]},
+  {"name":"Bologna","lat":44.49,"lng":11.34,"todo":["Eat tagliatelle al ragù","Climb the Asinelli tower","Walk the porticoes"]},
+  {"name":"Verona","lat":45.44,"lng":10.99,"todo":["See an opera in the Arena","Visit Juliet's balcony","Day-trip to Lake Garda"]},
+  {"name":"Como","lat":45.81,"lng":9.09,"todo":["Take the ferry to Bellagio","Visit Villa del Balbianello","Ride the funicular to Brunate"]},
+  {"name":"Dolomites","lat":46.54,"lng":12.14,"todo":["Hike round Tre Cime di Lavaredo","Ski the Sella Ronda","See Lago di Braies"]},
+  {"name":"Palermo","lat":38.12,"lng":13.36,"todo":["See the Palatine Chapel","Eat street food at Ballarò market","Visit Monreale"]},
+  {"name":"Taormina","lat":37.85,"lng":15.29,"todo":["See the Greek theatre","Climb Etna","Swim at Isola Bella"]},
+  {"name":"Cagliari","lat":39.22,"lng":9.12,"todo":["Walk the Castello district","Swim at Poetto","See the flamingos at Molentargius"]},
+  {"name":"Matera","lat":40.67,"lng":16.6,"todo":["Walk the Sassi cave dwellings","Sleep in a cave hotel","See the rock churches"]},
+  {"name":"Capri","lat":40.55,"lng":14.24,"todo":["Boat into the Blue Grotto","Ride the chairlift up Monte Solaro","See the Faraglioni rocks"]}
+],
+"GRC": [
+  {"name":"Athens","lat":37.98,"lng":23.73,"todo":["See the Acropolis and Parthenon","Visit the Acropolis Museum","Wander Plaka"]},
+  {"name":"Santorini","lat":36.42,"lng":25.43,"todo":["Watch sunset from Oia","Walk from Fira to Oia","Swim at the Red Beach"]},
+  {"name":"Mykonos","lat":37.45,"lng":25.33,"todo":["Walk Little Venice and the windmills","Day-trip to Delos","Lie on Paradise Beach"]},
+  {"name":"Crete","lat":35.34,"lng":25.13,"todo":["See Knossos","Hike the Samaria Gorge","Swim at Balos and Elafonissi"]},
+  {"name":"Rhodes","lat":36.43,"lng":28.22,"todo":["Walk the medieval old town","Visit Lindos and its acropolis","Swim at Anthony Quinn Bay"]},
+  {"name":"Corfu","lat":39.62,"lng":19.92,"todo":["Wander the old town","Swim at Paleokastritsa","See the Achilleion palace"]},
+  {"name":"Meteora","lat":39.71,"lng":21.63,"todo":["Visit the monasteries on the rocks","Watch sunset from the cliffs","Hike the old monk paths"]},
+  {"name":"Thessaloniki","lat":40.64,"lng":22.94,"todo":["See the White Tower","Walk the waterfront","Eat bougatsa"]},
+  {"name":"Delphi","lat":38.48,"lng":22.5,"todo":["See the Temple of Apollo","Visit the museum","Walk to the Castalian Spring"]},
+  {"name":"Naxos","lat":37.1,"lng":25.38,"todo":["See the Portara","Walk the mountain villages","Kitesurf at Mikri Vigla"]},
+  {"name":"Zakynthos","lat":37.78,"lng":20.9,"todo":["See Navagio shipwreck beach","Boat to the Blue Caves","Look for turtles at Laganas"]}
+],
+"DEU": [
+  {"name":"Berlin","lat":52.52,"lng":13.4,"todo":["Walk the East Side Gallery and the Brandenburg Gate","Visit Museum Island","Climb into the Reichstag dome"]},
+  {"name":"Munich","lat":48.14,"lng":11.58,"todo":["Drink in a beer garden or at Oktoberfest","See Marienplatz and the Glockenspiel","Visit Neuschwanstein"]},
+  {"name":"Hamburg","lat":53.55,"lng":9.99,"todo":["Walk the Speicherstadt","Hear a concert at the Elbphilharmonie","Go to the Sunday fish market"]},
+  {"name":"Cologne","lat":50.94,"lng":6.96,"todo":["Climb the cathedral tower","Drink Kölsch in the old town","Go to the Christmas markets"]},
+  {"name":"Dresden","lat":51.05,"lng":13.74,"todo":["See the Frauenkirche","Visit the Zwinger","Hike Saxon Switzerland"]},
+  {"name":"Heidelberg","lat":49.4,"lng":8.67,"todo":["See the castle","Walk the Philosophers' Way","Wander the old town"]},
+  {"name":"Rothenburg ob der Tauber","lat":49.38,"lng":10.18,"todo":["Walk the town walls","Join the night watchman's tour","Drive the Romantic Road"]},
+  {"name":"Füssen","lat":47.57,"lng":10.7,"todo":["See Neuschwanstein Castle","Visit Hohenschwangau","Walk the Marienbrücke"]},
+  {"name":"Nuremberg","lat":49.45,"lng":11.08,"todo":["See the Imperial Castle","Go to the Christkindlesmarkt","Visit the rally grounds documentation centre"]},
+  {"name":"Black Forest","lat":47.99,"lng":7.85,"todo":["Walk Freiburg's old town","See the Triberg waterfalls","Eat Black Forest gateau"]}
+],
+"AUT": [
+  {"name":"Vienna","lat":48.21,"lng":16.37,"todo":["See Schönbrunn Palace","Hear an opera at the State Opera","Eat cake in a coffee house"]},
+  {"name":"Salzburg","lat":47.81,"lng":13.04,"todo":["See Hohensalzburg Fortress","Visit Mozart's birthplace","Take a Sound of Music tour"]},
+  {"name":"Hallstatt","lat":47.56,"lng":13.65,"todo":["Walk the lakeside village","Tour the salt mine","See the Dachstein ice caves"]},
+  {"name":"Innsbruck","lat":47.27,"lng":11.4,"todo":["Ride the Nordkette cable car","See the Golden Roof","Ski in the Tyrol"]}
+],
+"CHE": [
+  {"name":"Zurich","lat":47.38,"lng":8.54,"todo":["Walk the old town and the lake","Swim in a river bath","Ride up the Uetliberg"]},
+  {"name":"Lucerne","lat":47.05,"lng":8.31,"todo":["Walk the Chapel Bridge","Ride up Mount Pilatus","Cruise Lake Lucerne"]},
+  {"name":"Interlaken","lat":46.69,"lng":7.86,"todo":["Ride to the Jungfraujoch","Paraglide over the lakes","Walk Lauterbrunnen's waterfalls"]},
+  {"name":"Zermatt","lat":46.02,"lng":7.75,"todo":["See the Matterhorn","Ride the Gornergrat railway","Ski all year on the glacier"]},
+  {"name":"Geneva","lat":46.2,"lng":6.14,"todo":["See the Jet d'Eau","Visit CERN","Tour the UN"]},
+  {"name":"Montreux","lat":46.43,"lng":6.91,"todo":["See Chillon Castle","Walk the lakeside promenade","Ride the GoldenPass train"]},
+  {"name":"Grindelwald","lat":46.62,"lng":8.04,"todo":["Walk the First Cliff Walk","Hike to Bachalpsee","Ski the Jungfrau region"]},
+  {"name":"St. Moritz","lat":46.5,"lng":9.84,"todo":["Ride the Bernina Express","Ski Corviglia","Ride the Glacier Express"]}
+],
+"NLD": [
+  {"name":"Amsterdam","lat":52.37,"lng":4.9,"todo":["Cruise the canals","See the Rijksmuseum and the Van Gogh Museum","Visit the Anne Frank House"]},
+  {"name":"Rotterdam","lat":51.92,"lng":4.48,"todo":["See the cube houses and the Markthal","Visit the windmills of Kinderdijk","Cross the Erasmus Bridge"]},
+  {"name":"Utrecht","lat":52.09,"lng":5.12,"todo":["Climb the Dom tower","Walk the wharf-side canals","Visit the Rietveld Schröder House"]},
+  {"name":"Lisse","lat":52.26,"lng":4.56,"todo":["See Keukenhof in spring","Cycle the bulb fields","Visit Haarlem"]}
+],
+"BEL": [
+  {"name":"Brussels","lat":50.85,"lng":4.35,"todo":["See the Grand-Place","Eat waffles and frites","Visit the Atomium"]},
+  {"name":"Bruges","lat":51.21,"lng":3.22,"todo":["Take a canal boat","Climb the Belfry","Eat Belgian chocolate"]},
+  {"name":"Ghent","lat":51.05,"lng":3.72,"todo":["See the Ghent Altarpiece","Explore Gravensteen castle","Walk the Graslei"]},
+  {"name":"Antwerp","lat":51.22,"lng":4.4,"todo":["See Rubens' house","Visit the cathedral","Walk the diamond district"]}
+],
+"CZE": [
+  {"name":"Prague","lat":50.08,"lng":14.44,"todo":["Walk the Charles Bridge at dawn","See Prague Castle","Watch the Astronomical Clock"]},
+  {"name":"Český Krumlov","lat":48.81,"lng":14.32,"todo":["See the castle","Raft the Vltava","Wander the old town"]},
+  {"name":"Kutná Hora","lat":49.95,"lng":15.27,"todo":["See the Bone Church","Visit St Barbara's Cathedral","Go down the silver mine"]},
+  {"name":"Brno","lat":49.2,"lng":16.61,"todo":["See Villa Tugendhat","Visit the Capuchin crypt","Taste Moravian wine"]}
+],
+"HUN": [
+  {"name":"Budapest","lat":47.5,"lng":19.04,"todo":["Soak in the Széchenyi Baths","Walk the Castle District and Fisherman's Bastion","Drink in the ruin bars"]},
+  {"name":"Lake Balaton","lat":46.91,"lng":17.89,"todo":["Swim in the lake","Visit the Tihany peninsula","Taste wine on the north shore"]},
+  {"name":"Eger","lat":47.9,"lng":20.38,"todo":["Taste Bull's Blood in the Valley of Beautiful Women","See the castle","Soak in the thermal baths"]}
+],
+"POL": [
+  {"name":"Kraków","lat":50.06,"lng":19.94,"todo":["Walk the Main Market Square","See Wawel Castle","Visit Auschwitz-Birkenau"]},
+  {"name":"Warsaw","lat":52.23,"lng":21.01,"todo":["Walk the rebuilt Old Town","Visit the Warsaw Uprising Museum","See Łazienki Park"]},
+  {"name":"Gdańsk","lat":54.35,"lng":18.65,"todo":["Walk the Long Market","Visit the European Solidarity Centre","See Malbork Castle"]},
+  {"name":"Wrocław","lat":51.11,"lng":17.03,"todo":["Hunt for the dwarves","Walk Ostrów Tumski","See the Market Square"]},
+  {"name":"Zakopane","lat":49.3,"lng":19.95,"todo":["Hike the Tatras","Ride up Kasprowy Wierch","Eat oscypek"]}
+],
+"HRV": [
+  {"name":"Dubrovnik","lat":42.65,"lng":18.09,"todo":["Walk the city walls","Kayak round Lokrum","Ride the cable car up Mount Srđ"]},
+  {"name":"Split","lat":43.51,"lng":16.44,"todo":["Walk Diocletian's Palace","Island-hop to Hvar and Brač","Climb Marjan Hill"]},
+  {"name":"Hvar","lat":43.17,"lng":16.44,"todo":["Climb to the fortress","Boat to the Pakleni Islands","See the lavender fields"]},
+  {"name":"Plitvice","lat":44.88,"lng":15.62,"todo":["Walk the boardwalks over the lakes","See the Great Waterfall","Visit Rastoke"]},
+  {"name":"Zagreb","lat":45.82,"lng":15.98,"todo":["See the Museum of Broken Relationships","Walk the Upper Town","Go to Dolac market"]},
+  {"name":"Zadar","lat":44.12,"lng":15.23,"todo":["Hear the Sea Organ","Watch sunset at the Greeting to the Sun","Visit the Kornati Islands"]},
+  {"name":"Rovinj","lat":45.08,"lng":13.64,"todo":["Wander the old town","Eat truffles in Istria","Swim at Golden Cape"]}
+],
+"SVN": [
+  {"name":"Ljubljana","lat":46.06,"lng":14.51,"todo":["Walk the river and the Triple Bridge","Climb to the castle","Eat at the Open Kitchen market"]},
+  {"name":"Bled","lat":46.37,"lng":14.11,"todo":["Row to the island church","Walk Vintgar Gorge","Eat cream cake"]},
+  {"name":"Bohinj","lat":46.28,"lng":13.89,"todo":["Swim in the lake","Hike to Savica waterfall","Ride up Vogel"]},
+  {"name":"Piran","lat":45.53,"lng":13.57,"todo":["Walk the Venetian old town","Visit the Škocjan Caves","See Predjama Castle"]}
+],
+"MNE": [
+  {"name":"Kotor","lat":42.42,"lng":18.77,"todo":["Climb the fortress walls","Boat to Our Lady of the Rocks","Drive the serpentine road to Lovćen"]},
+  {"name":"Budva","lat":42.29,"lng":18.84,"todo":["See Sveti Stefan","Walk the old town","Swim at Mogren"]},
+  {"name":"Durmitor","lat":43.15,"lng":19.08,"todo":["Raft the Tara River","Hike to the Black Lake","Cross the Đurđevića Tara Bridge"]}
+],
+"ALB": [
+  {"name":"Tirana","lat":41.33,"lng":19.82,"todo":["See Skanderbeg Square","Visit Bunk'Art","Ride the Dajti Express"]},
+  {"name":"Berat","lat":40.71,"lng":19.95,"todo":["Walk the town of a thousand windows","Visit the castle","Taste wine"]},
+  {"name":"Gjirokastër","lat":40.08,"lng":20.14,"todo":["Explore the castle","Walk the old bazaar","Visit the Ottoman houses"]},
+  {"name":"Ksamil","lat":39.77,"lng":20,"todo":["Swim off the islands","See Butrint","Visit the Blue Eye"]}
+],
+"BIH": [
+  {"name":"Sarajevo","lat":43.86,"lng":18.41,"todo":["Walk Baščaršija","Visit the Tunnel of Hope","Eat ćevapi"]},
+  {"name":"Mostar","lat":43.34,"lng":17.81,"todo":["Watch the bridge divers","Visit Kravice waterfalls","See Blagaj Tekke"]}
+],
+"DNK": [
+  {"name":"Copenhagen","lat":55.68,"lng":12.57,"todo":["Walk Nyhavn","Spend a day at Tivoli Gardens","Cycle to Christiania"]},
+  {"name":"Aarhus","lat":56.16,"lng":10.2,"todo":["Walk the rainbow at ARoS","See Den Gamle By","Visit the Moesgaard Museum"]},
+  {"name":"Billund","lat":55.73,"lng":9.11,"todo":["Go to Legoland","Visit the LEGO House","Walk Ribe, the oldest town"]}
+],
+"SWE": [
+  {"name":"Stockholm","lat":59.33,"lng":18.07,"todo":["See the Vasa Museum","Walk Gamla Stan","Take a boat round the archipelago"]},
+  {"name":"Gothenburg","lat":57.71,"lng":11.97,"todo":["Island-hop the archipelago","Visit Liseberg","Eat at the fish market"]},
+  {"name":"Kiruna","lat":67.86,"lng":20.23,"todo":["Sleep at the Icehotel","See the northern lights at Abisko","Go dog sledding"]},
+  {"name":"Malmö","lat":55.6,"lng":13,"todo":["See the Turning Torso","Swim at Ribersborg","Cross the Øresund Bridge"]}
+],
+"NOR": [
+  {"name":"Oslo","lat":59.91,"lng":10.75,"todo":["See the Viking ships and the Fram","Walk the Opera House roof","Visit Vigeland Park"]},
+  {"name":"Bergen","lat":60.39,"lng":5.32,"todo":["Walk Bryggen","Ride the Fløibanen","Eat at the fish market"]},
+  {"name":"Tromsø","lat":69.65,"lng":18.96,"todo":["See the northern lights","Go whale watching in winter","Ride the Fjellheisen"]},
+  {"name":"Lofoten","lat":68.23,"lng":14.56,"todo":["Hike Reinebringen","Stay in a rorbu fisherman's hut","Kayak the fjords"]},
+  {"name":"Geiranger","lat":62.1,"lng":7.21,"todo":["Cruise Geirangerfjord","Drive the Trollstigen","See the Seven Sisters falls"]},
+  {"name":"Stavanger","lat":58.97,"lng":5.73,"todo":["Hike to Pulpit Rock","Climb Kjeragbolten","Walk Old Stavanger"]},
+  {"name":"Flåm","lat":60.86,"lng":7.11,"todo":["Ride the Flåm Railway","Cruise the Nærøyfjord","See the Stegastein viewpoint"]}
+],
+"FIN": [
+  {"name":"Helsinki","lat":60.17,"lng":24.94,"todo":["Visit Suomenlinna","Sweat in a public sauna","See the Rock Church"]},
+  {"name":"Rovaniemi","lat":66.5,"lng":25.73,"todo":["Meet Santa at the Arctic Circle","Go husky sledding","See the northern lights"]},
+  {"name":"Saariselkä","lat":68.42,"lng":27.41,"todo":["Sleep in a glass igloo","Ski Lapland's fells","Ride a reindeer sleigh"]}
+],
+"ISL": [
+  {"name":"Reykjavík","lat":64.15,"lng":-21.94,"todo":["See Hallgrímskirkja","Soak in the Blue Lagoon","Go whale watching"]},
+  {"name":"Golden Circle","lat":64.31,"lng":-20.3,"todo":["See Gullfoss","Watch Strokkur erupt","Walk the rift at Þingvellir"]},
+  {"name":"Vík","lat":63.42,"lng":-19.01,"todo":["Walk Reynisfjara's black sand beach","See Skógafoss and Seljalandsfoss","Walk on a glacier"]},
+  {"name":"Jökulsárlón","lat":64.05,"lng":-16.18,"todo":["See the glacier lagoon","Walk Diamond Beach","Explore an ice cave in winter"]},
+  {"name":"Akureyri","lat":65.68,"lng":-18.09,"todo":["Go whale watching at Húsavík","See Mývatn and its baths","Visit Goðafoss"]}
+],
+"EST": [
+  {"name":"Tallinn","lat":59.44,"lng":24.75,"todo":["Walk the medieval old town","See the view from Toompea","Visit Kadriorg Palace"]},
+  {"name":"Tartu","lat":58.38,"lng":26.72,"todo":["Walk the university town","Visit the Estonian National Museum","See the bogs of Soomaa"]}
+],
+"LVA": [
+  {"name":"Riga","lat":56.95,"lng":24.11,"todo":["See the art nouveau streets","Walk the old town","Shop the central market in old Zeppelin hangars"]},
+  {"name":"Sigulda","lat":57.15,"lng":24.86,"todo":["See Turaida Castle","Ride the bobsleigh track","Walk the Gauja valley"]}
+],
+"LTU": [
+  {"name":"Vilnius","lat":54.69,"lng":25.28,"todo":["Walk the baroque old town","Visit the Republic of Užupis","See Trakai Castle"]},
+  {"name":"Curonian Spit","lat":55.31,"lng":21,"todo":["Walk the great dunes","Visit the Hill of Witches","Swim in the Baltic"]}
+],
+"ROU": [
+  {"name":"Bucharest","lat":44.43,"lng":26.1,"todo":["See the Palace of the Parliament","Walk the old town","Visit the Village Museum"]},
+  {"name":"Brașov","lat":45.66,"lng":25.61,"todo":["Walk the old town","See Bran Castle","Visit Peleș Castle"]},
+  {"name":"Sibiu","lat":45.8,"lng":24.15,"todo":["Walk the squares","Drive the Transfăgărășan","Visit the fortified churches"]},
+  {"name":"Sighișoara","lat":46.22,"lng":24.79,"todo":["Walk the citadel","See Dracula's birthplace","Visit Viscri"]},
+  {"name":"Cluj-Napoca","lat":46.77,"lng":23.59,"todo":["Go down the Salina Turda salt mine","Walk the old town","Visit the botanical garden"]}
+],
+"BGR": [
+  {"name":"Sofia","lat":42.7,"lng":23.32,"todo":["See the Alexander Nevsky Cathedral","Visit Rila Monastery","Climb Vitosha"]},
+  {"name":"Plovdiv","lat":42.14,"lng":24.75,"todo":["See the Roman theatre","Walk the old town","Visit Kapana"]},
+  {"name":"Veliko Tarnovo","lat":43.08,"lng":25.63,"todo":["Explore Tsarevets fortress","Watch the sound and light show","Visit Arbanasi"]},
+  {"name":"Bansko","lat":41.84,"lng":23.49,"todo":["Ski Pirin","Hike to the Seven Rila Lakes","Eat in a mehana"]}
+],
+"MLT": [
+  {"name":"Valletta","lat":35.9,"lng":14.51,"todo":["See St John's Co-Cathedral","Walk the Upper Barrakka Gardens","Visit the Three Cities"]},
+  {"name":"Mdina","lat":35.89,"lng":14.4,"todo":["Walk the silent city","See St Paul's Catacombs","Visit the Dingli Cliffs"]},
+  {"name":"Gozo","lat":36.04,"lng":14.24,"todo":["Swim at the Blue Lagoon on Comino","Dive the Blue Hole","See the Ġgantija temples"]}
+],
+"CYP": [
+  {"name":"Paphos","lat":34.77,"lng":32.42,"todo":["See the mosaics","Visit the Tombs of the Kings","Swim at Aphrodite's Rock"]},
+  {"name":"Ayia Napa","lat":34.99,"lng":34,"todo":["Swim at Nissi Beach","See the sea caves","Visit Cape Greco"]},
+  {"name":"Nicosia","lat":35.17,"lng":33.36,"todo":["Cross the Green Line","Walk the Venetian walls","See the Troodos monasteries"]}
+],
+"USA": [
+  {"name":"New York City","lat":40.71,"lng":-74.01,"todo":["Walk Central Park and the High Line","See the Statue of Liberty and Ellis Island","Watch a Broadway show"]},
+  {"name":"Los Angeles","lat":34.05,"lng":-118.24,"todo":["Walk Venice Beach to Santa Monica Pier","Hike to the Hollywood sign","Tour Universal or Warner Bros. studios"]},
+  {"name":"San Francisco","lat":37.77,"lng":-122.42,"todo":["Walk or cycle the Golden Gate Bridge","Visit Alcatraz","Ride a cable car"]},
+  {"name":"Las Vegas","lat":36.17,"lng":-115.14,"todo":["Walk the Strip at night","Fly over the Grand Canyon","Drive to Red Rock Canyon"]},
+  {"name":"Chicago","lat":41.88,"lng":-87.63,"todo":["Take the architecture boat tour","See The Bean in Millennium Park","Eat deep-dish pizza"]},
+  {"name":"Washington, D.C.","lat":38.91,"lng":-77.04,"todo":["Walk the National Mall","Visit the Smithsonian museums","Tour the Capitol"]},
+  {"name":"Miami","lat":25.76,"lng":-80.19,"todo":["Walk Art Deco South Beach","See the Wynwood Walls","Take an airboat in the Everglades"]},
+  {"name":"Orlando","lat":28.54,"lng":-81.38,"todo":["Spend a day at Walt Disney World","Ride Universal's Harry Potter world","See a launch at Kennedy Space Center"]},
+  {"name":"New Orleans","lat":29.95,"lng":-90.07,"todo":["Hear jazz on Frenchmen Street","Eat beignets at Café du Monde","Tour the swamps"]},
+  {"name":"Boston","lat":42.36,"lng":-71.06,"todo":["Walk the Freedom Trail","See a game at Fenway Park","Visit Harvard"]},
+  {"name":"Seattle","lat":47.61,"lng":-122.33,"todo":["See Pike Place Market","Ride up the Space Needle","Visit Mount Rainier"]},
+  {"name":"Honolulu","lat":21.31,"lng":-157.86,"todo":["Surf Waikiki","Climb Diamond Head","Visit Pearl Harbor"]},
+  {"name":"Maui","lat":20.8,"lng":-156.33,"todo":["Drive the Road to Hāna","Watch sunrise on Haleakalā","Snorkel Molokini"]},
+  {"name":"Grand Canyon","lat":36.06,"lng":-112.14,"todo":["Watch sunset from the South Rim","Hike the Bright Angel Trail","Raft the Colorado River"]},
+  {"name":"Sedona","lat":34.87,"lng":-111.76,"todo":["Hike the red rocks","Drive to Antelope Canyon and Horseshoe Bend","Ride a jeep tour"]},
+  {"name":"Yellowstone","lat":44.43,"lng":-110.59,"todo":["Watch Old Faithful erupt","See Grand Prismatic Spring","Spot bison in the Lamar Valley"]},
+  {"name":"Yosemite","lat":37.75,"lng":-119.59,"todo":["See El Capitan and Half Dome","Hike to Vernal Fall","Walk among the sequoias of Mariposa Grove"]},
+  {"name":"Moab","lat":38.57,"lng":-109.55,"todo":["See Delicate Arch at sunset","Drive Canyonlands","Mountain-bike the slickrock"]},
+  {"name":"Nashville","lat":36.16,"lng":-86.78,"todo":["Hear live music on Broadway","See the Grand Ole Opry","Visit the Country Music Hall of Fame"]},
+  {"name":"San Diego","lat":32.72,"lng":-117.16,"todo":["Visit the San Diego Zoo","Watch sea lions at La Jolla","Walk Balboa Park"]},
+  {"name":"Austin","lat":30.27,"lng":-97.74,"todo":["Hear live music on Sixth Street","Eat Texas barbecue","Watch the bats at Congress Avenue Bridge"]},
+  {"name":"Charleston","lat":32.78,"lng":-79.93,"todo":["Walk the historic district","Tour a plantation","Eat Lowcountry food"]},
+  {"name":"Key West","lat":24.56,"lng":-81.78,"todo":["Drive the Overseas Highway","Watch sunset at Mallory Square","Visit Hemingway's house"]},
+  {"name":"Anchorage","lat":61.22,"lng":-149.9,"todo":["Drive to Denali","Cruise the glaciers of Kenai Fjords","See the Alaska Native Heritage Center"]}
+],
+"CAN": [
+  {"name":"Vancouver","lat":49.28,"lng":-123.12,"todo":["Cycle the Stanley Park seawall","Cross the Capilano Suspension Bridge","Ride the Sea to Sky Highway to Whistler"]},
+  {"name":"Toronto","lat":43.65,"lng":-79.38,"todo":["Ride up the CN Tower","See Niagara Falls","Visit the Toronto Islands"]},
+  {"name":"Montréal","lat":45.5,"lng":-73.57,"todo":["Walk Old Montréal","Eat bagels and smoked meat","Climb Mount Royal"]},
+  {"name":"Québec City","lat":46.81,"lng":-71.21,"todo":["Walk the walls of the old city","See Château Frontenac","Visit Montmorency Falls"]},
+  {"name":"Banff","lat":51.18,"lng":-115.57,"todo":["Paddle Lake Louise and Moraine Lake","Ride the Banff Gondola","Drive the Icefields Parkway"]},
+  {"name":"Jasper","lat":52.87,"lng":-118.08,"todo":["Walk on the Athabasca Glacier","Boat to Spirit Island on Maligne Lake","Stargaze in the dark-sky preserve"]},
+  {"name":"Victoria","lat":48.43,"lng":-123.37,"todo":["See the Butchart Gardens","Go whale watching","Surf at Tofino"]},
+  {"name":"Whistler","lat":50.12,"lng":-122.95,"todo":["Ski Whistler Blackcomb","Ride the Peak 2 Peak Gondola","Mountain-bike the bike park"]},
+  {"name":"Halifax","lat":44.65,"lng":-63.58,"todo":["Walk the waterfront","See Peggy's Cove","Drive the Cabot Trail"]},
+  {"name":"Churchill","lat":58.77,"lng":-94.16,"todo":["See polar bears in autumn","Swim with belugas in summer","See the northern lights"]},
+  {"name":"Ottawa","lat":45.42,"lng":-75.7,"todo":["See Parliament Hill","Skate the Rideau Canal","Visit the museums"]}
+],
+"MEX": [
+  {"name":"Mexico City","lat":19.43,"lng":-99.13,"todo":["See the Zócalo and the Templo Mayor","Visit the Teotihuacán pyramids","Boat the canals of Xochimilco"]},
+  {"name":"Cancún","lat":21.16,"lng":-86.85,"todo":["Lie on the Hotel Zone beaches","Snorkel Isla Mujeres","Swim in the cenotes"]},
+  {"name":"Tulum","lat":20.21,"lng":-87.47,"todo":["See the ruins above the sea","Swim in the Gran Cenote","Visit Sian Ka'an"]},
+  {"name":"Playa del Carmen","lat":20.63,"lng":-87.08,"todo":["Dive Cozumel","Swim at Xcaret","Walk Quinta Avenida"]},
+  {"name":"Mérida","lat":20.97,"lng":-89.62,"todo":["See Chichén Itzá","Visit Uxmal","Swim in the Cuzamá cenotes"]},
+  {"name":"Oaxaca","lat":17.07,"lng":-96.73,"todo":["Eat mole and tlayudas","See Monte Albán","Visit Hierve el Agua"]},
+  {"name":"San Cristóbal de las Casas","lat":16.74,"lng":-92.64,"todo":["Boat through the Sumidero Canyon","Visit the village of Chamula","See Palenque"]},
+  {"name":"Guanajuato","lat":21.02,"lng":-101.26,"todo":["Walk the painted alleys","Join a callejoneada","See San Miguel de Allende"]},
+  {"name":"Puerto Vallarta","lat":20.65,"lng":-105.23,"todo":["Walk the Malecón","Go whale watching in winter","Boat to Yelapa"]},
+  {"name":"Los Cabos","lat":22.89,"lng":-109.92,"todo":["Boat to El Arco","Swim with whale sharks at La Paz","Watch whales in winter"]},
+  {"name":"Guadalajara","lat":20.66,"lng":-103.35,"todo":["Visit Tequila","Hear mariachi in Tlaquepaque","See the Orozco murals"]},
+  {"name":"Bacalar","lat":18.68,"lng":-88.39,"todo":["Paddle the lagoon of seven colours","Swim in the Cenote Azul","See the stromatolites"]}
+],
+"GTM": [
+  {"name":"Antigua","lat":14.56,"lng":-90.73,"todo":["Walk the colonial streets","Climb Acatenango to watch Fuego erupt","Tour a coffee farm"]},
+  {"name":"Lake Atitlán","lat":14.69,"lng":-91.2,"todo":["Boat between the villages","Kayak the lake","Climb Indian Nose for sunrise"]},
+  {"name":"Flores","lat":16.93,"lng":-89.89,"todo":["See Tikal","Walk the island town","Swim at Semuc Champey"]}
+],
+"BLZ": [
+  {"name":"Caye Caulker","lat":17.75,"lng":-88.03,"todo":["Snorkel Hol Chan with sharks and rays","Dive the Great Blue Hole","Go slow"]},
+  {"name":"San Ignacio","lat":17.16,"lng":-89.07,"todo":["Explore the ATM cave","See Xunantunich","Visit Caracol"]},
+  {"name":"Placencia","lat":16.51,"lng":-88.37,"todo":["Snorkel the cayes","Look for jaguars at Cockscomb","Swim with whale sharks in spring"]}
+],
+"CRI": [
+  {"name":"La Fortuna","lat":10.47,"lng":-84.64,"todo":["See Arenal volcano","Soak in the hot springs","Walk the hanging bridges"]},
+  {"name":"Monteverde","lat":10.3,"lng":-84.82,"todo":["Walk the cloud forest","Zipline over the canopy","Take a night walk"]},
+  {"name":"Manuel Antonio","lat":9.39,"lng":-84.14,"todo":["Look for sloths in the national park","Swim at the beaches","Kayak the mangroves"]},
+  {"name":"Tamarindo","lat":10.3,"lng":-85.84,"todo":["Surf the beaches","Watch turtles nest","Visit Rincón de la Vieja"]},
+  {"name":"Puerto Viejo","lat":9.66,"lng":-82.75,"todo":["Cycle the Caribbean coast","Snorkel Cahuita","Visit the sloth sanctuary"]},
+  {"name":"Tortuguero","lat":10.54,"lng":-83.5,"todo":["Watch turtles nest","Canoe the canals","Look for monkeys and caimans"]}
+],
+"PAN": [
+  {"name":"Panama City","lat":8.98,"lng":-79.52,"todo":["See the Panama Canal at Miraflores","Walk Casco Viejo","Visit the Biomuseo"]},
+  {"name":"San Blas","lat":9.57,"lng":-78.82,"todo":["Sail the Guna Yala islands","Snorkel the reefs","Sleep on an island"]},
+  {"name":"Bocas del Toro","lat":9.34,"lng":-82.24,"todo":["Island-hop","See Starfish Beach","Look for dolphins"]},
+  {"name":"Boquete","lat":8.78,"lng":-82.44,"todo":["Tour a coffee farm","Climb Volcán Barú","Walk the hanging bridges"]}
+],
+"CUB": [
+  {"name":"Havana","lat":23.11,"lng":-82.37,"todo":["Walk Old Havana","Ride in a classic car","Watch sunset on the Malecón"]},
+  {"name":"Trinidad","lat":21.8,"lng":-79.98,"todo":["Walk the cobbled streets","Dance salsa at the Casa de la Música","Ride to the Valle de los Ingenios"]},
+  {"name":"Viñales","lat":22.62,"lng":-83.71,"todo":["Ride horses through the tobacco fields","Visit a cigar farm","Explore the caves"]},
+  {"name":"Varadero","lat":23.15,"lng":-81.25,"todo":["Lie on the beach","Snorkel the reefs","Visit Matanzas"]},
+  {"name":"Santiago de Cuba","lat":20.02,"lng":-75.83,"todo":["See the Castillo del Morro","Hear son music","Visit the Moncada Barracks"]}
+],
+"DOM": [
+  {"name":"Punta Cana","lat":18.58,"lng":-68.37,"todo":["Lie on Bávaro beach","Visit Saona Island","Swim in the Hoyo Azul"]},
+  {"name":"Santo Domingo","lat":18.49,"lng":-69.93,"todo":["Walk the Zona Colonial","See the first cathedral of the Americas","Visit Los Tres Ojos"]},
+  {"name":"Samaná","lat":19.21,"lng":-69.34,"todo":["Watch humpbacks in winter","Swim at Playa Rincón","Hike to El Limón waterfall"]}
+],
+"JAM": [
+  {"name":"Montego Bay","lat":18.47,"lng":-77.92,"todo":["Lie on Doctor's Cave beach","Raft the Martha Brae","Swim the Luminous Lagoon"]},
+  {"name":"Ocho Rios","lat":18.41,"lng":-77.1,"todo":["Climb Dunn's River Falls","See the Blue Hole","Visit Bob Marley's birthplace"]},
+  {"name":"Negril","lat":18.27,"lng":-78.35,"todo":["Lie on Seven Mile Beach","Watch cliff divers at Rick's Café","See sunset"]},
+  {"name":"Kingston","lat":18,"lng":-76.79,"todo":["Visit the Bob Marley Museum","Hike the Blue Mountains","See Port Royal"]}
+],
+"COL": [
+  {"name":"Cartagena","lat":10.39,"lng":-75.48,"todo":["Walk the walled city","Boat to the Rosario Islands","Explore Getsemaní"]},
+  {"name":"Medellín","lat":6.24,"lng":-75.58,"todo":["Ride the metrocable","See Comuna 13's street art","Climb El Peñol at Guatapé"]},
+  {"name":"Bogotá","lat":4.71,"lng":-74.07,"todo":["See the Gold Museum","Ride up Monserrate","Visit the Salt Cathedral at Zipaquirá"]},
+  {"name":"Salento","lat":4.64,"lng":-75.57,"todo":["Hike the Cocora Valley's wax palms","Tour a coffee farm","Play tejo"]},
+  {"name":"Santa Marta","lat":11.24,"lng":-74.21,"todo":["Hike Tayrona National Park","Trek to the Lost City","Visit Minca"]}
+],
+"PER": [
+  {"name":"Cusco","lat":-13.53,"lng":-71.97,"todo":["Walk the Plaza de Armas and San Blas","See Sacsayhuamán","Hike Rainbow Mountain"]},
+  {"name":"Machu Picchu","lat":-13.16,"lng":-72.55,"todo":["Walk the Inca Trail","See sunrise over the citadel","Climb Huayna Picchu"]},
+  {"name":"Sacred Valley","lat":-13.33,"lng":-72.08,"todo":["See the terraces of Moray","Walk the salt pans of Maras","Visit Pisac market"]},
+  {"name":"Lima","lat":-12.05,"lng":-77.04,"todo":["Eat ceviche","Walk Miraflores and Barranco","See the historic centre"]},
+  {"name":"Arequipa","lat":-16.41,"lng":-71.54,"todo":["Visit Santa Catalina Monastery","See condors in the Colca Canyon","Walk the white city"]},
+  {"name":"Puno","lat":-15.84,"lng":-70.02,"todo":["Visit the floating Uros Islands","Stay on Amantaní","Cross Lake Titicaca"]},
+  {"name":"Huacachina","lat":-14.09,"lng":-75.76,"todo":["Sandboard the dunes","Fly over the Nazca Lines","Boat to the Ballestas Islands"]}
+],
+"BOL": [
+  {"name":"Uyuni","lat":-20.46,"lng":-66.83,"todo":["Cross the Salar de Uyuni","See the coloured lagoons","Visit the train cemetery"]},
+  {"name":"La Paz","lat":-16.49,"lng":-68.12,"todo":["Ride the cable cars","Cycle Death Road","Visit the Witches' Market"]},
+  {"name":"Copacabana","lat":-16.17,"lng":-69.09,"todo":["Boat to Isla del Sol","Climb Cerro Calvario","See the basilica"]},
+  {"name":"Sucre","lat":-19.04,"lng":-65.26,"todo":["Walk the white city","See dinosaur footprints","Visit Potosí's silver mines"]}
+],
+"ECU": [
+  {"name":"Quito","lat":-0.18,"lng":-78.47,"todo":["Walk the old town","Ride the TelefériQo","Stand on the equator"]},
+  {"name":"Galápagos","lat":-0.74,"lng":-90.31,"todo":["Snorkel with sea lions","See giant tortoises","Cruise the islands"]},
+  {"name":"Baños","lat":-1.4,"lng":-78.42,"todo":["Swing at the Casa del Árbol","Cycle the waterfall route","Soak in the hot springs"]},
+  {"name":"Cuenca","lat":-2.9,"lng":-79,"todo":["Walk the colonial centre","Hike El Cajas","See Panama hats being made"]},
+  {"name":"Otavalo","lat":0.23,"lng":-78.26,"todo":["Shop the market","Hike round Cuicocha","See Cotopaxi"]}
+],
+"CHL": [
+  {"name":"Santiago","lat":-33.45,"lng":-70.67,"todo":["Ride up San Cristóbal Hill","Taste wine in the Maipo Valley","Ski the Andes"]},
+  {"name":"Valparaíso","lat":-33.05,"lng":-71.62,"todo":["Ride the funiculars","See the street art","Visit Neruda's house"]},
+  {"name":"San Pedro de Atacama","lat":-22.91,"lng":-68.2,"todo":["Watch sunset in the Valley of the Moon","See the El Tatio geysers","Stargaze"]},
+  {"name":"Puerto Natales","lat":-51.73,"lng":-72.51,"todo":["Hike the W Trek in Torres del Paine","See the Grey Glacier","Look for pumas"]},
+  {"name":"Puerto Varas","lat":-41.32,"lng":-72.98,"todo":["See Osorno volcano","Visit Chiloé","Raft the Petrohué"]},
+  {"name":"Easter Island","lat":-27.11,"lng":-109.35,"todo":["See the moai of Ahu Tongariki at sunrise","Visit Rano Raraku quarry","Swim at Anakena"]}
+],
+"ARG": [
+  {"name":"Buenos Aires","lat":-34.6,"lng":-58.38,"todo":["Watch tango in San Telmo","Visit Recoleta Cemetery","Eat steak in a parrilla"]},
+  {"name":"Iguazú","lat":-25.6,"lng":-54.57,"todo":["See the Devil's Throat","Boat under the falls","Walk the upper and lower circuits"]},
+  {"name":"El Calafate","lat":-50.34,"lng":-72.27,"todo":["See the Perito Moreno Glacier","Trek on the ice","Cruise to Upsala"]},
+  {"name":"El Chaltén","lat":-49.33,"lng":-72.89,"todo":["Hike to Laguna de los Tres under Fitz Roy","Walk to Laguna Torre","See the Huemul glacier"]},
+  {"name":"Bariloche","lat":-41.13,"lng":-71.31,"todo":["Drive the Seven Lakes Road","Ride up Cerro Campanario","Eat chocolate"]},
+  {"name":"Mendoza","lat":-32.89,"lng":-68.84,"todo":["Taste Malbec","See Aconcagua","Raft the Mendoza River"]},
+  {"name":"Ushuaia","lat":-54.8,"lng":-68.3,"todo":["Cruise the Beagle Channel","Hike Tierra del Fuego","Sail to Antarctica"]},
+  {"name":"Salta","lat":-24.79,"lng":-65.41,"todo":["Drive to Cafayate","See the Quebrada de Humahuaca","Ride the Train to the Clouds"]},
+  {"name":"Puerto Madryn","lat":-42.77,"lng":-65.04,"todo":["Watch whales at Península Valdés","See penguins at Punta Tombo","Dive with sea lions"]}
+],
+"BRA": [
+  {"name":"Rio de Janeiro","lat":-22.91,"lng":-43.17,"todo":["See Christ the Redeemer","Ride the cable car up Sugarloaf","Lie on Copacabana and Ipanema"]},
+  {"name":"Foz do Iguaçu","lat":-25.55,"lng":-54.59,"todo":["See the panorama of the falls","Visit the Bird Park","See the Itaipu dam"]},
+  {"name":"São Paulo","lat":-23.55,"lng":-46.63,"todo":["Walk Avenida Paulista","See Beco do Batman","Eat at the Municipal Market"]},
+  {"name":"Salvador","lat":-12.97,"lng":-38.5,"todo":["Walk Pelourinho","See capoeira","Eat acarajé"]},
+  {"name":"Manaus","lat":-3.12,"lng":-60.02,"todo":["Stay in a jungle lodge","See the Meeting of the Waters","Visit the Teatro Amazonas"]},
+  {"name":"Paraty","lat":-23.22,"lng":-44.71,"todo":["Walk the colonial streets","Boat the bay","Visit Ilha Grande"]},
+  {"name":"Florianópolis","lat":-27.6,"lng":-48.55,"todo":["Surf the island","Sandboard Joaquina","Walk to Lagoinha do Leste"]},
+  {"name":"Bonito","lat":-21.13,"lng":-56.48,"todo":["Snorkel the clear rivers","Abseil into the Abismo Anhumas","Visit the Pantanal"]},
+  {"name":"Fernando de Noronha","lat":-3.85,"lng":-32.42,"todo":["Snorkel with turtles","See Baía do Sancho","Watch spinner dolphins"]},
+  {"name":"Lençóis","lat":-12.56,"lng":-41.39,"todo":["Hike the Chapada Diamantina","Swim the Poço Azul","Climb Morro do Pai Inácio for sunset"]}
+],
+"URY": [
+  {"name":"Montevideo","lat":-34.9,"lng":-56.16,"todo":["Walk the Rambla","Eat at the Mercado del Puerto","See the old town"]},
+  {"name":"Colonia del Sacramento","lat":-34.47,"lng":-57.84,"todo":["Walk the cobbled old town","Climb the lighthouse","Watch sunset over the river"]},
+  {"name":"Punta del Este","lat":-34.96,"lng":-54.95,"todo":["See La Mano","Visit Casapueblo","Lie on the beaches"]}
+],
+"MAR": [
+  {"name":"Marrakech","lat":31.63,"lng":-8.01,"todo":["See Jemaa el-Fnaa at night","Walk the Jardin Majorelle","Get lost in the souks"]},
+  {"name":"Fes","lat":34.03,"lng":-5,"todo":["Get lost in the medina of Fes el-Bali","See the Chouara tannery","Visit the Bou Inania Madrasa"]},
+  {"name":"Chefchaouen","lat":35.17,"lng":-5.27,"todo":["Wander the blue medina","Hike to the Spanish Mosque for sunset","Walk to Akchour waterfalls"]},
+  {"name":"Merzouga","lat":31.08,"lng":-4.01,"todo":["Ride a camel into the Erg Chebbi dunes","Sleep in a desert camp","Watch sunrise over the Sahara"]},
+  {"name":"Essaouira","lat":31.51,"lng":-9.77,"todo":["Walk the ramparts","Kitesurf the bay","Eat grilled fish at the port"]},
+  {"name":"Ouarzazate","lat":30.92,"lng":-6.89,"todo":["See Aït Benhaddou","Visit the Atlas Studios","Drive the Dadès and Todra gorges"]},
+  {"name":"Imlil","lat":31.14,"lng":-7.92,"todo":["Climb Toubkal","Walk the Berber villages","Stay in a kasbah"]},
+  {"name":"Tangier","lat":35.76,"lng":-5.83,"todo":["Visit the Caves of Hercules","Walk the kasbah","Drink mint tea at Café Hafa"]},
+  {"name":"Casablanca","lat":33.57,"lng":-7.59,"todo":["See the Hassan II Mosque","Walk the Corniche","Visit Rabat"]}
+],
+"EGY": [
+  {"name":"Cairo","lat":30.04,"lng":31.24,"todo":["See the Pyramids of Giza and the Sphinx","Visit the Grand Egyptian Museum","Get lost in Khan el-Khalili"]},
+  {"name":"Luxor","lat":25.69,"lng":32.64,"todo":["See the Valley of the Kings","Walk Karnak Temple","Balloon over the west bank at dawn"]},
+  {"name":"Aswan","lat":24.09,"lng":32.9,"todo":["Sail a felucca on the Nile","See Abu Simbel","Visit Philae Temple"]},
+  {"name":"Sharm El Sheikh","lat":27.92,"lng":34.33,"todo":["Dive Ras Mohammed","Climb Mount Sinai for sunrise","Snorkel the Blue Hole at Dahab"]},
+  {"name":"Hurghada","lat":27.26,"lng":33.81,"todo":["Dive the Red Sea reefs","Snorkel Giftun Island","Ride into the desert"]},
+  {"name":"Alexandria","lat":31.2,"lng":29.92,"todo":["See the Bibliotheca Alexandrina","Visit the Citadel of Qaitbay","Explore the catacombs"]},
+  {"name":"Siwa","lat":29.2,"lng":25.52,"todo":["Float in the salt lakes","See the Shali fortress","Ride into the Great Sand Sea"]}
+],
+"TUN": [
+  {"name":"Tunis","lat":36.81,"lng":10.18,"todo":["See the Bardo Museum's mosaics","Visit Carthage","Walk Sidi Bou Said"]},
+  {"name":"Djerba","lat":33.81,"lng":10.85,"todo":["See the street art of Djerbahood","Visit El Ghriba","Lie on the beaches"]},
+  {"name":"Tozeur","lat":33.92,"lng":8.13,"todo":["See the Star Wars sets","Visit the mountain oases","Cross the Chott el Jerid"]},
+  {"name":"El Jem","lat":35.3,"lng":10.71,"todo":["See the Roman amphitheatre","Visit Kairouan's Great Mosque","Walk Sousse's medina"]}
+],
+"ZAF": [
+  {"name":"Cape Town","lat":-33.92,"lng":18.42,"todo":["Ride up Table Mountain","Drive to the Cape of Good Hope and Boulders penguins","Visit Robben Island"]},
+  {"name":"Stellenbosch","lat":-33.93,"lng":18.86,"todo":["Taste wine in the Winelands","Visit Franschhoek","Ride the wine tram"]},
+  {"name":"Kruger","lat":-24.99,"lng":31.59,"todo":["Look for the Big Five","Stay in a private game reserve","Drive the Panorama Route"]},
+  {"name":"Johannesburg","lat":-26.2,"lng":28.05,"todo":["Visit the Apartheid Museum","Tour Soweto","See the Cradle of Humankind"]},
+  {"name":"Durban","lat":-29.86,"lng":31.02,"todo":["Surf the Golden Mile","Eat bunny chow","Visit the Drakensberg"]},
+  {"name":"Hermanus","lat":-34.42,"lng":19.24,"todo":["Watch whales from the cliffs","Cage-dive with sharks at Gansbaai","Walk the cliff path"]},
+  {"name":"Knysna","lat":-34.04,"lng":23.05,"todo":["Drive the Garden Route","Bungee from Bloukrans Bridge","Walk Tsitsikamma"]}
+],
+"KEN": [
+  {"name":"Nairobi","lat":-1.29,"lng":36.82,"todo":["Feed giraffes at the Giraffe Centre","Visit the elephant orphanage","See Nairobi National Park"]},
+  {"name":"Maasai Mara","lat":-1.49,"lng":35.14,"todo":["See the Great Migration","Balloon over the Mara","Visit a Maasai village"]},
+  {"name":"Amboseli","lat":-2.65,"lng":37.26,"todo":["See elephants under Kilimanjaro","Visit Tsavo","Watch the swamps at sunset"]},
+  {"name":"Diani","lat":-4.32,"lng":39.58,"todo":["Lie on Diani beach","Snorkel Wasini Island","Kitesurf"]},
+  {"name":"Lamu","lat":-2.27,"lng":40.9,"todo":["Walk the Swahili old town","Sail a dhow","Ride a donkey"]}
+],
+"TZA": [
+  {"name":"Zanzibar","lat":-6.16,"lng":39.19,"todo":["Walk Stone Town","Lie on Nungwi beach","Tour a spice farm"]},
+  {"name":"Arusha","lat":-3.39,"lng":36.68,"todo":["See the Ngorongoro Crater","Watch the migration on the Serengeti","See elephants at Tarangire"]},
+  {"name":"Moshi","lat":-3.35,"lng":37.34,"todo":["Climb Kilimanjaro","Swim at Materuni waterfalls","Tour a coffee farm"]},
+  {"name":"Serengeti","lat":-2.33,"lng":34.83,"todo":["See the Great Migration","Balloon at dawn","Look for big cats"]}
+],
+"UGA": [
+  {"name":"Bwindi","lat":-1.05,"lng":29.62,"todo":["Trek to see mountain gorillas","Visit the Batwa","Walk the Impenetrable Forest"]},
+  {"name":"Kampala","lat":0.35,"lng":32.58,"todo":["Visit the Kasubi Tombs","Raft the Nile at Jinja","See the source of the Nile"]},
+  {"name":"Murchison Falls","lat":2.28,"lng":31.69,"todo":["See the falls","Boat the Nile","Look for lions"]}
+],
+"RWA": [
+  {"name":"Kigali","lat":-1.95,"lng":30.06,"todo":["Visit the Genocide Memorial","Walk the markets","Eat brochettes"]},
+  {"name":"Musanze","lat":-1.5,"lng":29.63,"todo":["Trek to see mountain gorillas","See golden monkeys","Hike Dian Fossey's grave"]},
+  {"name":"Lake Kivu","lat":-2.08,"lng":29.35,"todo":["Kayak the lake","Visit Nyungwe's canopy walk","Walk the Congo Nile Trail"]}
+],
+"NAM": [
+  {"name":"Sossusvlei","lat":-24.73,"lng":15.34,"todo":["Climb Dune 45 or Big Daddy","Walk Deadvlei","Fly over the dunes"]},
+  {"name":"Swakopmund","lat":-22.68,"lng":14.53,"todo":["Sandboard the dunes","Kayak with seals at Walvis Bay","Drive the Skeleton Coast"]},
+  {"name":"Etosha","lat":-18.86,"lng":16.33,"todo":["Watch the waterholes","Look for black rhino","Stay at Okaukuejo"]},
+  {"name":"Windhoek","lat":-22.56,"lng":17.08,"todo":["See the Christuskirche","Visit the Namibia Craft Centre","Drive to the Kalahari"]}
+],
+"BWA": [
+  {"name":"Maun","lat":-19.98,"lng":23.42,"todo":["Glide the Okavango Delta by mokoro","Fly over the delta","Visit Moremi"]},
+  {"name":"Kasane","lat":-17.81,"lng":25.15,"todo":["Boat the Chobe River","See elephants in Chobe National Park","Day-trip to Victoria Falls"]},
+  {"name":"Makgadikgadi","lat":-20.75,"lng":25.5,"todo":["Sleep on the salt pans","Meet the meerkats","Ride quad bikes"]}
+],
+"ZWE": [
+  {"name":"Victoria Falls","lat":-17.93,"lng":25.83,"todo":["See the falls","Bungee from the bridge","Raft the Zambezi"]},
+  {"name":"Hwange","lat":-18.63,"lng":26.5,"todo":["Look for elephants and painted dogs","Watch the waterholes","Walk with a guide"]},
+  {"name":"Mana Pools","lat":-15.75,"lng":29.35,"todo":["Canoe the Zambezi","Walk with elephants","Look for wild dogs"]}
+],
+"ZMB": [
+  {"name":"Livingstone","lat":-17.85,"lng":25.85,"todo":["Swim in Devil's Pool","Fly over the falls","Cruise the Zambezi at sunset"]},
+  {"name":"South Luangwa","lat":-13.08,"lng":31.8,"todo":["Go on a walking safari","See leopards on a night drive","Look for wild dogs"]},
+  {"name":"Lower Zambezi","lat":-15.5,"lng":29.75,"todo":["Canoe among hippos","Fish for tigerfish","Watch elephants cross"]}
+],
+"MDG": [
+  {"name":"Antananarivo","lat":-18.88,"lng":47.51,"todo":["See the Rova palace","Visit the Lemurs' Park","Shop the markets"]},
+  {"name":"Morondava","lat":-20.28,"lng":44.28,"todo":["Walk the Avenue of the Baobabs","See the Tsingy de Bemaraha","Visit Kirindy"]},
+  {"name":"Nosy Be","lat":-13.33,"lng":48.27,"todo":["Snorkel with whale sharks","Lie on the beaches","See lemurs on Nosy Komba"]},
+  {"name":"Andasibe","lat":-18.93,"lng":48.42,"todo":["Hear the indri lemurs","Take a night walk","Look for chameleons"]}
+],
+"MUS": [
+  {"name":"Grand Baie","lat":-20.01,"lng":57.58,"todo":["Sail to the northern islands","Snorkel the lagoon","Dive the reefs"]},
+  {"name":"Le Morne","lat":-20.45,"lng":57.31,"todo":["Kitesurf the lagoon","Climb Le Morne Brabant","See the underwater waterfall from the air"]},
+  {"name":"Chamarel","lat":-20.43,"lng":57.38,"todo":["See the Seven Coloured Earths","Walk Black River Gorges","Taste rum"]}
+],
+"SYC": [
+  {"name":"Mahé","lat":-4.62,"lng":55.45,"todo":["Lie on Beau Vallon","Hike Morne Seychellois","Walk Victoria market"]},
+  {"name":"Praslin","lat":-4.33,"lng":55.74,"todo":["See the coco de mer at Vallée de Mai","Swim at Anse Lazio","Snorkel Curieuse"]},
+  {"name":"La Digue","lat":-4.36,"lng":55.83,"todo":["Cycle to Anse Source d'Argent","Swim at Grand Anse","See giant tortoises"]}
+],
+"ETH": [
+  {"name":"Addis Ababa","lat":9.03,"lng":38.74,"todo":["See Lucy at the National Museum","Drink coffee at a ceremony","Shop the Merkato"]},
+  {"name":"Lalibela","lat":12.03,"lng":39.04,"todo":["See the rock-hewn churches","Watch an Orthodox ceremony","Hike to Asheton Maryam"]},
+  {"name":"Gondar","lat":12.61,"lng":37.47,"todo":["See the royal enclosure","Visit Debre Berhan Selassie","Trek the Simien Mountains"]},
+  {"name":"Danakil","lat":14.24,"lng":40.3,"todo":["See Erta Ale's lava lake","Walk Dallol's colours","Watch the salt caravans"]}
+],
+"GHA": [
+  {"name":"Accra","lat":5.6,"lng":-0.19,"todo":["Walk Jamestown","Visit the Kwame Nkrumah Memorial","Eat at Makola Market"]},
+  {"name":"Cape Coast","lat":5.1,"lng":-1.25,"todo":["Visit Cape Coast Castle","Walk Kakum's canopy","See Elmina Castle"]},
+  {"name":"Kumasi","lat":6.69,"lng":-1.62,"todo":["See the Manhyia Palace","Visit the Kejetia Market","See kente weaving"]}
+],
+"SEN": [
+  {"name":"Dakar","lat":14.72,"lng":-17.47,"todo":["Take the ferry to Gorée Island","See the African Renaissance Monument","Visit the pink Lac Rose"]},
+  {"name":"Saint-Louis","lat":16.03,"lng":-16.49,"todo":["Walk the colonial island","See the birds at Djoudj","Visit the fishing quarter"]},
+  {"name":"Sine-Saloum","lat":14.1,"lng":-16.6,"todo":["Kayak the mangroves","Visit the shell islands","Watch birds"]}
+],
+"CPV": [
+  {"name":"Sal","lat":16.75,"lng":-22.95,"todo":["Float in the salt pans","Kitesurf Santa Maria","Swim with lemon sharks"]},
+  {"name":"Santo Antão","lat":17.07,"lng":-25.17,"todo":["Hike the green valleys","Walk to Paul","See the coast road"]},
+  {"name":"Boa Vista","lat":16.13,"lng":-22.83,"todo":["Lie on Santa Monica beach","Watch turtles nest","Ride the dunes"]}
+],
+"AUS": [
+  {"name":"Sydney","lat":-33.87,"lng":151.21,"todo":["See the Opera House and climb the Harbour Bridge","Walk Bondi to Coogee","Take the ferry to Manly"]},
+  {"name":"Melbourne","lat":-37.81,"lng":144.96,"todo":["Drink coffee in the laneways","Drive the Great Ocean Road","See the penguins of Phillip Island"]},
+  {"name":"Cairns","lat":-16.92,"lng":145.77,"todo":["Snorkel or dive the Great Barrier Reef","Explore the Daintree rainforest","Ride the Skyrail to Kuranda"]},
+  {"name":"Airlie Beach","lat":-20.27,"lng":148.72,"todo":["Sail the Whitsundays","See Whitehaven Beach","Fly over Heart Reef"]},
+  {"name":"Uluru","lat":-25.34,"lng":131.04,"todo":["Watch sunset over Uluru","Walk Kata Tjuta's Valley of the Winds","See the Field of Light"]},
+  {"name":"Brisbane","lat":-27.47,"lng":153.03,"todo":["Walk South Bank","See koalas at Lone Pine","Visit the Gold Coast"]},
+  {"name":"Byron Bay","lat":-28.64,"lng":153.61,"todo":["Walk to the lighthouse","Surf The Pass","Visit Nimbin"]},
+  {"name":"Perth","lat":-31.95,"lng":115.86,"todo":["Meet quokkas on Rottnest","See the Pinnacles","Walk Kings Park"]},
+  {"name":"Hobart","lat":-42.88,"lng":147.33,"todo":["Visit MONA","Walk Wineglass Bay","See Port Arthur"]},
+  {"name":"Adelaide","lat":-34.93,"lng":138.6,"todo":["Taste wine in the Barossa","See Kangaroo Island","Walk the Central Market"]},
+  {"name":"Darwin","lat":-12.46,"lng":130.84,"todo":["See Kakadu","Swim at Litchfield","Watch sunset at Mindil Beach market"]},
+  {"name":"Broome","lat":-17.96,"lng":122.24,"todo":["Ride a camel on Cable Beach","See the Staircase to the Moon","Fly over the Horizontal Falls"]},
+  {"name":"Canberra","lat":-35.28,"lng":149.13,"todo":["See Parliament House","Visit the Australian War Memorial","Walk Lake Burley Griffin"]}
+],
+"NZL": [
+  {"name":"Queenstown","lat":-45.03,"lng":168.66,"todo":["Bungee from the Kawarau Bridge","Cruise Milford Sound","Ride the Shotover Jet"]},
+  {"name":"Auckland","lat":-36.85,"lng":174.76,"todo":["Climb the Sky Tower","Take the ferry to Waiheke","Walk Rangitoto"]},
+  {"name":"Rotorua","lat":-38.14,"lng":176.25,"todo":["See the geysers at Te Puia","Watch a Māori hangi and haka","Visit Wai-O-Tapu"]},
+  {"name":"Wellington","lat":-41.29,"lng":174.78,"todo":["Visit Te Papa","Ride the cable car","Tour Weta Workshop"]},
+  {"name":"Christchurch","lat":-43.53,"lng":172.64,"todo":["Ride the TranzAlpine","Go whale watching at Kaikōura","Punt the Avon"]},
+  {"name":"Wanaka","lat":-44.7,"lng":169.13,"todo":["See That Wanaka Tree","Climb Roys Peak","Ski Cardrona"]},
+  {"name":"Taupō","lat":-38.69,"lng":176.07,"todo":["Walk the Tongariro Alpine Crossing","See Huka Falls","Skydive over the lake"]},
+  {"name":"Matamata","lat":-37.81,"lng":175.77,"todo":["Visit Hobbiton","See the Waitomo glowworm caves","Walk Wairere Falls"]},
+  {"name":"Bay of Islands","lat":-35.28,"lng":174.09,"todo":["Sail among the islands","Swim with dolphins","Visit Waitangi"]},
+  {"name":"Franz Josef","lat":-43.39,"lng":170.18,"todo":["Heli-hike the glacier","Walk to Lake Matheson","Soak in the hot pools"]},
+  {"name":"Aoraki / Mount Cook","lat":-43.73,"lng":170.1,"todo":["Walk the Hooker Valley","Stargaze at Tekapo","Fly over the glaciers"]}
+],
+"FJI": [
+  {"name":"Nadi","lat":-17.8,"lng":177.42,"todo":["Island-hop the Mamanucas","Visit the Sri Siva Subramaniya temple","Soak in the Sabeto mud pools"]},
+  {"name":"Yasawa Islands","lat":-17,"lng":177.33,"todo":["Swim with manta rays","Snorkel the Blue Lagoon","Stay in a village"]},
+  {"name":"Taveuni","lat":-16.85,"lng":-179.97,"todo":["Dive the Rainbow Reef","Stand on the dateline","Walk to Tavoro waterfalls"]},
+  {"name":"Coral Coast","lat":-18.15,"lng":177.65,"todo":["Sandboard the Sigatoka dunes","Dive with sharks at Beqa","Walk to the village waterfalls"]}
+],
+"PYF": [
+  {"name":"Bora Bora","lat":-16.5,"lng":-151.74,"todo":["Stay in an overwater bungalow","Snorkel with rays and sharks","Climb Mount Pahia"]},
+  {"name":"Moorea","lat":-17.54,"lng":-149.83,"todo":["Snorkel with stingrays","Drive to the Belvedere lookout","Swim with whales in season"]},
+  {"name":"Tahiti","lat":-17.65,"lng":-149.43,"todo":["Eat at the Papeete roulottes","See the surf at Teahupo'o","Walk to the waterfalls"]}
+]
+}
