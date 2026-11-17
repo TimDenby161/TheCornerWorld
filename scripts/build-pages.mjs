@@ -91,6 +91,7 @@ ${index ? "" : `<meta name="robots" content="noindex">\n`}${base ? `<link rel="c
   <nav class="tabs" aria-label="Main">
     <span class="mode">
       <a href="${up}" class="on">Discover</a>
+      <a href="${up}samples/">Samples</a>
       <a href="${up}plan/">Book</a>
     </span>
   </nav>
@@ -347,15 +348,17 @@ Address: [your address].<br>
 Date: [today's date].</blockquote>`,
 }));
 
-// The planning page is written by hand, but its footer says who runs the site, from site.json
-const planPage = new URL("plan/index.html", out);
-writeFileSync(planPage, readFileSync(planPage, "utf8").replace(/(<!-- trader: [^>]*-->)[\s\S]*?(<!-- \/trader -->)/,
+// The planning and sample-trip pages are written by hand, but their footers say who runs the site, from site.json
+for (const page of ["plan/index.html", "samples/index.html"]) {
+  const planPage = new URL(page, out);
+  writeFileSync(planPage, readFileSync(planPage, "utf8").replace(/(<!-- trader: [^>]*-->)[\s\S]*?(<!-- \/trader -->)/,
   (all, open, close) => `${open}© ${NAME}${trader.name ? `, run by ${esc(trader.name)}, a sole trader${trader.address ? `, ${esc(trader.address)}` : ""}` : ""}${close}`));
+}
 
 // The sitemap needs full addresses, so it waits for `url` in site.json
 const live = list.filter(({ g }) => g.status !== "draft");
 if (base) {
-  const urls = ["", "guides/", "plan/", "privacy/", "terms/", ...live.map(({ slug }) => `guides/${slug}/`)];
+  const urls = ["", "guides/", "samples/", "plan/", "privacy/", "terms/", ...live.map(({ slug }) => `guides/${slug}/`)];
   writeFileSync(new URL("sitemap.xml", out), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `<url><loc>${esc(base + u)}</loc></url>`).join("\n")}

@@ -383,7 +383,7 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
   .ready .sheet { animation-name: arrive-up; }
   .stage::before { left: 50%; top: 30%; }
 }
-@media (max-width: 480px) { .links .round { display: none; } }
+@media (max-width: 480px) { .links .round { display: none; } .home .brand { padding: 5px; } }
 @media (hover: none) { .stops li[draggable] { cursor: auto; } }
 
 @media (prefers-reduced-motion: reduce) {

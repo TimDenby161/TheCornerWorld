@@ -109,6 +109,8 @@ button { cursor: pointer; }
 .tabs .mode a.on, .links .mode a.on { background: var(--text-primary); color: var(--surface-1); }
 .mode a[aria-current="page"] { cursor: default; }
 @media (max-width: 820px) { .tabs .mode a, .links .mode a { height: 28px; padding: 0 12px; } }
+/* A phone: the three choices need the room, so the brand shows just its globe */
+@media (max-width: 480px) { .brand > span:last-child { display: none; } .tabs .mode a, .links .mode a { padding: 0 10px; } }
 .count {
   display: inline-block; min-width: 18px; margin-left: 6px; padding: 0 5px; border-radius: 999px;
   background: var(--orange); color: #fff; font-size: 12px; line-height: 18px; text-align: center;
