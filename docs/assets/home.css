@@ -226,6 +226,7 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 
 .home .filters { margin-top: 0; }
 .group { margin-top: 16px; }
+.group .chips + .chips { margin-top: 6px; }
 .group-label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 7px; font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .group-value { font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
 .home .chips { margin-top: 0; }

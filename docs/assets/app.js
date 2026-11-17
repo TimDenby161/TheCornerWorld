@@ -453,12 +453,12 @@ function renderDiscover() {
     toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
       { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
 
-  const group = (label, value, body) => h("div", { class: "group" }, h("p", { class: "group-label" }, label, value), body);
+  const group = (label, value, ...body) => h("div", { class: "group" }, h("p", { class: "group-label" }, label, value), ...body);
   const filters = h("div", { class: "filters" },
     group("Where", null, where),
     group("When", when, months),
-    group("Great for", null, great),
-    group("Interests", null, likes));
+    // The categories and the interests share one heading, a row each
+    group("Great for", null, great, likes));
   for (const sync of syncs) sync();
   // The results narrow to a country as you type its name
   const find = h("input", {
