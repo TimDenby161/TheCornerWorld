@@ -3,7 +3,6 @@
 -- People sign in with Google (Supabase Auth keeps them in auth.users). This migration adds what an
 -- account can hold, and the rules for who may read and change it:
 --
---   public.trips               the trip a visitor builds on the map: one each, theirs alone
 --   public.client_trips        a paid trip page made for a client
 --   public.client_trip_members the email addresses allowed to open a client's trip page
 --   public.client_trip_pages   the page itself (its HTML, styles and script)
@@ -57,34 +56,6 @@ begin
 end;
 $$;
 revoke all on function private.touch_updated_at() from public, anon, authenticated;
-
--- ---------- a visitor's own trip ----------
-
-create table public.trips (
-  user_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,
-  -- The trip exactly as the map page keeps it in the browser. The page checks it field by field when it
-  -- reads it back (cleanTrip in docs/assets/app.js), so this only has to keep out what isn't a trip at all.
-  data jsonb not null,
-  updated_at timestamptz not null default now(),
-  constraint trips_data_is_a_small_object check (jsonb_typeof(data) = 'object' and octet_length(data::text) <= 20000)
-);
-comment on table public.trips is 'The trip each visitor is building on the map. One row per account; only its owner can see or change it.';
-
-create trigger trips_touch before insert or update on public.trips
-  for each row execute function private.touch_updated_at();
-
-alter table public.trips enable row level security;
-revoke all on public.trips from public, anon, authenticated;
-grant select, insert, update, delete on public.trips to authenticated;
-
-create policy "A visitor reads their own trip" on public.trips
-  for select to authenticated using ((select auth.uid()) = user_id);
-create policy "A visitor saves their own trip" on public.trips
-  for insert to authenticated with check ((select auth.uid()) = user_id);
-create policy "A visitor changes their own trip" on public.trips
-  for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
-create policy "A visitor deletes their own trip" on public.trips
-  for delete to authenticated using ((select auth.uid()) = user_id);
 
 -- ---------- client trip pages ----------
 

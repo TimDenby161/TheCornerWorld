@@ -2,11 +2,11 @@
 -- Each test signs in as someone, tries something, and checks the database allowed or refused it.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(46);
+select plan(30);
 
 -- ---------- the cast ----------
 -- Everyone here has an address at rules.test, which nobody real can have, and the checks count only
--- them and the two trips made below, so rows already in the database don't change the answers.
+-- them and the two client trips made below, so rows already in the database don't change the answers.
 -- ada and ben are visitors. cy is a client whose address is on a trip. dee signed up with the same
 -- kind of address as a client but never proved she owns it. tim is the admin.
 insert into auth.users (id, instance_id, aud, role, email, email_confirmed_at, created_at, updated_at) values
@@ -27,7 +27,6 @@ insert into public.client_trip_members (trip_id, email) values
 insert into public.client_trip_pages (trip_id, html, css, js) values
   ('11111111-1111-1111-1111-111111111111', '<h1>Japan</h1>', 'h1{}', '1'),
   ('22222222-2222-2222-2222-222222222222', '<h1>Peru</h1>', 'h1{}', '1');
-insert into public.trips (user_id, data) values ('00000000-0000-0000-0000-00000000000b', '{"name":"Ben''s trip","stops":[]}');
 
 -- Signs in as a user, or as nobody (a visitor who hasn't signed in)
 create function pg_temp.sign_in(who uuid) returns void language plpgsql as $$
@@ -52,33 +51,12 @@ select is((select count(*)::int from pg_proc p join pg_namespace n on n.oid = p.
 
 -- ---------- a visitor who hasn't signed in ----------
 select pg_temp.sign_out();
-select throws_ok('select * from public.trips', '42501', null, 'Not signed in: can''t read trips');
 select throws_ok('select * from public.client_trips', '42501', null, 'Not signed in: can''t read client trips');
 select throws_ok('select * from public.client_trip_pages', '42501', null, 'Not signed in: can''t read client trip pages');
 select throws_ok('select * from public.client_trip_members', '42501', null, 'Not signed in: can''t read who is on a trip');
 select throws_ok('select * from private.admins', '42501', null, 'Not signed in: can''t read the admin list');
 select throws_ok('select public.is_admin()', '42501', null, 'Not signed in: can''t call is_admin');
 select throws_ok('select public.delete_my_account()', '42501', null, 'Not signed in: can''t call delete_my_account');
-select throws_ok($$insert into public.trips (user_id, data) values ('00000000-0000-0000-0000-00000000000a', '{}')$$, '42501', null, 'Not signed in: can''t save a trip');
-
--- ---------- a visitor's own trip ----------
-select pg_temp.sign_in('00000000-0000-0000-0000-00000000000a');
-select is((select count(*)::int from public.trips), 0, 'Ada can''t see Ben''s trip');
-select lives_ok($$insert into public.trips (data) values ('{"name":"Ada","stops":[]}')$$, 'Ada saves her trip (the row is hers without saying so)');
-select is((select data ->> 'name' from public.trips), 'Ada', 'Ada sees her own trip, and only hers');
-select throws_ok($$insert into public.trips (user_id, data) values ('00000000-0000-0000-0000-00000000000d', '{}')$$, '42501', null, 'Ada can''t save a trip as somebody else');
-select lives_ok($$update public.trips set data = '{"name":"hacked"}' where user_id = '00000000-0000-0000-0000-00000000000b'$$, 'Ada''s attempt to change Ben''s trip runs…');
-select pg_temp.as_owner();
-select is((select data ->> 'name' from public.trips where user_id = '00000000-0000-0000-0000-00000000000b'), 'Ben''s trip', '…and changes nothing');
-select pg_temp.sign_in('00000000-0000-0000-0000-00000000000a');
-select throws_ok($$update public.trips set user_id = '00000000-0000-0000-0000-00000000000d'$$, '42501', null, 'Ada can''t hand her trip to somebody else');
-select throws_ok($$update public.trips set data = '[1, 2, 3]'$$, '23514', null, 'A trip has to be an object');
-select throws_ok($$update public.trips set data = jsonb_build_object('name', repeat('x', 30000))$$, '23514', null, 'A trip can''t be huge');
-select lives_ok($$update public.trips set data = '{"name":"Ada 2"}', updated_at = '2001-01-01'$$, 'Ada changes her trip');
-select cmp_ok((select updated_at from public.trips), '>', now() - interval '1 minute', 'The time it changed is the database''s, not the one the browser sent');
-select lives_ok($$delete from public.trips where user_id = '00000000-0000-0000-0000-00000000000b'$$, 'Ada''s attempt to delete Ben''s trip runs…');
-select pg_temp.as_owner();
-select is((select count(*)::int from public.trips where user_id = '00000000-0000-0000-0000-00000000000b'), 1, '…and deletes nothing');
 
 -- ---------- client trip pages ----------
 select pg_temp.sign_in('00000000-0000-0000-0000-00000000000a');
@@ -109,13 +87,12 @@ select is((select count(*)::int from public.client_trips where id in ('11111111-
 select is((select count(*)::int from public.client_trip_members where email like '%@rules.test'), 3, 'Tim sees who is on each trip');
 select lives_ok($$insert into public.client_trip_members (trip_id, email) values ('22222222-2222-2222-2222-222222222222', 'ada@rules.test')$$, 'Tim adds Ada to a trip');
 select throws_ok($$insert into public.client_trip_members (trip_id, email) values ('22222222-2222-2222-2222-222222222222', 'Ada@Rules.Test')$$, '23514', null, 'An address must be stored in lower case');
-select is((select count(*)::int from public.trips), 0, 'Being an admin doesn''t show Tim anyone''s own trip');
 
 -- ---------- deleting an account ----------
 select pg_temp.sign_in('00000000-0000-0000-0000-00000000000b');
 select lives_ok('select public.delete_my_account()', 'Ben deletes his account');
 select pg_temp.as_owner();
-select is((select count(*)::int from auth.users where id = '00000000-0000-0000-0000-00000000000b') + (select count(*)::int from public.trips where user_id = '00000000-0000-0000-0000-00000000000b'), 0, 'Ben''s account and his trip are gone');
+select is((select count(*)::int from auth.users where id = '00000000-0000-0000-0000-00000000000b'), 0, 'Ben''s account is gone');
 select is((select count(*)::int from auth.users where email ilike '%@rules.test'), 4, 'Nobody else''s account went with it');
 
 select * from finish();

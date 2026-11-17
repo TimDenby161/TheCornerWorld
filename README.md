@@ -79,13 +79,13 @@ Accounts are kept in a [Supabase](https://supabase.com) project. The site is sti
 
 A browser can be made to send anything, so nothing in `docs/` decides who may see what. The database does, with the rules in `supabase/migrations/`:
 
-- Every table has row level security. Someone who hasn't signed in can read and change nothing. A visitor can reach only their own trip. A client trip and its page can be read only by an account whose email address is on that trip's list, and only once the account has proved it owns the address (Google vouches for it). Only an admin can write a client trip, its list or its page.
+- Every table has row level security. Someone who hasn't signed in can read and change nothing. A client trip and its page can be read only by an account whose email address is on that trip's list, and only once the account has proved it owns the address (Google vouches for it). Only an admin can write a client trip, its list or its page.
 - Who is an admin is a table (`private.admins`) in a part of the database the site cannot reach at all. You add yourself by hand, once (step 6 below). Nothing on the site can add an admin.
-- `npm run test:db` proves the rules: 46 tests that sign in as a visitor, a client, an impostor and an admin and check what each is allowed and refused.
+- `npm run test:db` proves the rules: 30 tests that sign in as a visitor, a client, an impostor and an admin and check what each is allowed and refused.
 - Sign-in uses PKCE: Google's answer comes back as a one-use code only that browser can redeem. There are no passwords.
 - The site holds the project's address and its **publishable** key, which are public by design. The **secret** key must never be in this repository or in `docs/`; `npm run accounts` refuses it and `npm run check` fails if it finds one.
 - A page with sign-in may talk to this site and the Supabase project, and nowhere else (its security policy says so, and `npm run check` checks it). `trip/` may also run a script from memory (`blob:`), which is how a client's trip page runs after the database hands it over; nothing written into a page can use that.
-- Anyone can delete their own account, and the trip saved to it, from the account button on the map. `privacy/` says what is kept; it is written by `scripts/build-pages.mjs`, so change it there if what accounts store changes.
+- Anyone can delete their own account from the account button on the map. `privacy/` says what is kept; it is written by `scripts/build-pages.mjs`, so change it there if what accounts store changes.
 
 Two limits worth knowing:
 
