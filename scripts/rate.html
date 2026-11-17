@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rate countries</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --surface: #fff; --line: #e2e5ea; --text: #111; --muted: #6b7079; --chip: #eef0f3; --blue: #2a78d6;
+    --s1: #d9483b; --s2: #f0973b; --s3: #e8cf55; --s4: #3cb27b;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0b0f16; --surface: #151b25; --line: #263040; --text: #eef1f5; --muted: #8b94a3; --chip: #1e2633; --blue: #4a94ee;
+      --s1: #b9443a; --s2: #c98232; --s3: #bfa944; --s4: #25a87c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .app { display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
+  aside { display: flex; flex-direction: column; border-right: 1px solid var(--line); background: var(--surface); min-height: 0; }
+  .top { padding: 16px 16px 10px; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0 0 4px; font-size: 18px; }
+  .progress { margin: 0 0 10px; color: var(--muted); font-size: 12.5px; }
+  input[type=search] { width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; }
+  .views { display: flex; gap: 4px; margin-top: 8px; }
+  .views button { flex: 1; height: 28px; border: 0; border-radius: 8px; background: var(--chip); font-size: 12px; font-weight: 600; color: var(--muted); }
+  .views button[aria-pressed=true] { background: var(--blue); color: #fff; }
+  ul { margin: 0; padding: 6px; list-style: none; overflow: auto; flex: 1; }
+  li button { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: 8px; background: none; text-align: left; }
+  li button:hover { background: var(--chip); }
+  li button[aria-current=true] { background: color-mix(in srgb, var(--blue) 16%, transparent); }
+  .flag { font-size: 18px; }
+  .name small { display: block; color: var(--muted); font-size: 11.5px; }
+  .pill { min-width: 36px; padding: 2px 7px; border-radius: 99px; background: var(--c); color: #fff; font-size: 12px; font-weight: 700; text-align: center; text-shadow: 0 1px 1px rgba(0,0,0,.25); }
+  .pill.none { background: var(--chip); color: var(--muted); text-shadow: none; }
+  .draft { opacity: .55; }
+  main { overflow: auto; padding: 32px 40px; }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .head .flag { font-size: 40px; }
+  .head h2 { margin: 0; font-size: 28px; }
+  .overall { margin-left: auto; font-size: 22px; padding: 6px 14px; }
+  .note { margin: 0 0 26px; color: var(--muted); }
+  .cat { margin-bottom: 20px; }
+  .cat p { display: flex; justify-content: space-between; margin: 0 0 7px; font-weight: 650; }
+  .cat p span { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+  .nums { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; max-width: 560px; }
+  .nums button { height: 40px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-weight: 650; }
+  .nums button:hover { border-color: var(--blue); }
+  .nums button[aria-pressed=true] { background: var(--c); border-color: var(--c); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.25); }
+  .actions { display: flex; gap: 8px; margin-top: 26px; }
+  .actions button { height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-weight: 600; }
+  .actions .primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .status { position: fixed; right: 20px; bottom: 16px; padding: 7px 12px; border-radius: 9px; background: var(--surface); border: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  .status.err { color: #fff; background: var(--s1); border-color: var(--s1); }
+  .cat p { flex-wrap: wrap; gap: 2px 12px; }
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 40vh 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--line); }
+    main { padding: 20px 16px 60px; }
+    .nums { gap: 3px; }
+    .nums button { height: 36px; padding: 0; }
+  }
+  kbd { padding: 0 5px; border: 1px solid var(--line); border-radius: 4px; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="top">
+      <h1>Rate countries</h1>
+      <p class="progress" id="progress"></p>
+      <input type="search" id="q" placeholder="Find a country" autocomplete="off">
+      <div class="views" id="views"></div>
+    </div>
+    <ul id="list"></ul>
+  </aside>
+  <main id="main"></main>
+</div>
+<p class="status" id="status">Loading…</p>
+<script>
+"use strict";
+const HINTS = ["How good, varied and easy to find the food is", "How much there is to see and do", "Good value: 10 is cheap for what you get", "How easy and welcoming it is with children", "How safe it is for visitors (check the UK travel advice)"];
+const STOPS = [2.5, 5, 6.5, 8.5];
+let countries = [], byId = new Map(), R = null, current = null, view = "all";
+const $ = (s) => document.querySelector(s);
+const css = getComputedStyle(document.documentElement);
+const stops = ["--s1", "--s2", "--s3", "--s4"].map((v) => hex(css.getPropertyValue(v).trim()));
+function hex(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+// The same red to green as the map (SCORE_STOPS in docs/assets/globe.js)
+function colour(n) {
+  if (n <= STOPS[0]) return `rgb(${stops[0]})`;
+  for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i]) {
+    const t = (n - STOPS[i - 1]) / (STOPS[i] - STOPS[i - 1]), a = stops[i - 1], b = stops[i];
+    return `rgb(${a.map((v, k) => Math.round(v + (b[k] - v) * t))})`;
+  }
+  return `rgb(${stops[3]})`;
+}
+const own = (id) => R.scores[id];
+const partsOf = (c) => own(c.id) || (c.within && own(c.within));
+const overall = (p) => Math.round(p.reduce((a, b) => a + b, 0) / p.length * 10) / 10;
+const checked = (id) => R.checked.includes(id);
+
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "text") n.textContent = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+  }
+  n.append(...kids.flat().filter((k) => k != null && k !== false));
+  return n;
+}
+function pill(p, cls = "") {
+  return p ? el("span", { class: `pill ${cls}`, style: `--c: ${colour(overall(p))}`, text: overall(p).toFixed(1) }) : el("span", { class: "pill none", text: "–" });
+}
+
+let saveTimer = 0;
+function save() {
+  clearTimeout(saveTimer);
+  $("#status").className = "status"; $("#status").textContent = "Saving…";
+  saveTimer = setTimeout(async () => {
+    try {
+      const res = await fetch("/data", { method: "POST", headers: { "content-type": "application/json", "x-rate": "1" }, body: JSON.stringify(R) });
+      if (!res.ok) throw new Error(await res.text());
+      $("#status").textContent = `Saved to ratings.json · ${new Date().toLocaleTimeString()}`;
+    } catch (err) {
+      $("#status").className = "status err"; $("#status").textContent = `Not saved: ${err.message}`;
+    }
+  }, 250);
+}
+
+const VIEWS = [["all", "Countries"], ["todo", "Not checked"], ["parts", "States & islands"]];
+function renderList() {
+  $("#views").replaceChildren(...VIEWS.map(([k, label]) => el("button", { "aria-pressed": String(view === k), text: label, onclick: () => { view = k; renderList(); } })));
+  const q = $("#q").value.trim().toLowerCase();
+  const shown = countries.filter((c) => (view === "parts" ? c.within : !c.within) && (view !== "todo" || !checked(c.id)) && (!q || c.name.toLowerCase().includes(q)));
+  const top = countries.filter((c) => !c.within && own(c.id)), done = top.filter((c) => checked(c.id)).length;
+  $("#progress").textContent = `${done} of ${top.length} countries checked by you · the rest are first drafts`;
+  $("#list").replaceChildren(...shown.map((c) => el("li", null, el("button", { "aria-current": String(c.id === current), onclick: () => pick(c.id) },
+    el("span", { class: "flag", text: c.flag || "·" }),
+    el("span", { class: "name" }, c.name, c.within && el("small", { text: own(c.id) ? `Own scores · in ${byId.get(c.within).name}` : `Uses ${byId.get(c.within).name}'s` })),
+    pill(partsOf(c), checked(c.id) || c.within ? "" : "draft")))));
+}
+
+function pick(id) { current = id; renderList(); renderMain(); }
+
+function renderMain() {
+  const c = byId.get(current);
+  if (!c) { $("#main").replaceChildren(el("p", { class: "note", text: "Pick a country on the left. Click a number to score it; every change saves at once. The ↑ and ↓ keys move between countries." })); return; }
+  const parts = partsOf(c), inherits = c.within && !own(c.id), parent = c.within && byId.get(c.within);
+  const set = (i, n) => {
+    if (!own(c.id)) R.scores[c.id] = (parts || R.categories.map(() => 5)).slice();
+    R.scores[c.id][i] = n;
+    if (!checked(c.id)) R.checked.push(c.id);
+    save(); renderList(); renderMain();
+  };
+  $("#main").replaceChildren(
+    el("div", { class: "head" }, el("span", { class: "flag", text: c.flag || "" }), el("h2", { text: c.name }), parts && pill(parts, "overall")),
+    el("p", { class: "note", text: inherits ? `Uses ${parent.name}'s scores. Click any number to give ${c.name} its own.`
+      : checked(c.id) ? "Checked by you." : "First draft by Claude: change anything that's wrong, or press “Looks right” to mark it checked." }),
+    ...R.categories.map((name, i) => el("div", { class: "cat" },
+      el("p", null, name, el("span", { text: HINTS[i] || "" })),
+      el("div", { class: "nums", style: `--c: ${parts ? colour(parts[i]) : "var(--blue)"}` }, Array.from({ length: 10 }, (_, k) =>
+        el("button", { "aria-pressed": String(!inherits && parts?.[i] === k + 1), style: `--c: ${colour(k + 1)}`, text: String(k + 1), onclick: () => set(i, k + 1) }))))),
+    el("div", { class: "actions" },
+      !c.within && parts && !checked(c.id) && el("button", { class: "primary", text: "Looks right", onclick: () => { R.checked.push(c.id); save(); next(); } }),
+      !c.within && checked(c.id) && el("button", { text: "Mark as draft again", onclick: () => { R.checked = R.checked.filter((x) => x !== c.id); save(); renderList(); renderMain(); } }),
+      c.within && own(c.id) && el("button", { text: `Use ${parent.name}'s scores instead`, onclick: () => { delete R.scores[c.id]; R.checked = R.checked.filter((x) => x !== c.id); save(); renderList(); renderMain(); } })));
+}
+
+function next(step = 1) {
+  const shown = countries.filter((c) => (view === "parts" ? c.within : !c.within) && (view !== "todo" || !checked(c.id) || c.id === current) && (!$("#q").value.trim() || c.name.toLowerCase().includes($("#q").value.trim().toLowerCase())));
+  const at = shown.findIndex((c) => c.id === current);
+  const to = shown[Math.max(0, Math.min(shown.length - 1, at + step))];
+  if (to) pick(to.id);
+  $("#list").querySelector("[aria-current=true]")?.scrollIntoView({ block: "nearest" });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.target === $("#q")) { if (e.key === "Enter") next(0); return; }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); next(e.key === "ArrowDown" ? 1 : -1); }
+});
+$("#q").addEventListener("input", renderList);
+
+fetch("/data").then((r) => r.json()).then((d) => {
+  countries = d.countries.sort((a, b) => a.name.localeCompare(b.name)); R = d.ratings;
+  for (const c of countries) byId.set(c.id, c);
+  $("#status").textContent = "Ready";
+  renderList(); renderMain();
+});
+</script>
+</body>
+</html>

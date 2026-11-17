@@ -8,6 +8,7 @@
 const RAD = Math.PI / 180, DEG = 180 / Math.PI, HALF = Math.PI / 2;
 const K_MAX = 48;                 // how far in the globe zooms (1 is the whole globe)
 const FLAT_W = 5.47, FLAT_H = 2.84; // the flat map's size, in the same units as a globe of radius 1
+const SCORE_STOPS = [2.5, 5, 6.5, 8.5]; // the scores that are fully --g-s1 (red), --g-s2, --g-s3 and --g-s4 (green)
 const FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif';
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -399,10 +400,19 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       label: get("--g-label"), ink: get("--g-ink"), paper: get("--g-paper"), edge: get("--g-edge"),
       hoverFill: get("--g-hover"), hoverLine: get("--g-hover-line"),
       trip: get("--g-trip"), selected: get("--g-selected"), guide: get("--g-guide"), muted: get("--g-muted"), airport: get("--g-airport"),
+      // Scores out of 10, red for the lowest to green for the highest (fill keys "s0" to "s100": tenths of a point)
+      score: d3.scaleLinear().domain(SCORE_STOPS).range(["--g-s1", "--g-s2", "--g-s3", "--g-s4"].map(get)).interpolate(d3.interpolateRgb).clamp(true),
     };
-    for (const s of feats) { s.to = theme.fills[s.key]; s.col = s.to.slice(); s.from = s.to; }
+    for (const s of feats) { s.to = fillOf(s.key); s.col = s.to.slice(); s.from = s.to; }
     tween = null;
     invalidate(true);
+  }
+
+  // The colour for a fill key: one of theme.fills, or "s" and a score in tenths, worked out once and kept
+  function fillOf(key) {
+    if (theme.fills[key]) return theme.fills[key];
+    if (/^s\d+$/.test(key)) { const c = d3.rgb(theme.score(+key.slice(1) / 10)); return (theme.fills[key] = [c.r, c.g, c.b]); }
+    return theme.fills.land;
   }
 
   // Says what each thing looks like now: { fill(feature), selected(feature), dot(dot), showPin(pin), activePin(pin) }.
@@ -414,7 +424,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       const key = state.fill(s.f);
       s.selected = state.selected(s.f);
       if (key === s.key) continue;
-      s.key = key; s.to = theme.fills[key]; changed = true;
+      s.key = key; s.to = fillOf(key); changed = true;
     }
     for (const d of dots) d.key = state.dot(d);
     const now = performance.now();
@@ -785,7 +795,8 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       const plain = d.key === "land" || d.key === "none";
       c.beginPath(); c.arc(q[0], q[1], close ? 2.8 : plain ? 1.5 : 2, 0, 7);
       c.globalAlpha = close ? 1 : plain ? 0.55 : 0.9;
-      c.fillStyle = plain ? theme.muted : theme[d.key] || theme.muted; c.fill();
+      const col = !plain && fillOf(d.key);
+      c.fillStyle = plain ? theme.muted : `rgb(${col[0] | 0},${col[1] | 0},${col[2] | 0})`; c.fill();
       if (close) { c.strokeStyle = theme.line; c.lineWidth = 1; c.stroke(); }
       c.globalAlpha = 1;
       hits.push({ x: q[0], y: q[1], r: close ? 9 : 4.5, target: { type: "country", country: d.country } });

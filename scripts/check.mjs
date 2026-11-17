@@ -139,6 +139,20 @@ if (site.contactEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(site.contactEmail)) 
 if (site.planning?.url && !/^https:\/\//.test(site.planning.url)) fail(join(docs, "data/site.json"), "planning.url must start with https://");
 for (const partner of site.partners || []) if (!/^https:\/\//.test(partner.url || "")) fail(join(docs, "data/site.json"), `partner "${partner.label}" needs an https:// address`);
 
+// The scores the map is coloured by (scripts/rate.mjs writes them): whole numbers 1 to 10, one per category, for real countries
+{
+  const file = join(docs, "data/ratings.json");
+  const ratings = JSON.parse(readFileSync(file, "utf8"));
+  const known = new Set(JSON.parse(readFileSync(join(docs, "data/countries.json"), "utf8")).map((c) => c.id));
+  const size = ratings.categories?.length;
+  if (!size) fail(file, "needs a list of categories");
+  for (const [id, parts] of Object.entries(ratings.scores || {})) {
+    if (!known.has(id)) fail(file, `${id} is not a country in data/countries.json`);
+    if (!Array.isArray(parts) || parts.length !== size || !parts.every((n) => Number.isInteger(n) && n >= 1 && n <= 10)) fail(file, `${id}: needs ${size} whole numbers from 1 to 10`);
+  }
+  for (const id of ratings.checked || []) if (!ratings.scores?.[id]) fail(file, `${id} is marked checked but has no scores`);
+}
+
 for (const warning of warnings) console.warn(`WARN  ${warning}`);
 if (failures.length) {
   for (const failure of failures.slice(0, 40)) console.error(`FAIL  ${failure}`);
