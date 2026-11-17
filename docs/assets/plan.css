@@ -8,16 +8,33 @@ body.plan { display: block; height: auto; min-height: 100%; background: var(--su
 .plan .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 .plan h1, .plan h2, .plan h3 { letter-spacing: -0.02em; }
 .plan section { padding: 96px 0; border-top: 1px solid var(--border); }
+.plan main > section:first-child { border-top: 0; }
 .plan .eyebrow { margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue-text); }
 .plan .section-title { margin: 0 0 14px; font-size: clamp(30px, 4vw, 44px); line-height: 1.08; font-weight: 800; max-width: 20ch; }
 .plan .section-lede { margin: 0 0 40px; font-size: 18px; line-height: 1.55; color: var(--text-secondary); max-width: 52ch; }
 
-/* The header stays at the top of the screen all the way down the Book page, and its logo goes back to the top */
+/* The header, as on the map page: the logo and the menu as two solid pills floating a little below the
+   top edge, clear of where a phone blurs the top of the page. --bar is its height. */
+body.plan { --bar: 64px; }
+.plan .app-bar { height: calc(env(safe-area-inset-top) + var(--bar)); padding: calc(env(safe-area-inset-top) + 10px) 12px 10px; background: none; border: 0; pointer-events: none; }
+.plan .app-bar > * { pointer-events: auto; }
+.plan .brand { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px 0 8px; border-radius: 999px; background: var(--surface-1); border: 1px solid var(--border);
+  box-shadow: 0 6px 18px -10px rgba(11,11,11,.35); color: inherit; font-size: 16px; text-decoration: none; }
+.plan .brand-mark { width: 26px; height: 26px; }
+.plan .tabs .mode { padding: 4px; background: var(--surface-1); border: 1px solid var(--border); box-shadow: 0 6px 18px -10px rgba(11,11,11,.35); }
+.plan .tabs .mode a { height: 34px; padding: 0 14px; }
+.plan .brand:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+/* The Book page: the header stays at the top all the way down, and its logo goes back to the top */
 body.plan:not(.samples) .app-bar { position: sticky; top: 0; z-index: 30; }
-body.plan:not(.samples) .brand { color: inherit; text-decoration: none; border-radius: 8px; }
-body.plan:not(.samples) .brand:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+@media (max-width: 820px) {
+  body.plan { --bar: 62px; }
+  .plan .app-bar { padding-inline: 10px; }
+  .plan .brand { height: 42px; padding: 0 14px 0 6px; font-size: 15px; }
+  .plan .tabs .mode a { height: 32px; padding: 0 12px; }
+}
+@media (max-width: 480px) { .plan .brand { width: 42px; padding: 0; justify-content: center; } }
 /* A link to a section lands with the section's top just below the header */
-.plan section { scroll-margin-top: 49px; }
+.plan section { scroll-margin-top: var(--bar); }
 html:has(body.plan) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html:has(body.plan) { scroll-behavior: auto; } }
 
@@ -30,9 +47,9 @@ html:has(body.plan) { scroll-behavior: smooth; }
 .btn-ghost:hover { background: var(--chip-bg); }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 
-/* 1. The promise. On a phone it fills the screen below the header (49px, styles.css .app-bar). */
+/* 1. The promise. On a phone it fills the screen below the header (--bar). */
 .plan section.hero { border-top: 0; padding: 0; }
-.hero-inner { display: flex; flex-direction: column; min-height: min(calc(100svh - 57px), 760px); padding-block: 72px 40px; }
+.hero-inner { display: flex; flex-direction: column; min-height: min(calc(100svh - var(--bar)), 760px); padding-block: 72px 40px; }
 .hero .eyebrow { margin-top: auto; }
 .hero h1 { margin: 0 0 22px; font-size: clamp(44px, 7vw, 84px); line-height: 1; font-weight: 800; letter-spacing: -0.04em; max-width: 12ch; }
 .hero .lede { margin: 0 0 32px; font-size: 20px; line-height: 1.55; color: var(--text-secondary); max-width: 36em; }
@@ -230,7 +247,7 @@ html:has(body.plan) { scroll-behavior: smooth; }
   .plan .section-title { font-size: 30px; }
   .plan .section-lede { font-size: 17px; margin-bottom: 28px; }
   /* The first screen: exactly the phone's screen below the header */
-  .hero-inner { min-height: calc(100svh - 49px - env(safe-area-inset-top)); padding-block: 28px 20px; }
+  .hero-inner { min-height: calc(100svh - var(--bar) - env(safe-area-inset-top)); padding-block: 24px 20px; }
   .hero h1 { font-size: 44px; line-height: 1.02; margin-bottom: 18px; }
   .hero .lede { font-size: 17px; margin-bottom: 28px; }
   .hero-ctas { flex-direction: column; }
@@ -243,7 +260,7 @@ html:has(body.plan) { scroll-behavior: smooth; }
   .sample-copy { text-align: center; }
   .sample-copy .section-title, .sample-copy .section-lede { margin-inline: auto; }
   .sample-copy .section-lede { margin-bottom: 22px; font-size: 16px; }
-  .phone { --w: min(300px, calc((100svh - 49px - 230px) * 0.462 + 22px)); padding: 9px; border-radius: 44px; }
+  .phone { --w: min(300px, calc((100svh - var(--bar) - 230px) * 0.462 + 22px)); padding: 9px; border-radius: 44px; }
   .phone::before { top: 17px; width: 76px; height: 22px; margin-left: -38px; }
   .screen { border-radius: 36px; }
   .sample-actions { flex-direction: column; }
@@ -310,9 +327,9 @@ html:has(body.plan) { scroll-behavior: smooth; }
 
 /* Samples page on a phone: the trips and the "Plan your trip" line fill the screen exactly, with the
    button in the bottom corner. The rows grow to take up the room; the footer is below, a scroll away.
-   49px is the height of the top bar (styles.css .app-bar) below the phone's notch. */
+   --bar is the height of the header below the phone's notch. */
 @media (max-width: 640px) {
-  .samples main { display: flex; flex-direction: column; min-height: calc(100svh - 49px - env(safe-area-inset-top)); }
+  .samples main { display: flex; flex-direction: column; min-height: calc(100svh - var(--bar) - env(safe-area-inset-top)); }
   .samples section#sample { flex: 1; display: flex; }
   .samples section#sample > .wrap { flex: 1; display: flex; flex-direction: column; width: 100%; }
   .samples .sample-card { flex: 1 1 0; min-height: 76px; }
