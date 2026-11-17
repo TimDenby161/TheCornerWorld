@@ -236,7 +236,8 @@ document.addEventListener("click", ev => {
   document.querySelector(`[data-st="${CSS.escape(k)}"]`)?.focus();
 }, true);
 
-let OPT = store.get("firstNight", "A"); if (OPT !== "A" && OPT !== "B") OPT = "A";
+// The sample is fixed on Option B (straight from Cancún airport to Valladolid); the A/B choice is not shown
+const OPT = "B";
 const pick = v => (v && typeof v === "object" && !Array.isArray(v)) ? v[OPT] : v;
 const inOpt = e => !e[6] || e[6].toUpperCase() === OPT;
 const visDays = (p, opt = OPT) => p.days.map((d, i) => i).filter(i => !p.days[i][3] || p.days[i][3] === opt);
@@ -321,7 +322,6 @@ function renderSummary(){
   const fPaid = (isPaid("flight1") ? 190 : 0) + (isPaid("flight2") ? 990 : 0);
   const paidTotal = fPaid + rows.reduce((a, r) => a + r.pd, 0);
   document.getElementById("sum-paid").textContent = gbp(paidTotal);
-  document.getElementById("sum-opt").textContent = "Option " + OPT;
   fillItinerary();
   document.getElementById("sum-total").textContent = gbp(total);
   document.getElementById("sum-pp").textContent = `About ${gbp(Math.round(total / 2))} each.`;
@@ -734,10 +734,6 @@ function fillHighlights(){
   el.innerHTML = HIGHLIGHTS.map(([name, place, x]) => `<figure class="hl"><svg viewBox="${x} 0 330 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${widen(SCENES[place])}</svg><figcaption>${esc(name)}</figcaption></figure>`).join("");
 }
 fillHighlights(); render(); renderSummary(); fillOptionCosts(); fillStatic();
-document.querySelectorAll(".opt-card").forEach(b => b.addEventListener("click", () => {
-  OPT = b.dataset.opt; store.set("firstNight", OPT);
-  render(); fit(); renderSummary(); fillOptionCosts();
-}));
 function fit(){
   let changed = false;
   root.querySelectorAll(".place").forEach(sec => {
@@ -784,7 +780,6 @@ addEventListener("keydown", e => {
     STATUS = d.status && typeof d.status === "object" ? { ...d.status } : {};
     HOTEL = d.hotels && typeof d.hotels === "object" ? { ...d.hotels } : {};
     MEALP = d.mealPrices && typeof d.mealPrices === "object" ? JSON.parse(JSON.stringify(d.mealPrices)) : {};
-    if (d.firstNight === "A" || d.firstNight === "B") OPT = d.firstNight;
     localSet("plan_v2", PLAN); localSet("status", STATUS); localSet("hotels", HOTEL); localSet("mealPrices", MEALP); localSet("firstNight", OPT);
     if (!drag) { refresh(); fillStatic(); }
   };
