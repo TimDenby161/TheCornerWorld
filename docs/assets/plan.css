@@ -7,7 +7,6 @@ body.plan { display: block; height: auto; min-height: 100%; background: var(--pa
 .plan .eyebrow { margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange-text); }
 .plan .section-title { margin: 0 0 14px; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.05; font-weight: 800; max-width: 18ch; }
 .plan .section-lede { margin: 0 0 40px; font-size: 18px; line-height: 1.55; color: var(--text-secondary); max-width: 60ch; }
-.plan .tabs a[aria-current="page"] { background: var(--chip-bg); color: var(--text-primary); }
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; font: inherit; font-weight: 700; font-size: 16px; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }

@@ -121,11 +121,6 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 .acct .initial { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--blue-btn); color: #fff; font-size: 13px; font-weight: 700; }
 .links a.accent { background: var(--text-primary); color: var(--surface-1); }
 .links a.accent:hover { background: var(--text-primary); color: var(--surface-1); filter: brightness(1.25); }
-/* Discover | Book: a two-way switch, the page you are on filled in */
-.links .mode { display: inline-flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--chip-bg); }
-.links .mode a { height: 30px; }
-.links .mode a[aria-current="page"] { background: var(--text-primary); color: var(--surface-1); cursor: default; }
-@media (max-width: 820px) { .links .mode a { height: 28px; } }
 
 /* What sits on the map: the card that follows the pointer, the key, the view and zoom buttons, "Surprise me" */
 .home .tip {

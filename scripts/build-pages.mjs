@@ -89,9 +89,10 @@ ${index ? "" : `<meta name="robots" content="noindex">\n`}${base ? `<link rel="c
 <header class="app-bar">
   <p class="brand"><span class="brand-mark" aria-hidden="true"></span><span>${NAME}</span></p>
   <nav class="tabs" aria-label="Main">
-    <a href="${up}">Map</a>
-    <a href="${up}guides/">Guides</a>
-    <a href="${up}plan/">Plan a trip</a>
+    <span class="mode">
+      <a href="${up}" class="on">Discover</a>
+      <a href="${up}plan/">Book</a>
+    </span>
   </nav>
 </header>
 <main>
