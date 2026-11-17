@@ -28,12 +28,21 @@ const phone = matchMedia("(max-width: 820px)");
 
 let countries = [], byId = new Map(), ratings = { categories: [], scores: {} }, activities = {}, weather = {}, site = { partners: [] };
 
-// A country's scores: { parts: [food, activities, budget, family, safety], overall } with overall the
-// average to one decimal place. A state or island without its own takes its country's. Null if unscored.
+// A country's scores: { parts: [food, activities, budget, family, safety], likes: [beaches, history, wildlife,
+// hiking, relax], overall } with overall the average of the parts alone, to one decimal place. A state or
+// island without its own takes its country's. Null if unscored.
 function scoreOf(c) {
-  const parts = c && (ratings.scores[c.id] || ratings.scores[c.within]);
-  if (!parts?.length) return null;
-  return { parts, overall: Math.round(parts.reduce((a, b) => a + b, 0) / parts.length * 10) / 10 };
+  const all = c && (ratings.scores[c.id] || ratings.scores[c.within]);
+  if (!all?.length) return null;
+  const n = ratings.categories.length, parts = all.slice(0, n);
+  return { parts, likes: all.slice(n), overall: Math.round(parts.reduce((a, b) => a + b, 0) / parts.length * 10) / 10 };
+}
+// A score out of 10 for each name, as bars in the colour of the score
+function bars(names, scores, colour) {
+  return h("ul", { class: "rating-bars" }, names.map((name, i) => h("li", null,
+    h("span", { text: name }),
+    h("span", { class: "bar", "aria-hidden": "true" }, Object.assign(h("i"), { style: `width: ${scores[i] * 10}%; background: ${colour(scores[i])}` })),
+    h("b", { text: String(scores[i]) }))));
 }
 // Score to colour, as on the map (SCORE_STOPS in assets/globe.js): red for the lowest to green for the highest.
 // Read from the theme each time, so it follows light and dark.
@@ -57,7 +66,7 @@ function scoreBadge(score, colour) {
   return badge;
 }
 let globe = null;
-const state = { info: "todo", selected: null, query: "", sort: "score", month: 0, region: "", great: new Set(), scroll: 0 };
+const state = { info: "todo", selected: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -237,7 +246,7 @@ function hideHint() {
   $("#hint").classList.add("gone");
 }
 
-function filtersActive() { return Boolean(state.query.trim() || state.month || state.region || state.great.size); }
+function filtersActive() { return Boolean(state.query.trim() || state.month || state.region || state.great.size || state.likes.size); }
 
 // Whether a country passes the filters. A state or island is judged as its country.
 function matches(id) {
@@ -252,6 +261,7 @@ function matches(id) {
   if (state.month && !greatMonths(c.within || id).includes(state.month)) return false;
   if (state.region && c.region !== state.region) return false;
   for (const i of state.great) if (score.parts[i] < GREAT) return false;
+  for (const i of state.likes) if (!(score.likes[i] >= GREAT)) return false;
   return true;
 }
 
@@ -436,6 +446,9 @@ function renderDiscover() {
       state.region = state.region === r ? "" : r;
       if (state.region) { hideHint(); globe.flyTo(REGIONS[r]); }
     }, { class: "chip" })));
+  const likes = h("div", { class: "chips one-line", role: "group", "aria-label": `Interests: scores ${GREAT} or more` }, ratings.interests.map((label, i) =>
+    toggle(label, () => state.likes.has(i), () => { if (state.likes.has(i)) state.likes.delete(i); else state.likes.add(i); },
+      { class: "chip", title: `${label}: ${GREAT} or more out of 10` })));
   const great = h("div", { class: "chips one-line", role: "group", "aria-label": `Great for: scores ${GREAT} or more` }, GREAT_LABELS.map((label, i) =>
     toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
       { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
@@ -444,7 +457,8 @@ function renderDiscover() {
   const filters = h("div", { class: "filters" },
     group("Where", null, where),
     group("When", when, months),
-    group("Great for", null, great));
+    group("Great for", null, great),
+    group("Interests", null, likes));
   for (const sync of syncs) sync();
   // The results narrow to a country as you type its name
   const find = h("input", {
@@ -456,7 +470,7 @@ function renderDiscover() {
       else if (e.key === "Escape" && state.query) { e.preventDefault(); e.stopPropagation(); state.query = e.target.value = ""; renderResults(); paint(); }
     },
   });
-  state.clear = () => { state.month = 0; state.region = ""; state.query = find.value = ""; state.great.clear(); refresh(); };
+  state.clear = () => { state.month = 0; state.region = ""; state.query = find.value = ""; state.great.clear(); state.likes.clear(); refresh(); };
 
   panel.replaceChildren(
     h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
@@ -501,7 +515,7 @@ function renderResults() {
   box.replaceChildren(shown.length
       ? h("ul", { class: "cards" }, shown.map((id) => {
           const c = byId.get(id), score = scoreOf(c), best = greatMonths(id);
-          const strong = GREAT_LABELS.filter((_, i) => score.parts[i] >= GREAT);
+          const strong = [...GREAT_LABELS.filter((_, i) => score.parts[i] >= GREAT), ...ratings.interests.filter((_, i) => score.likes[i] >= GREAT)];
           const meta = [strong.length && `Great for ${strong.join(", ").toLowerCase()}`, best.length && `great weather ${monthRanges(best)}`].filter(Boolean).join(" · ");
           return h("li", null, h("button", { type: "button", class: "card", "data-id": id, onclick: () => select(id), ...peekAt(c) },
             h("span", { class: "card-flag", text: c.flag, "aria-hidden": "true" }),
@@ -585,10 +599,9 @@ function renderDestination() {
       const colour = scoreScale();
       body.push(h("div", { class: "rating" },
         h("div", { class: "rating-head" }, h("h2", { class: "section", text: "Our scores" }), scoreBadge(score, colour(score.overall)), h("span", { class: "muted", text: "out of 10" })),
-        h("ul", { class: "rating-bars" }, ratings.categories.map((name, i) => h("li", null,
-          h("span", { text: name }),
-          h("span", { class: "bar", "aria-hidden": "true" }, Object.assign(h("i"), { style: `width: ${score.parts[i] * 10}%; background: ${colour(score.parts[i])}` })),
-          h("b", { text: String(score.parts[i]) }))))));
+        bars(ratings.categories, score.parts, colour),
+        h("h2", { class: "section rating-sub", text: "Interests" }),
+        bars(ratings.interests, score.likes, colour)));
     }
     const top = activities[c.id];
     if (top?.length) body.push(h("h2", { class: "section", text: "Top 3 things to do" }), h("ol", { class: "top3" }, top.slice(0, 3).map((t) => h("li", { text: t }))));

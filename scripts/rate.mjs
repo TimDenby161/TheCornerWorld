@@ -3,7 +3,9 @@
 // docs/data/ratings.json, which the map colours from. Nothing here is published: the page lives in
 // scripts/, and the server only listens on this machine.
 //
-// ratings.json: { categories: [...], checked: [ids you have scored yourself], scores: { id: [n, n, n, n, n] } }
+// ratings.json: { categories: [...], interests: [...], checked: [ids you have scored yourself],
+//   scores: { id: [a score for each category, then one for each interest] } }
+// The overall score is the average of the categories alone: the interests (beaches, history…) are not in it.
 // A state or island with no scores of its own takes its country's.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, renameSync } from "node:fs";
@@ -21,14 +23,15 @@ const PORT = 8740;
 // One country to a line, so a change shows up in git as one line
 export function format(r) {
   const rows = Object.keys(r.scores).sort().map((id) => `  ${JSON.stringify(id)}: [${r.scores[id].join(", ")}]`);
-  return `{\n "categories": ${JSON.stringify(r.categories)},\n "checked": ${JSON.stringify([...new Set(r.checked)].sort())},\n "scores": {\n${rows.join(",\n")}\n }\n}\n`;
+  return `{\n "categories": ${JSON.stringify(r.categories)},\n "interests": ${JSON.stringify(r.interests)},\n "checked": ${JSON.stringify([...new Set(r.checked)].sort())},\n "scores": {\n${rows.join(",\n")}\n }\n}\n`;
 }
 
 function valid(r) {
-  if (!r || !Array.isArray(r.categories) || !Array.isArray(r.checked) || typeof r.scores !== "object") return "missing categories, checked or scores";
+  if (!r || !Array.isArray(r.categories) || !Array.isArray(r.interests) || !Array.isArray(r.checked) || typeof r.scores !== "object") return "missing categories, interests, checked or scores";
+  const size = r.categories.length + r.interests.length;
   for (const [id, parts] of Object.entries(r.scores)) {
     if (!ids.has(id)) return `unknown country ${id}`;
-    if (!Array.isArray(parts) || parts.length !== r.categories.length || !parts.every((n) => Number.isInteger(n) && n >= 1 && n <= 10)) return `${id}: each score must be a whole number from 1 to 10`;
+    if (!Array.isArray(parts) || parts.length !== size || !parts.every((n) => Number.isInteger(n) && n >= 1 && n <= 10)) return `${id}: each score must be a whole number from 1 to 10`;
   }
   return "";
 }

@@ -126,8 +126,8 @@ for (const partner of site.partners || []) if (!/^https:\/\//.test(partner.url |
   const file = join(docs, "data/ratings.json");
   const ratings = JSON.parse(readFileSync(file, "utf8"));
   const known = new Set(JSON.parse(readFileSync(join(docs, "data/countries.json"), "utf8")).map((c) => c.id));
-  const size = ratings.categories?.length;
-  if (!size) fail(file, "needs a list of categories");
+  const size = (ratings.categories?.length || 0) + (ratings.interests?.length || 0);
+  if (!ratings.categories?.length || !ratings.interests?.length) fail(file, "needs a list of categories and of interests");
   for (const [id, parts] of Object.entries(ratings.scores || {})) {
     if (!known.has(id)) fail(file, `${id} is not a country in data/countries.json`);
     if (!Array.isArray(parts) || parts.length !== size || !parts.every((n) => Number.isInteger(n) && n >= 1 && n <= 10)) fail(file, `${id}: needs ${size} whole numbers from 1 to 10`);

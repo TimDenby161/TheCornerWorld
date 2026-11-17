@@ -284,6 +284,7 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .rating { margin: 4px 0 6px; }
 .rating-head { display: flex; align-items: center; gap: 8px; margin: 18px 0 10px; }
 .home .rating-head .section { margin: 0 4px 0 0; }
+.home .rating-sub { margin: 18px 0 10px; }
 .rating-bars { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .rating-bars li { display: grid; grid-template-columns: 116px 1fr 22px; align-items: center; gap: 10px; font-size: 13.5px; }
 .rating-bars .bar { height: 8px; border-radius: 99px; background: var(--chip-bg); overflow: hidden; }

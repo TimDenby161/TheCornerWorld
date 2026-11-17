@@ -42,6 +42,7 @@
   .overall { margin-left: auto; font-size: 22px; padding: 6px 14px; }
   .note { margin: 0 0 26px; color: var(--muted); }
   .cat { margin-bottom: 20px; }
+  .split { margin: 30px 0 14px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 15px; }
   .cat p { display: flex; justify-content: space-between; margin: 0 0 7px; font-weight: 650; }
   .cat p span { color: var(--muted); font-weight: 500; font-size: 12.5px; }
   .nums { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; max-width: 560px; }
@@ -80,7 +81,8 @@
 <p class="status" id="status">Loading…</p>
 <script>
 "use strict";
-const HINTS = ["How good, varied and easy to find the food is", "How much there is to see and do", "Good value: 10 is cheap for what you get", "How easy and welcoming it is with children", "How safe it is for visitors (check the UK travel advice)"];
+const HINTS = ["How good, varied and easy to find the food is", "How much there is to see and do", "Good value: 10 is cheap for what you get", "How easy and welcoming it is with children", "How safe it is for visitors (check the UK travel advice)",
+  "Sand, water and how good the beaches are", "Old towns, ruins, museums and sites", "Animals and nature to see", "Trails and walks, from easy to multi-day", "How good it is for unwinding and doing very little"];
 const STOPS = [2.5, 5, 6.5, 8.5];
 let countries = [], byId = new Map(), R = null, current = null, view = "all";
 const $ = (s) => document.querySelector(s);
@@ -98,7 +100,8 @@ function colour(n) {
 }
 const own = (id) => R.scores[id];
 const partsOf = (c) => own(c.id) || (c.within && own(c.within));
-const overall = (p) => Math.round(p.reduce((a, b) => a + b, 0) / p.length * 10) / 10;
+// The overall score is the average of the categories alone, not the interests that follow them
+const overall = (p) => { const q = p.slice(0, R.categories.length); return Math.round(q.reduce((a, b) => a + b, 0) / q.length * 10) / 10; };
 const checked = (id) => R.checked.includes(id);
 
 function el(tag, attrs, ...kids) {
@@ -149,7 +152,7 @@ function renderMain() {
   if (!c) { $("#main").replaceChildren(el("p", { class: "note", text: "Pick a country on the left. Click a number to score it; every change saves at once. The ↑ and ↓ keys move between countries." })); return; }
   const parts = partsOf(c), inherits = c.within && !own(c.id), parent = c.within && byId.get(c.within);
   const set = (i, n) => {
-    if (!own(c.id)) R.scores[c.id] = (parts || R.categories.map(() => 5)).slice();
+    if (!own(c.id)) R.scores[c.id] = (parts || [...R.categories, ...R.interests].map(() => 5)).slice();
     R.scores[c.id][i] = n;
     if (!checked(c.id)) R.checked.push(c.id);
     save(); renderList(); renderMain();
@@ -158,7 +161,8 @@ function renderMain() {
     el("div", { class: "head" }, el("span", { class: "flag", text: c.flag || "" }), el("h2", { text: c.name }), parts && pill(parts, "overall")),
     el("p", { class: "note", text: inherits ? `Uses ${parent.name}'s scores. Click any number to give ${c.name} its own.`
       : checked(c.id) ? "Checked by you." : "First draft by Claude: change anything that's wrong, or press “Looks right” to mark it checked." }),
-    ...R.categories.map((name, i) => el("div", { class: "cat" },
+    ...[...R.categories, ...R.interests].map((name, i) => el("div", { class: "cat" },
+      i === R.categories.length && el("h3", { class: "split", text: "Interests (not in the overall score)" }),
       el("p", null, name, el("span", { text: HINTS[i] || "" })),
       el("div", { class: "nums", style: `--c: ${parts ? colour(parts[i]) : "var(--blue)"}` }, Array.from({ length: 10 }, (_, k) =>
         el("button", { "aria-pressed": String(!inherits && parts?.[i] === k + 1), style: `--c: ${colour(k + 1)}`, text: String(k + 1), onclick: () => set(i, k + 1) }))))),
