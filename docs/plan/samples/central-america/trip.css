@@ -422,15 +422,18 @@ span.st{cursor:default}
 .sample-bar b{font-weight:700}
 .sample-bar:hover{filter:brightness(1.08)}
 @media (max-width:700px){.sample-bar{bottom:calc(env(safe-area-inset-bottom) + 12px);right:12px;padding:8px 14px;font-size:12px}.sample-bar .long{display:none}}
-/* The logo, top left as on the site's other pages: back to the samples. It scrolls away with the page. */
+/* The logo, top left as on the site's other pages: back to the samples. It stays in the corner as you scroll,
+   so the headings that sit in that corner when a slide snaps to the top move right to clear it. */
 body{padding-top:calc(env(safe-area-inset-top) + 72px)}
-.sample-back{display:grid;place-items:center;position:absolute;left:16px;top:calc(env(safe-area-inset-top) + 14px);z-index:60;width:44px;height:44px;border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.14);background:#fff;border:1px solid rgba(0,0,0,.08)}
+.sample-back{display:grid;place-items:center;position:fixed;left:16px;top:calc(env(safe-area-inset-top) + 14px);z-index:60;width:44px;height:44px;border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.14);background:#fff;border:1px solid rgba(0,0,0,.08)}
 .sample-back img{display:block;width:26px;height:26px}
 .sample-back:hover{transform:scale(1.06)}
+@media (max-width:1180px){.place-head,.home h2,.summary .cost>.eyebrow{padding-left:46px}}
 @media (max-width:700px){body{padding-top:calc(env(safe-area-inset-top) + 64px)}.sample-back{left:12px;top:calc(env(safe-area-inset-top) + 12px);width:40px;height:40px}.sample-back img{width:24px;height:24px}}
 /* The first slide snaps to the very top, so the logo above it stays in view */
 .summary,.summary .sum-left{scroll-margin-top:calc(env(safe-area-inset-top) + 72px)}
 @media (max-width:700px){.summary,.summary .sum-left{scroll-margin-top:calc(env(safe-area-inset-top) + 64px)}}
 .framed body{padding-top:28px}
 .framed .summary,.framed .summary .sum-left{scroll-margin-top:12px}
+.framed .place-head,.framed .home h2,.framed .summary .cost>.eyebrow{padding-left:0}
 .framed .sample-bar,.framed .sample-back{display:none}
