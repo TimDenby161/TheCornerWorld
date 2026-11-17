@@ -1,5 +1,5 @@
-/* The Corner World: what trip/ and a locked client page (docs/c/) show before a client's trip page opens
-   (sign in, choose a trip, enter the password, or why it can't open). Every rule is for a tv- class, so nothing here can touch the trip page itself, and
+/* The Corner World: what a locked client page (docs/c/) shows before the client's trip page opens
+   (enter the password, or why it can't open). Every rule is for a tv- class, so nothing here can touch the trip page itself, and
    this sheet is taken away when the trip page arrives with its own styles. */
 .tv {
   --tv-ink: #0b0b0b; --tv-soft: #55534e; --tv-paper: #f9f9f7; --tv-card: #ffffff; --tv-line: rgba(11, 11, 11, .12); --tv-blue: #2a78d6;

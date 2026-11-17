@@ -117,11 +117,6 @@ body.home:not(.ready) :is(.sheet, .topbar, .legend, .tools, .cue) { opacity: 0; 
 .links .round { width: 34px; padding: 0; }
 .links a:hover, .links .round:hover { background: var(--chip-bg); color: var(--text-primary); }
 /* The account button: "Sign in" with a figure, or the first letter of the name of whoever is signed in */
-.links .acct { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 10px; border: 0; border-radius: 999px; background: none; color: var(--text-secondary); font-weight: 600; font-size: 14px; white-space: nowrap; transition: background .15s, color .15s; }
-.links .acct:hover { background: var(--chip-bg); color: var(--text-primary); }
-.links .acct .ic { width: 16px; height: 16px; }
-.links .acct.in { padding: 0 4px; }
-.acct .initial { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--blue-btn); color: #fff; font-size: 13px; font-weight: 700; }
 .links a.accent { background: var(--text-primary); color: var(--surface-1); }
 .links a.accent:hover { background: var(--text-primary); color: var(--surface-1); filter: brightness(1.25); }
 
@@ -323,17 +318,6 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .home button.tag { padding: 5px 12px; font-size: 13px; transition: background .15s, color .15s; }
 .home button.tag:hover { background: var(--blue-btn); color: #fff; }
 
-.ask { max-width: min(380px, calc(100vw - 32px)); padding: 22px; border: 1px solid var(--glass-line); border-radius: 22px; background: var(--surface-1); color: var(--text-primary); box-shadow: var(--lift-lg); }
-.ask[open] { animation: rise .3s var(--ease); }
-.ask::backdrop { background: rgba(6, 10, 16, .5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
-.ask p { margin: 0; font-size: 16px; font-weight: 600; }
-.ask .actions { justify-content: flex-end; }
-.ask .fine { margin-top: 8px; font-size: 14px; font-weight: 400; line-height: 1.45; color: var(--text-secondary); }
-.ask .fine a { color: var(--blue); }
-.ask .actions { flex-wrap: wrap; margin-top: 16px; }
-.ask .actions + .actions { margin-top: 10px; }
-.ask a.small { text-decoration: none; color: inherit; }
-.home .toast { left: calc((100% - var(--free-r) + var(--gap)) / 2); bottom: calc(env(safe-area-inset-bottom) + 76px); padding: 10px 18px; font-weight: 600; box-shadow: var(--lift); animation: rise .3s var(--ease); }
 
 /* As the window narrows, the bottom row runs out of room: "Surprise me" moves to the left and the key goes
    above the view buttons, then the zoom buttons go (the wheel and pinching still zoom) */
@@ -349,8 +333,6 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
   .home .brand { padding: 5px 14px 5px 6px; font-size: 15px; }
   .links a, .links .round { height: 32px; padding: 0 12px; }
   .links .round { padding: 0; width: 32px; }
-  .links .acct { height: 32px; padding: 0 8px; }
-  .links .acct:not(.in) span { display: none; }
   /* The sheet is solid here, with no blur behind it. As glass it was 95% solid, so the blur could hardly
      be seen, yet a phone had to blur half the screen again on every frame the globe moved. */
   .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h); border-radius: 24px 24px 0 0; border-bottom: 0; background: var(--sheet-solid); -webkit-backdrop-filter: none; backdrop-filter: none; transition: height .42s var(--ease); }
@@ -364,7 +346,6 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
   .tools, .cue { bottom: calc(var(--sheet-h) + 10px); transition: bottom .42s var(--ease); }
   .cue { left: var(--gap); transform: none; }
   .surprise { min-width: 0; height: 40px; font-size: 14px; }
-  .home .toast { left: 50%; bottom: calc(var(--sheet-h) + 60px); }
   .sheet-drag .sheet, .sheet-drag .tools, .sheet-drag .cue { transition: none; }
   .ready .sheet { animation-name: arrive-up; }
   .stage::before { left: 50%; top: 30%; }

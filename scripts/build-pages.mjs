@@ -8,7 +8,6 @@ const read = (name) => JSON.parse(readFileSync(new URL(`data/${name}.json`, out)
 const site = read("site");
 
 const NAME = "The Corner World";
-const accountsOn = Boolean(site.accounts?.url); // sign-in is on (see npm run accounts)
 // Who runs the site. The law on selling online (the E-Commerce Regulations 2002) asks for the trader's
 // name, a postal address and an email address on the site: they are `trader` and `contactEmail` in site.json.
 const trader = { name: "", address: "", ...site.trader };
@@ -69,8 +68,8 @@ function legal(up) {
 }
 
 // The privacy notice: what the site and the planning service keep about people, why, and for how long.
-// If what is collected changes (the brief form, payments, the mailing list, accounts in
-// docs/assets/account.js and supabase/migrations/), change this page with it, and UPDATED above.
+// If what is collected changes (the brief form, payments, the mailing list), change this page with it,
+// and UPDATED above.
 const mail = site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">${esc(site.contactEmail)}</a>` : "";
 const contactLine = [mail && `email ${mail}`, trader.address && `write to ${esc(trader.name)}, ${esc(trader.address)}`].filter(Boolean).join(", or ");
 
@@ -81,7 +80,7 @@ writeFileSync(new URL("privacy/index.html", out), page({
   description: "What The Corner World keeps about you, why, and how to have it deleted.",
   index: true,
   body: `<h1>Privacy</h1>
-<p class="lede">You can use the map without telling us anything. This page is about what happens if you ask us to plan a trip, pay us, or join our emails${accountsOn ? ", or sign in" : ""}.</p>
+<p class="lede">You can use the map without telling us anything. This page is about what happens if you ask us to plan a trip, pay us, or join our emails.</p>
 <p class="muted">Last updated ${UPDATED}.</p>
 <h2 class="section">Who we are</h2>
 <p class="note">${NAME} is run by ${esc(trader.name || "its owner")}, a sole trader in the UK, who decides how your information is used (the "controller", in the words of UK data protection law).${contactLine ? ` To ask anything about your information, ${contactLine}.` : ""}</p>
@@ -105,24 +104,9 @@ writeFileSync(new URL("privacy/index.html", out), page({
 <li><b>Your browser:</b> your choice of light or dark, and, on a trip page, the changes you make and the page's password (so you aren't asked again) are kept in your own browser's storage. They are never sent to us. Clearing your browser's site data removes them.</li>
 <li><b>Links:</b> links to other sites, such as GOV.UK or booking sites, take you to sites with their own privacy notices.</li>
 </ul>
-`
-  // Sign-in (accounts in data/site.json) is described only while it is on
-  + (accountsOn ? `
-<h2 class="section">If you sign in: what we keep</h2>
-<ul class="tips">
-<li><b>From Google, when you sign in:</b> your name, your email address and the address of your profile picture. We never see your Google password.</li>
-<li><b>If we made a trip page for you:</b> the page, and the email addresses allowed to open it.</li>
-</ul>
-<p class="note">The choices you make on a trip page (what you have booked or paid, activities you add) stay in your browser and are not sent to us.</p>
-<h2 class="section">If you sign in: what we use it for</h2>
-<p class="note">To sign you in, and to show your trip page to you and nobody else: the service you asked for when you signed in (Article 6(1)(b)). We don't sell it, share it or use it for advertising.</p>
-<h2 class="section">If you sign in: where it is kept</h2>
-<p class="note">With Supabase, our database provider, on servers in Ireland. Signing in is handled by Google and Supabase. While you are signed in, a sign-in token is kept in your browser's storage, and it is removed when you sign out.</p>
-<h2 class="section">If you sign in: how long, and how to delete it</h2>
-<p class="note">Until you delete your account. On the map, open your account (top right) and choose Delete account: the account is deleted at once. A trip page we made for you is kept as described above.</p>
-` : "") + `
+
 <h2 class="section">Who else handles it</h2>
-<p class="note">Only the companies that run the services above for us: Google (Gmail), Stripe (payments), Kit (our emails) and GitHub (hosting)${accountsOn ? " and Supabase (accounts)" : ""}. Each may only use it to provide that service. Some of them hold it in the United States; where they do, it is protected by the UK's data bridge with the US (the UK Extension to the EU-US Data Privacy Framework) or by the standard data protection contracts approved for the UK. We never sell your information or share it for advertising.</p>
+<p class="note">Only the companies that run the services above for us: Google (Gmail), Stripe (payments), Kit (our emails) and GitHub (hosting). Each may only use it to provide that service. Some of them hold it in the United States; where they do, it is protected by the UK's data bridge with the US (the UK Extension to the EU-US Data Privacy Framework) or by the standard data protection contracts approved for the UK. We never sell your information or share it for advertising.</p>
 
 <h2 class="section">Your rights</h2>
 <p class="note">You can ask for a copy of what we hold about you, or for it to be corrected or deleted, ask us to stop or limit using it, or object to how we use it, and you can withdraw any consent you have given${mail ? `, by emailing ${mail}` : ""}. We will reply within a month. If you are unhappy with how we have handled it, you can complain to the Information Commissioner's Office (<a href="https://ico.org.uk/make-a-complaint/">ico.org.uk</a>).</p>

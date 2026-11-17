@@ -19,7 +19,6 @@ const REGIONS = {
 const ICONS = {
   search: "M11 4a7 7 0 1 0 0 14a7 7 0 0 0 0-14zM21 21l-4.3-4.3",
   back: "M19 12H5M11 18l-6-6 6-6",
-  person: "M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0",
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -101,29 +100,6 @@ function monthRanges(months) {
     runs.push(i === j ? MONTHS[i] : `${MONTHS[i]}–${MONTHS[j]}`);
   }
   return runs.join(", ");
-}
-
-let toastTimer;
-function toast(message) {
-  const el = $("#toast");
-  el.textContent = message;
-  el.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.hidden = true; }, 2600);
-}
-
-// A yes-or-no question in the page's own style. Resolves true for yes. `danger` marks a yes that destroys something.
-function ask(message, yes, danger) {
-  return new Promise((resolve) => {
-    const box = h("dialog", { class: "ask" },
-      h("p", { text: message }),
-      h("div", { class: "actions" },
-        h("button", { type: "button", class: "small", text: "Cancel", onclick: () => box.close("no") }),
-        h("button", { type: "button", class: danger ? "primary danger" : "primary", text: yes, onclick: () => box.close("yes") })));
-    box.addEventListener("close", () => { box.remove(); resolve(box.returnValue === "yes"); });
-    document.body.append(box);
-    box.showModal();
-  });
 }
 
 // ---------- booking links ----------
@@ -642,74 +618,6 @@ function renderDestination() {
   disclose(panel, panel.querySelector(".credits"));
 }
 
-// ---------- the account ----------
-
-// Signing in (assets/account.js, switched off while accounts are off) opens a client's trip pages.
-const account = window.tcwAccount || { enabled: false, user: null, ready: Promise.resolve(), onChange() {} };
-
-function dialog(...kids) {
-  const box = h("dialog", { class: "ask" }, kids);
-  box.addEventListener("close", () => box.remove());
-  document.body.append(box);
-  box.showModal();
-  return box;
-}
-
-function signInBox() {
-  const box = dialog(
-    h("p", { text: "Sign in to The Corner World" }),
-    h("p", { class: "fine", text: "If we've made a trip page for you, signing in opens it." }),
-    h("p", { class: "fine" }, "We keep your name and email address from Google. ", h("a", { href: "privacy/", text: "What we keep and why" }), "."),
-    h("div", { class: "actions" },
-      h("button", { type: "button", class: "small", text: "Cancel", onclick: () => box.close() }),
-      h("button", { type: "button", class: "primary", text: "Continue with Google", autofocus: true, onclick: async (e) => {
-        e.target.disabled = true;
-        try { await account.signIn(); } catch (err) { console.error(err); box.close(); toast("Couldn't start sign-in. Check your connection and try again."); }
-      } })));
-}
-
-function accountBox() {
-  const user = account.user;
-  const admin = h("a", { class: "small", href: "admin/", text: "Admin", hidden: true });
-  account.isAdmin().then((yes) => { admin.hidden = !yes; });
-  const box = dialog(
-    h("p", { text: user.name || user.email }),
-    user.name && h("p", { class: "fine", text: user.email }),
-    h("p", { class: "fine" }, h("a", { href: "privacy/", text: "What we keep and why" })),
-    h("div", { class: "actions" }, h("a", { class: "small", href: "trip/", text: "My trip pages" }), admin),
-    h("div", { class: "actions" },
-      h("button", { type: "button", class: "small danger", text: "Delete account", onclick: async () => {
-        box.close();
-        if (!await ask("Delete your account? This can't be undone.", "Delete account", true)) return;
-        try { await account.remove(); toast("Your account has been deleted"); } catch (err) { console.error(err); toast("Couldn't delete the account. Try again in a moment."); }
-      } }),
-      h("button", { type: "button", class: "small", text: "Sign out", onclick: async () => {
-        box.close();
-        try { await account.signOut(); toast("Signed out"); } catch (err) { console.error(err); toast("Couldn't sign out. Try again in a moment."); }
-      } }),
-      h("button", { type: "button", class: "primary", text: "Done", autofocus: true, onclick: () => box.close() })));
-}
-
-function accountButton() {
-  const btn = $("#account-btn"), user = account.user;
-  btn.hidden = false;
-  btn.classList.toggle("in", Boolean(user));
-  btn.setAttribute("aria-label", user ? `Your account: ${user.email}` : "Sign in");
-  btn.replaceChildren(...(user ? [h("span", { class: "initial", text: (user.name || user.email || "?").trim().charAt(0).toUpperCase() })] : [icon("person"), h("span", { text: "Sign in" })]));
-  btn.onclick = user ? accountBox : signInBox;
-}
-
-// Shows the account button at once, and again when it is known who is signed in
-function accounts() {
-  if (!account.enabled) return;
-  accountButton();
-  account.onChange(accountButton);
-  account.ready.then(() => {
-    accountButton();
-    if (account.problem) toast("Sign-in didn't finish. Try again.");
-  });
-}
-
 // ---------- start ----------
 
 // Opens the country the address asks for, if any (#c=JPN). True if it did.
@@ -763,9 +671,7 @@ async function start() {
 
   $("#hint").textContent = matchMedia("(pointer: coarse)").matches ? "Drag to spin · Pinch to zoom · Tap a country" : "Drag to spin · Scroll to zoom · Click a country";
   document.body.classList.add("ready");
-  const opened = openFromHash();
-  accounts();
-  if (opened) return;
+  if (openFromHash()) return;
   // Nothing asked for: the globe arrives and turns slowly until it is touched
   if (await globe.arrive({ lng: 12, lat: 22 })) globe.spin(true);
 }

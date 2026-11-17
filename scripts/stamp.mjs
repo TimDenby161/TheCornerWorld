@@ -23,8 +23,7 @@ function fingerprint(file) {
   return fingerprints.get(file);
 }
 
-// A page's text with every local .js and .css address stamped: what a script or stylesheet tag loads,
-// and `data-lib`, the library assets/account.js fetches when someone signs in
+// A page's text with every local .js and .css address stamped: what a script or stylesheet tag loads
 export function stamped(page, html = readFileSync(page, "utf8")) {
   const stamp = (all, before, address, after) => {
     if (/^([a-z]+:)?\/\//i.test(address)) return all;
@@ -32,8 +31,7 @@ export function stamped(page, html = readFileSync(page, "utf8")) {
     return existsSync(file) ? `${before}${address}?v=${fingerprint(file)}${after}` : all;
   };
   return html
-    .replace(/(<(?:script|link)\b[^>]*?\b(?:src|href)=")([^"?#]+\.(?:js|css))(?:\?[^"#]*)?(")/g, stamp)
-    .replace(/(<script\b[^>]*?\bdata-lib=")([^"?#]+\.js)(?:\?[^"#]*)?(")/g, stamp);
+    .replace(/(<(?:script|link)\b[^>]*?\b(?:src|href)=")([^"?#]+\.(?:js|css))(?:\?[^"#]*)?(")/g, stamp);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
