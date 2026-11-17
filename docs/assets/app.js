@@ -382,11 +382,12 @@ function disclose(box, before) {
 
 // Where to point the map to take in a country: the middle of its largest landmass and the angle across it
 // (in radians), so far-off territories don't pull the view out to the whole world.
+// A country is framed to fill about 80% of the free map: its outline's circle is padded by a tenth, so near 1 (the circle overstates most shapes)
 function frameOf(country) {
   if (country.frame) return country.frame;
   // A country drawn mostly as its states is framed by its size, as is one too small for a shape
   const spread = country.parts.reduce((sum, part) => sum + part.area, 0) > country.area / 2;
-  const bySize = { lng: country.lng, lat: country.lat, r: clamp(Math.sqrt(country.area / Math.PI) / 6371 * 1.8, 0.004, 1.3) };
+  const bySize = { lng: country.lng, lat: country.lat, r: clamp(Math.sqrt(country.area / Math.PI) / 6371 * 1.8, 0.004, 1.3), fill: 1 };
   if (!country.features.length || spread) return (country.frame = bySize);
   const polygons = country.features.flatMap((f) => f.geometry.type === "MultiPolygon"
     ? f.geometry.coordinates.map((coordinates) => ({ type: "Polygon", coordinates }))
@@ -397,7 +398,7 @@ function frameOf(country) {
   const main = sized.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
   const middle = d3.geoCentroid(main);
   const r = Math.max(...main.coordinates[0].map((point) => d3.geoDistance(middle, point)));
-  return (country.frame = { lng: middle[0], lat: middle[1], r: Math.max(r * 1.1, 0.004) });
+  return (country.frame = { lng: middle[0], lat: middle[1], r: Math.max(r * 1.1, 0.004), fill: 1 });
 }
 
 function buildMap(world) {

@@ -465,16 +465,16 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     if (dest.k) return dest.k;
     if (morph >= 1 || mode === "flat") {
       if (dest.ppd) return clamp(dest.ppd / (geom.S * 0.87 * RAD), 1, kMaxFlat());
-      if (dest.r) return clamp(0.56 * goal.R / (geom.S * dest.r), 1, kMaxFlat());
+      if (dest.r) return clamp(0.56 * (dest.fill || 0.62) / 0.62 * goal.R / (geom.S * dest.r), 1, kMaxFlat());
       return flat.k;
     }
     if (dest.ppd) return clamp(dest.ppd / (geom.R * RAD), 1, K_MAX);
-    if (dest.r) return clamp(0.62 / Math.sin(clamp(dest.r, 0.001, HALF)), 1, K_MAX);
+    if (dest.r) return clamp((dest.fill || 0.62) / Math.sin(clamp(dest.r, 0.001, HALF)), 1, K_MAX);
     return view.k;
   }
 
   // Flies to a place: { lng, lat } and one of k, r (the angle across what should fit, in radians) or ppd
-  // (pixels to a degree). `spins` adds whole turns of the globe on the way. Resolves when it gets there.
+  // (pixels to a degree). With r, `fill` is how much of the free space the circle r takes (0.62 by default). `spins` adds whole turns of the globe on the way. Resolves when it gets there.
   function flyTo(dest, opts = {}) {
     stopMotion();
     spinning = false;
