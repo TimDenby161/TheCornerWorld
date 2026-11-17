@@ -1,6 +1,7 @@
 # Japan sample: sources (researched 17 Nov 2026)
 
-Brief (made up): 1 adult, London, May 2027, about 2 weeks, £3,500, balanced pace, food, temples, trains, mid-range.
+Brief (made up): 1 adult, London, May 2027, about 2 weeks, £2,300, balanced pace, food, temples, trains, budget-minded: business hotels, one stop each way.
+Re-priced 17 Nov 2026 to a budget level: Finnair via Helsinki ~£720 open-jaw (a direct BA/JAL flight is ~£300 more), business hotels ~¥11,000 (£55) a night, a simpler ryokan ~£120.
 Rate used: £1 = ¥210 (mid-November 2026).
 
 - Flights: BA/JAL Heathrow–Haneda direct, 13:05 → 10:55+1 in the March–October 2026 timetable (flightsfrom.com, kayak.com, businesstraveller.com). No direct Osaka–London flight: Finnair via Helsinki or JAL via Tokyo (jal.co.jp, idealo). **Times not confirmed for May 2027.**

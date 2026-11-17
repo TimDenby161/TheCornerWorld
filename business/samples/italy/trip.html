@@ -462,9 +462,9 @@ span.st{cursor:default}
   <div class="tbl-wrap"><table class="legs">
     <thead><tr><th>When</th><th>Journey</th><th>Takes</th><th>Price</th><th>Status</th></tr></thead>
     <tbody>
-      <tr class="k-shuttle"><td class="mono">Mon 31 May<br>12:00</td><td><i></i><b>Private transfer Sorrento → Naples airport</b><small>Child seat included · book ahead</small></td><td class="mono">1h15</td><td>€130 (£113) for 3</td><td data-st-slot="ev:Sorrento:3:Private transfer to Naples airport"></td></tr>
-      <tr class="k-flight"><td class="mono">Mon 31 May<br>15:05</td><td><i></i><b>Naples → London Gatwick</b><small>easyJet or BA · lands 17:00 UK time</small></td><td class="mono">2h55</td><td>£390 for 3</td><td data-st-slot="flight2"></td></tr>
-      <tr class="k-other"><td class="mono">Mon 31 May<br>17:00</td><td><i></i><b>Land at Gatwick</b><small>Not Heathrow, where you flew out. Plan how you're getting home.</small></td><td></td><td></td><td></td></tr>
+      <tr class="k-shuttle"><td class="mono">Mon 31 May<br>11:30</td><td><i></i><b>Curreri bus Sorrento → Naples airport</b><small>From Sorrento station · children half price</small></td><td class="mono">1h15</td><td>€25 (£22) for 3</td><td data-st-slot="ev:Sorrento:3:Bus to Naples airport"></td></tr>
+      <tr class="k-flight"><td class="mono">Mon 31 May<br>15:05</td><td><i></i><b>Naples → London Gatwick</b><small>easyJet · lands 17:00 UK time</small></td><td class="mono">2h55</td><td>£240 for 3</td><td data-st-slot="flight2"></td></tr>
+      <tr class="k-other"><td class="mono">Mon 31 May<br>17:00</td><td><i></i><b>Land at Gatwick</b><small>Plan how you're getting home.</small></td><td></td><td></td><td></td></tr>
     </tbody>
   </table></div>
   <p>Two one-way flights, in to Florence and home from Naples, so there's no going back up the country. A 4-year-old needs their own seat and usually pays about the adult fare.</p>
@@ -474,11 +474,11 @@ span.st{cursor:default}
   <div class="card">
     <h2>Book now</h2>
     <ol>
-      <li>Flights, about £900 for 3: Heathrow → Florence Sat 22 May (<a href="https://www.google.com/travel/flights?q=Flights%20from%20LHR%20to%20FLR%20on%202027-05-22%20one%20way" target="_blank" rel="noopener">search</a>), Naples → Gatwick Mon 31 May (<a href="https://www.google.com/travel/flights?q=Flights%20from%20NAP%20to%20LGW%20on%202027-05-31%20one%20way" target="_blank" rel="noopener">search</a>)</li>
+      <li>Flights, about £540 for 3 with cabin bags: Gatwick → Florence Sat 22 May (<a href="https://www.google.com/travel/flights?q=Flights%20from%20LGW%20to%20FLR%20on%202027-05-22%20one%20way" target="_blank" rel="noopener">search</a>), Naples → Gatwick Mon 31 May (<a href="https://www.google.com/travel/flights?q=Flights%20from%20NAP%20to%20LGW%20on%202027-05-31%20one%20way" target="_blank" rel="noopener">search</a>)</li>
       <li>Hotels with a family room (ask for a real bed, not a cot, for a 4-year-old): Sorrento first, as late May is busy</li>
       <li>Timed tickets: Uffizi for Sun 23 May, Colosseum for Wed 26 May, Vatican Museums for Thu 27 May</li>
       <li>Trains on trenitalia.com, cheaper well ahead: Florence → Rome Tue 25 May, Rome → Naples Fri 28 May. Children 4–14 pay half</li>
-      <li>Private transfers with a child seat: Naples station → Sorrento and Sorrento → Naples airport</li>
+      <li>Campania Express seats from Naples to Sorrento, Fri 28 May: it runs only a few times a day</li>
       <li>Travel insurance for all three of you</li>
     </ol>
   </div>
@@ -505,13 +505,13 @@ const PAX = 3; // travellers: every price on the page is the total for this many
 // def = suggested slot [day, start] or null. Free time inside win (arrive → leave) shows as Free.
 const PLACES = [
   { name:"Florence", country:"Italy", tz:"1 hour ahead of the UK", arrive:"Sat 22 May, 11:15", stay:"3 nights", from:7, to:22,
-    cost:{hotel:[430,860,"3 nights · family room",570],transport:[18,18],act:[0,0],food:[0,0]},
+    cost:{hotel:[235,470,"3 nights · family apartment",315],transport:[18,18],act:[0,0],food:[0,0]},
     win:[[0,"12:00"],[3,"10:00"]],
-    meals:[["l0", "Lunch · schiacciata", 0, "12:30", 60, 7, "Florence's stuffed flatbread, from a sandwich shop"], ["d0", "Dinner · trattoria", 0, "18:30", 90, 19, "Book the first sitting · plain pasta for the little one"], ["b1", "Breakfast", 1, "08:00", 45, 6, "Cornetto and cappuccino at the bar"], ["l1", "Lunch · Mercato Centrale", 1, "12:30", 60, 11, "Food hall: something for everyone"], ["d1", "Dinner", 1, "18:45", 90, 19, ""], ["b2", "Breakfast", 2, "08:00", 45, 6, ""], ["l2", "Lunch in Pisa", 2, "13:00", 60, 11, ""], ["d2", "Dinner · bistecca night", 2, "18:30", 90, 24, "Bistecca alla fiorentina to share"], ["b3", "Breakfast", 3, "08:00", 45, 6, ""]],
+    meals:[["l0", "Lunch · schiacciata", 0, "12:30", 60, 6, "Florence's stuffed flatbread, from a sandwich shop"], ["d0", "Dinner · trattoria", 0, "18:30", 90, 14, "Book the first sitting · plain pasta for the little one"], ["b1", "Breakfast", 1, "08:00", 45, 4, "Cornetto and cappuccino at the bar"], ["l1", "Lunch · Mercato Centrale", 1, "12:30", 60, 8, "Food hall: something for everyone"], ["d1", "Dinner", 1, "18:45", 90, 14, ""], ["b2", "Breakfast", 2, "08:00", 45, 4, ""], ["l2", "Lunch in Pisa", 2, "13:00", 60, 8, ""], ["d2", "Dinner · bistecca night", 2, "18:30", 90, 16, "Bistecca alla fiorentina to share"], ["b3", "Breakfast", 3, "08:00", 45, 4, ""]],
     blurb:"Small enough to walk, with gelato every hundred metres. Short visits to the big galleries, a garden to run around in, and a day trip to Pisa's Leaning Tower.",
     days:[["Day 1","Sat 22 May"],["Day 2","Sun 23 May"],["Day 3","Mon 24 May"],["Day 4","Tue 25 May"]],
     ev:[
-      [0,"09:15","11:15","Flight from Heathrow","flight","BA · leaves 08:05 UK time, lands 11:15 Florence time","","£510 for 3","2h10"],
+      [0,"09:15","11:15","Flight from Gatwick","flight","Vueling · leaves 08:05 UK time, lands 11:15 Florence time","","£300 for 3","2h10"],
       [0,"11:15","12:00","Bags, then tram T2","shuttle","Airport → Unità in 20 min · under-6s free","","€3.40 (£3) for 3","45m"],
       [3,"10:00","11:35","Frecciarossa to Rome","shuttle","Firenze SMN → Roma Termini · book a table of four · children 4–14 half price","","€100 (£87) for 3","1h35"],
     ],
@@ -525,12 +525,12 @@ const PLACES = [
       {id:"leonardo", name:"Leonardo Interactive Museum", dur:90, pp:7, note:"Hands-on models of his machines · about €9 (£7.80) adults, less for children", def:null},
       {id:"accademia", name:"Accademia · Michelangelo's David", dur:75, pp:9.3, note:"About €16 (£14) each adult, under-18s free · closed Mondays", def:null},
     ],
-    flag:"<b>Check:</b> BA's Heathrow–Florence times are from the 2026 timetable. Florence airport's runway is short: in bad weather, flights divert to Pisa or Bologna."
+    flag:"<b>Check:</b> Vueling's Gatwick–Florence times are from the 2026 timetable. Florence airport's runway is short: in bad weather, flights divert to Pisa or Bologna."
   },
   { name:"Rome", country:"Italy", arrive:"Tue 25 May, 11:35", stay:"3 nights", from:7, to:22,
-    cost:{hotel:[450,900,"3 nights · family room",600],transport:[120,120],act:[0,0],food:[0,0]},
+    cost:{hotel:[255,510,"3 nights · family room",340],transport:[120,120],act:[0,0],food:[0,0]},
     win:[[0,"12:15"],[3,"10:00"]],
-    meals:[["l0", "Lunch · pizza al taglio", 0, "12:30", 60, 8, "Pizza by the slice, sold by weight"], ["d0", "Dinner", 0, "18:30", 90, 20, "Cacio e pepe and carbonara"], ["b1", "Breakfast", 1, "08:00", 45, 6, ""], ["l1", "Lunch", 1, "12:30", 60, 11, ""], ["d1", "Dinner", 1, "18:30", 90, 20, ""], ["b2", "Breakfast", 2, "07:45", 45, 6, ""], ["l2", "Lunch", 2, "13:15", 60, 11, ""], ["d2", "Dinner in Trastevere", 2, "18:30", 90, 22, ""], ["b3", "Breakfast", 3, "08:00", 45, 6, ""]],
+    meals:[["l0", "Lunch · pizza al taglio", 0, "12:30", 60, 6, "Pizza by the slice, sold by weight"], ["d0", "Dinner", 0, "18:30", 90, 14, "Cacio e pepe and carbonara"], ["b1", "Breakfast", 1, "08:00", 45, 4, ""], ["l1", "Lunch", 1, "12:30", 60, 8, ""], ["d1", "Dinner · pizzeria", 1, "18:30", 75, 11, "Roman thin-crust pizza, about €10 a pizza"], ["b2", "Breakfast", 2, "07:45", 45, 4, ""], ["l2", "Lunch", 2, "13:15", 60, 8, ""], ["d2", "Dinner in Trastevere", 2, "18:30", 90, 15, ""], ["b3", "Breakfast", 3, "08:00", 45, 4, ""]],
     blurb:"One big sight each morning, then a long lunch, a rest and a park. Under-18s go free at the Colosseum and Pantheon, and under-6s at the Vatican.",
     days:[["Day 1","Tue 25 May"],["Day 2","Wed 26 May"],["Day 3","Thu 27 May"],["Day 4","Fri 28 May"]],
     ev:[
@@ -548,19 +548,19 @@ const PLACES = [
     ],
     flag:"<b>Check:</b> Colosseum tickets are released about 30 days ahead and go within hours. The Vatican is very busy: book the first entry slot."
   },
-  { name:"Sorrento", country:"Italy", arrive:"Fri 28 May, 12:45", stay:"3 nights", from:7, to:22,
-    cost:{hotel:[390,780,"3 nights · family room with a pool",525],transport:[301,301],act:[0,0],food:[0,0]},
-    win:[[0,"12:45"],[3,"12:00"]],
-    meals:[["l0", "Lunch", 0, "13:00", 60, 11, ""], ["d0", "Dinner · gnocchi alla sorrentina", 0, "18:45", 90, 20, ""], ["b1", "Breakfast at the hotel", 1, "08:00", 45, 0, "In the room price"], ["l1", "Lunch on Capri", 1, "12:25", 60, 15, "Pricey: about €17 (£15) each"], ["d1", "Dinner", 1, "18:30", 90, 20, ""], ["b2", "Breakfast at the hotel", 2, "08:00", 45, 0, "In the room price"], ["l2", "Lunch", 2, "13:15", 60, 11, ""], ["d2", "Dinner · Marina Grande", 2, "18:45", 90, 22, "Seafood by the fishing boats"], ["b3", "Breakfast at the hotel", 3, "08:30", 45, 0, "In the room price"]],
-    blurb:"Cliffs, lemon groves and a hotel pool. A boat to Capri, a morning in Pompeii under Vesuvius, and an afternoon on the beach.",
+  { name:"Sorrento", country:"Italy", arrive:"Fri 28 May, 12:50", stay:"3 nights", from:7, to:22,
+    cost:{hotel:[225,450,"3 nights · family room",300],transport:[127,127],act:[0,0],food:[0,0]},
+    win:[[0,"13:00"],[3,"11:30"]],
+    meals:[["l0", "Lunch", 0, "13:00", 60, 8, ""], ["d0", "Dinner · gnocchi alla sorrentina", 0, "18:45", 90, 14, ""], ["b1", "Breakfast at the hotel", 1, "08:00", 45, 0, "In the room price"], ["l1", "Lunch on Capri", 1, "12:25", 60, 12, "Pricey: about €14 (£12) each"], ["d1", "Dinner", 1, "18:30", 90, 14, ""], ["b2", "Breakfast at the hotel", 2, "08:00", 45, 0, "In the room price"], ["l2", "Lunch", 2, "13:15", 60, 8, ""], ["d2", "Dinner · Marina Grande", 2, "18:45", 90, 16, "Seafood by the fishing boats"], ["b3", "Breakfast at the hotel", 3, "08:30", 45, 0, "In the room price"]],
+    blurb:"Cliffs, lemon groves and the sea. A boat to Capri, a morning in Pompeii under Vesuvius, and an afternoon on the beach.",
     days:[["Day 1","Fri 28 May"],["Day 2","Sat 29 May"],["Day 3","Sun 30 May"],["Day 4","Mon 31 May"]],
     ev:[
       [0,"10:00","11:10","Frecciarossa to Naples","shuttle","Roma Termini → Napoli Centrale · children 4–14 half price","","€75 (£65) for 3","1h10"],
-      [0,"11:30","12:45","Private transfer to Sorrento","shuttle","Driver meets you at the station · child seat included","","€130 (£113) for 3","1h15"],
-      [3,"12:00","13:15","Private transfer to Naples airport","shuttle","Child seat included","","€130 (£113) for 3","1h15"],
-      [3,"13:15","14:15","Lunch at the airport","food","","","€12 (£10.50) each"],
-      [3,"14:15","15:05","Security + boarding","other","","","Free"],
-      [3,"15:05","17:00","Flight to London Gatwick","flight","easyJet or BA · lands 17:00 UK time","","£390 for 3","2h55"],
+      [0,"11:40","12:50","Campania Express to Sorrento","shuttle","Tourist train from Napoli Garibaldi, under the main station · reserved seats, room for bags","","€35 (£30) for 3","1h10"],
+      [3,"11:30","12:45","Bus to Naples airport","shuttle","Curreri bus from Sorrento station · children half price","","€25 (£22) for 3","1h15"],
+      [3,"13:00","14:00","Lunch at the airport","food","","","€9 (£8) each"],
+      [3,"14:00","15:05","Security + boarding","other","","","Free"],
+      [3,"15:05","17:00","Flight to London Gatwick","flight","easyJet · lands 17:00 UK time","","£240 for 3","2h55"],
     ],
     acts:[
       {id:"lemons", name:"Lemon grove + limoncello tasting", dur:90, pp:8.7, note:"About €15 (£13) each adult, children free · lemonade for the little one", def:[0,"16:00"]},
@@ -570,7 +570,7 @@ const PLACES = [
       {id:"positano", name:"Positano by boat", dur:420, pp:0, tr:120, note:"Ferry about €20 (£17) each adult each way, children half · steep steps everywhere", def:null},
       {id:"passeggiata", name:"Evening passeggiata", dur:60, pp:0, note:"Corso Italia and Piazza Tasso · free", def:null},
     ],
-    flag:"<b>Check:</b> Capri ferry fares change by company and time of day, about €21.50–24.50 an adult each way in 2026. Book both transfers with a child seat."
+    flag:"<b>Check:</b> Capri ferry fares change by company and time of day, about €21.50–24.50 an adult each way in 2026. The Campania Express runs about March to October, a few trains a day; the Circumvesuviana (€4.50, often standing) is the backup."
   },
 ];
 
@@ -621,8 +621,8 @@ const store = { get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); 
 // Booking status for every flight, transport leg, activity and meal
 const ST = [["guess","Guessed"],["research","Researched"],["booked","Booked"],["paid","Booked + paid"]];
 const ST_DEF = {};
-const SHARED = { "Flight from Heathrow":"flight1", "Flight to London Gatwick":"flight2", "Frecciarossa to Rome":"fr-rome",
-  "Frecciarossa to Naples":"fr-naples", "Private transfer to Sorrento":"tr-sorrento" };
+const SHARED = { "Flight from Gatwick":"flight1", "Flight to London Gatwick":"flight2", "Frecciarossa to Rome":"fr-rome",
+  "Frecciarossa to Naples":"fr-naples", "Campania Express to Sorrento":"campania" };
 let STATUS = store.get("status", {});
 const stOf = k => STATUS[k] || ST_DEF[k] || "guess";
 const stLabel = k => ST.find(x => x[0] === stOf(k))[1];
@@ -706,7 +706,7 @@ function fillOptionCosts(){
   if (ea) ea.innerHTML = `<b>£${a}</b> ${a > b ? "£" + d + " more" : a < b ? "£" + d + " less" : ""}`;
   if (eb) eb.innerHTML = `<b>£${b}</b> ${b < a ? "£" + d + " less" : b > a ? "£" + d + " more" : ""}`;
 }
-const FLIGHTS = 900, EXTRAS = 126, BUDGET = 5000;
+const FLIGHTS = 540, EXTRAS = 105, BUDGET = 3000;
 // How much is already paid: items marked "Booked + paid"
 const priceNum = str => { if (!str) return 0; const m = str.match(/= £([\d.,]+) for 3/) || str.match(/\(£([\d.,]+)\) for 3/) || str.match(/£([\d.,]+)/); return m ? parseFloat(m[1].replace(/,/g, "")) : 0; };
 const isPaid = k => stOf(k) === "paid";
@@ -725,7 +725,7 @@ function renderSummary(){
   vis.forEach(p => p.ev.forEach(e => { const k = evStKey(p, e); if (k) owner[k] = p.name; }));
   const rows = vis.map((p, i) => ({ i, name: p.title || p.name, sub: `${costOf(p).hotel[2]} · ${tierOf(p)} hotel · ${placed(p).filter(x => !x.a.meal).length} activities`, v: placeSum(p), pd: paidOf(p, owner) }));
   const total = FLIGHTS + EXTRAS + rows.reduce((a, r) => a + r.v, 0);
-  const fPaid = (isPaid("flight1") ? 510 : 0) + (isPaid("flight2") ? 390 : 0);
+  const fPaid = (isPaid("flight1") ? 300 : 0) + (isPaid("flight2") ? 240 : 0);
   const paidTotal = fPaid + rows.reduce((a, r) => a + r.pd, 0);
   document.getElementById("sum-paid").textContent = gbp(paidTotal);
   fillItinerary();
@@ -735,9 +735,9 @@ function renderSummary(){
   bel.className = "budget " + (diff > 0 ? "over" : "under");
   bel.innerHTML = `Budget <b class="mono">${gbp(BUDGET)}</b> · <b class="mono">${gbp(Math.abs(diff))}</b> ${diff > 0 ? "over" : "under"}`;
   document.getElementById("sum-rows").innerHTML =
-    `<tr><th>Flights<small>LHR → Florence Sat 22 May · £510</small><small>Naples → LGW Mon 31 May · £390</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
+    `<tr><th>Flights<small>Gatwick → Florence Sat 22 May · £300</small><small>Naples → Gatwick Mon 31 May · £240</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
     rows.map(r => `<tr class="place-row" data-go="p${r.i}"><th><span class="num">${String(r.i + 1).padStart(2, "0")}</span><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="mono">${gbp(r.v)}</td></tr>`).join("") +
-    `<tr><th>Fees and extras<small><span title="Paid at each hotel, per adult per night: Florence about €7, Rome about €7.50, Sorrento about €3. Children are exempt. About €105 in all." style="text-decoration:underline dotted;cursor:help">City taxes - £91</span></small><small><span title="The EU's travel authorisation, €20 each for adults, free for children. Due to start in late 2026: check whether it is running." style="text-decoration:underline dotted;cursor:help">ETIAS x2 - £35</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
+    `<tr><th>Fees and extras<small><span title="Paid at each hotel, per adult per night, at 3-star rates: Florence about €5.50, Rome about €6, Sorrento about €2. Children are exempt. About €81 in all." style="text-decoration:underline dotted;cursor:help">City taxes - £70</span></small><small><span title="The EU's travel authorisation, €20 each for adults, free for children. Due to start in late 2026: check whether it is running." style="text-decoration:underline dotted;cursor:help">ETIAS x2 - £35</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
     `<tr class="tot"><th>Total for 3</th><td class="mono">${gbp(total)}</td></tr>`;
   document.querySelectorAll("#sum-rows .place-row").forEach(tr => tr.onclick = () => document.getElementById(tr.dataset.go)?.scrollIntoView({ behavior: "smooth" }));
 }

@@ -8,13 +8,13 @@ const PAX = 1; // travellers: every price on the page is the total for this many
 // def = suggested slot [day, start] or null. Free time inside win (arrive → leave) shows as Free.
 const PLACES = [
   { name:"Tokyo", country:"Japan", tz:"8 hours ahead of the UK", arrive:"Sun 16 May, 10:55", stay:"4 nights", from:6, to:23,
-    cost:{hotel:[255,510,"4 nights",340],transport:[28,28],act:[0,0],food:[0,0]},
+    cost:{hotel:[165,330,"4 nights · business hotel",220],transport:[28,28],act:[0,0],food:[0,0]},
     win:[[0,"12:30"],[4,"09:30"]],
-    meals:[["l0", "Lunch · ramen", 0, "13:00", 60, 5, "Ticket-machine ramen shop, about ¥1,100 (£5)"], ["d0", "Dinner · izakaya", 0, "18:30", 90, 14, "Small plates and a beer, then an early night"], ["b1", "Breakfast", 1, "08:00", 45, 4, "Konbini or café"], ["l1", "Lunch in Harajuku", 1, "12:00", 60, 7, ""], ["d1", "Dinner · sushi", 1, "20:15", 90, 18, "Standing sushi bar near Shibuya"], ["b2", "Breakfast", 2, "07:45", 40, 4, ""], ["l2", "Lunch", 2, "11:45", 60, 7, ""], ["d2", "Dinner · Omoide Yokocho", 2, "18:45", 90, 15, "Yakitori in the alleys by Shinjuku station"], ["b3", "Breakfast", 3, "07:00", 40, 4, ""], ["l3", "Lunch · yuba in Nikko", 3, "13:00", 60, 10, "Nikko's tofu-skin speciality"], ["d3", "Dinner", 3, "19:00", 90, 14, ""], ["b4", "Breakfast", 4, "07:45", 45, 4, ""]],
+    meals:[["l0", "Lunch · ramen", 0, "13:00", 60, 5, "Ticket-machine ramen shop, about ¥1,100 (£5)"], ["d0", "Dinner · izakaya", 0, "18:30", 90, 10, "Small plates and a beer, then an early night"], ["b1", "Breakfast", 1, "08:00", 45, 4, "Konbini or café"], ["l1", "Lunch in Harajuku", 1, "12:00", 60, 6, ""], ["d1", "Dinner · sushi", 1, "20:15", 90, 12, "Conveyor-belt sushi near Shibuya"], ["b2", "Breakfast", 2, "07:45", 40, 4, ""], ["l2", "Lunch", 2, "11:45", 60, 7, ""], ["d2", "Dinner · Omoide Yokocho", 2, "18:45", 90, 11, "Yakitori in the alleys by Shinjuku station"], ["b3", "Breakfast", 3, "07:00", 40, 4, ""], ["l3", "Lunch · yuba in Nikko", 3, "13:00", 60, 6, "Nikko's tofu-skin speciality"], ["d3", "Dinner", 3, "19:00", 90, 10, ""], ["b4", "Breakfast", 4, "07:45", 45, 4, ""]],
     blurb:"Neon, shrines and the May Grand Sumo Tournament, which runs 9–23 May 2027. Day 4 is a day trip to Nikko's gold-leafed shrines in the forest.",
     days:[["Day 1","Sun 16 May"],["Day 2","Mon 17 May"],["Day 3","Tue 18 May"],["Day 4","Wed 19 May"],["Day 5","Thu 20 May"]],
     ev:[
-      [0,"06:00","10:55","Flight from Heathrow","flight","JAL or BA, direct · leaves Sat 13:05 UK time, lands 10:55 Tokyo time","","£1,050 for 1","13h50"],
+      [0,"06:00","10:55","Flight from Heathrow","flight","Finnair via Helsinki · leaves Sat 07:20 UK time, lands 10:55 Tokyo time","","£720 for 1","19h35"],
       [0,"11:00","11:45","Immigration + bags","other","No visa needed on a UK passport, for up to 90 days","","Free"],
       [0,"11:45","12:30","Keikyu train to the hotel","shuttle","Haneda → Shinagawa or Asakusa · tap in with a Suica card","","¥600 (£3) for 1","45m"],
       [4,"09:30","11:00","Romancecar to Hakone","shuttle","Shinjuku → Hakone-Yumoto · reserved seat","","¥2,470 (£12) for 1","1h30"],
@@ -31,10 +31,10 @@ const PLACES = [
       {id:"akihabara", name:"Akihabara", dur:120, pp:0, note:"Electronics, anime and retro games · free", def:null},
       {id:"tower", name:"Tokyo Tower main deck", dur:75, pp:6, note:"¥1,200 (£5.70)", def:null},
     ],
-    flag:"<b>Check:</b> the flight times are from the 2026 timetable. Sumo tickets go on sale 10 April 2027 and the good seats sell out on the first day."
+    flag:"<b>Check:</b> the flight times are guesses from the 2026 timetable; a direct flight with BA or JAL costs about £300 more. Sumo tickets go on sale 10 April 2027 and the good seats sell out on the first day."
   },
   { name:"Hakone", country:"Japan", arrive:"Thu 20 May, 11:00", stay:"1 night", from:6, to:23,
-    cost:{hotel:[140,280,"1 night · ryokan with dinner",190],transport:[41,41],act:[0,0],food:[0,0]},
+    cost:{hotel:[90,180,"1 night · ryokan with dinner",120],transport:[41,41],act:[0,0],food:[0,0]},
     win:[[0,"11:00"],[1,"10:00"]],
     meals:[["l0", "Lunch · soba", 0, "11:30", 60, 7, "Near Hakone-Yumoto station"], ["d0", "Kaiseki dinner at the ryokan", 0, "18:30", 120, 0, "In the room price"], ["b1", "Japanese breakfast at the ryokan", 1, "08:00", 60, 0, "In the room price"]],
     blurb:"Hot springs, a steaming volcanic valley and, on a clear day, Mt Fuji over Lake Ashi. One night in a ryokan: tatami room, onsen bath, dinner in a robe. The Hakone Freepass, ¥6,000 (£29), covers the trains, ropeway and boat.",
@@ -53,9 +53,9 @@ const PLACES = [
     flag:"<b>Check:</b> the Owakudani ropeway closes when volcanic gas is high, and buses run instead. Fuji hides in cloud on many May days."
   },
   { name:"Kyoto", country:"Japan", arrive:"Fri 21 May, 12:50", stay:"4 nights", from:6, to:23,
-    cost:{hotel:[300,600,"4 nights",400],transport:[70,70],act:[0,0],food:[0,0]},
+    cost:{hotel:[165,330,"4 nights · business hotel",220],transport:[70,70],act:[0,0],food:[0,0]},
     win:[[0,"13:00"],[4,"10:00"]],
-    meals:[["l0", "Lunch at the station", 0, "13:00", 60, 7, "Kyoto Station's ramen street"], ["d0", "Dinner in Pontocho", 0, "18:00", 90, 15, "Lantern-lit alley by the river"], ["b1", "Breakfast", 1, "06:00", 30, 3, "Konbini onigiri before Fushimi Inari"], ["l1", "Lunch", 1, "12:30", 60, 8, ""], ["d1", "Dinner", 1, "19:00", 90, 15, ""], ["b2", "Breakfast", 2, "06:45", 40, 4, ""], ["l2", "Lunch · Nishiki Market", 2, "12:30", 60, 10, "Grazing on skewers and pickles"], ["d2", "Dinner · kaiseki set", 2, "19:00", 90, 30, "The splurge: a seasonal set menu"], ["b3", "Breakfast", 3, "07:45", 40, 4, ""], ["l3", "Lunch in Nara", 3, "12:15", 60, 8, "Kakinoha-zushi, sushi wrapped in persimmon leaves"], ["d3", "Dinner", 3, "19:00", 90, 15, ""], ["b4", "Breakfast", 4, "08:00", 45, 4, ""]],
+    meals:[["l0", "Lunch at the station", 0, "13:00", 60, 6, "Kyoto Station's ramen street"], ["d0", "Dinner in Pontocho", 0, "18:00", 90, 11, "Lantern-lit alley by the river"], ["b1", "Breakfast", 1, "06:00", 30, 3, "Konbini onigiri before Fushimi Inari"], ["l1", "Lunch", 1, "12:30", 60, 6, ""], ["d1", "Dinner", 1, "19:00", 90, 10, ""], ["b2", "Breakfast", 2, "06:45", 40, 4, ""], ["l2", "Lunch · Nishiki Market", 2, "12:30", 60, 6, "Grazing on skewers and pickles"], ["d2", "Dinner · kaiseki set", 2, "19:00", 90, 20, "The treat: a seasonal set menu at lunch-style prices"], ["b3", "Breakfast", 3, "07:45", 40, 4, ""], ["l3", "Lunch in Nara", 3, "12:15", 60, 6, "Kakinoha-zushi, sushi wrapped in persimmon leaves"], ["d3", "Dinner", 3, "19:00", 90, 10, ""], ["b4", "Breakfast", 4, "08:00", 45, 4, ""]],
     blurb:"Two thousand temples, geisha districts and gardens. Start early: the big sights are calm before 08:00 and packed by 10:00. Day 4 is a day trip to Nara's deer and Great Buddha.",
     days:[["Day 1","Fri 21 May"],["Day 2","Sat 22 May"],["Day 3","Sun 23 May"],["Day 4","Mon 24 May"],["Day 5","Tue 25 May"]],
     ev:[
@@ -76,9 +76,9 @@ const PLACES = [
     flag:"<b>Check:</b> temple prices are from 2025–26 listings. Book Kyoto hotels early: May is busy."
   },
   { name:"Hiroshima", country:"Japan", arrive:"Tue 25 May, 11:45", stay:"2 nights", from:6, to:23,
-    cost:{hotel:[135,270,"2 nights",180],transport:[66,66],act:[0,0],food:[0,0]},
+    cost:{hotel:[75,150,"2 nights · business hotel",100],transport:[66,66],act:[0,0],food:[0,0]},
     win:[[0,"12:00"],[2,"10:00"]],
-    meals:[["l0", "Lunch", 0, "12:00", 60, 7, ""], ["d0", "Dinner · okonomiyaki", 0, "18:30", 75, 9, "Hiroshima-style, layered with noodles, at Okonomimura"], ["b1", "Breakfast", 1, "07:15", 40, 4, ""], ["l1", "Lunch on Miyajima", 1, "12:30", 60, 12, "Grilled oysters or anago-meshi (eel on rice)"], ["d1", "Dinner", 1, "19:00", 90, 15, ""], ["b2", "Breakfast", 2, "08:30", 45, 4, ""]],
+    meals:[["l0", "Lunch", 0, "12:00", 60, 6, ""], ["d0", "Dinner · okonomiyaki", 0, "18:30", 75, 9, "Hiroshima-style, layered with noodles, at Okonomimura"], ["b1", "Breakfast", 1, "07:15", 40, 4, ""], ["l1", "Lunch on Miyajima", 1, "12:30", 60, 9, "Grilled oysters or anago-meshi (eel on rice)"], ["d1", "Dinner", 1, "19:00", 90, 10, ""], ["b2", "Breakfast", 2, "08:30", 45, 4, ""]],
     blurb:"A moving afternoon at the Peace Park, then a day on Miyajima: the 'floating' torii, a ropeway up Mt Misen and wild deer.",
     days:[["Day 1","Tue 25 May"],["Day 2","Wed 26 May"],["Day 3","Thu 27 May"]],
     ev:[
@@ -94,9 +94,9 @@ const PLACES = [
     flag:"The torii looks like it floats at high tide: check the tide table for Wed 26 May and move the visit if you need to."
   },
   { name:"Osaka", country:"Japan", arrive:"Thu 27 May, 11:30", stay:"2 nights", from:6, to:23,
-    cost:{hotel:[120,240,"2 nights",160],transport:[67,67],act:[0,0],food:[0,0]},
+    cost:{hotel:[75,150,"2 nights · business hotel",100],transport:[67,67],act:[0,0],food:[0,0]},
     win:[[0,"12:00"],[2,"07:30"]],
-    meals:[["l0", "Lunch · Kuromon Market", 0, "12:15", 60, 12, "Wagyu skewers, sea urchin, fruit"], ["d0", "Dinner · Dotonbori street food", 0, "18:30", 120, 15, "Takoyaki, kushikatsu and okonomiyaki under the neon"], ["b1", "Breakfast", 1, "07:45", 40, 4, ""], ["l1", "Lunch in Himeji", 1, "12:00", 60, 8, ""], ["d1", "Dinner", 1, "19:45", 90, 15, ""], ["b2", "Breakfast", 2, "06:45", 40, 4, ""]],
+    meals:[["l0", "Lunch · Kuromon Market", 0, "12:15", 60, 9, "Wagyu skewers, sea urchin, fruit"], ["d0", "Dinner · Dotonbori street food", 0, "18:30", 120, 11, "Takoyaki, kushikatsu and okonomiyaki under the neon"], ["b1", "Breakfast", 1, "07:45", 40, 4, ""], ["l1", "Lunch in Himeji", 1, "12:00", 60, 6, ""], ["d1", "Dinner", 1, "19:45", 90, 10, ""], ["b2", "Breakfast", 2, "06:45", 40, 4, ""]],
     blurb:"Japan's kitchen: loud, friendly and built around eating. Day 2 is a day trip to Himeji, the finest original castle in the country.",
     days:[["Day 1","Thu 27 May"],["Day 2","Fri 28 May"],["Day 3","Sat 29 May"]],
     ev:[
@@ -112,7 +112,7 @@ const PLACES = [
       {id:"shinsekai", name:"Shinsekai + Tsutenkaku", dur:120, pp:5.7, note:"Retro neighbourhood · tower ¥1,200 (£5.70)", def:null},
       {id:"usj", name:"Universal Studios Japan", dur:600, pp:45, note:"About ¥9,500 (£45), more for Express passes", def:null},
     ],
-    flag:"<b>Check:</b> the flight home is a guess, Finnair via Helsinki or JAL via Tokyo. Price both before you book the flight out: it's one open-jaw booking."
+    flag:"<b>Check:</b> the flight home is a guess. Book it with the flight out as one open-jaw ticket, and compare Finnair with JAL via Tokyo."
   },
 ];
 
@@ -248,7 +248,7 @@ function fillOptionCosts(){
   if (ea) ea.innerHTML = `<b>£${a}</b> ${a > b ? "£" + d + " more" : a < b ? "£" + d + " less" : ""}`;
   if (eb) eb.innerHTML = `<b>£${b}</b> ${b < a ? "£" + d + " less" : b > a ? "£" + d + " more" : ""}`;
 }
-const FLIGHTS = 1050, EXTRAS = 12, BUDGET = 3500;
+const FLIGHTS = 720, EXTRAS = 12, BUDGET = 2300;
 // How much is already paid: items marked "Booked + paid"
 const priceNum = str => { if (!str) return 0; const m = str.match(/= £([\d.,]+) for 1/) || str.match(/\(£([\d.,]+)\) for 1/) || str.match(/£([\d.,]+)/); return m ? parseFloat(m[1].replace(/,/g, "")) : 0; };
 const isPaid = k => stOf(k) === "paid";
@@ -277,7 +277,7 @@ function renderSummary(){
   bel.className = "budget " + (diff > 0 ? "over" : "under");
   bel.innerHTML = `Budget <b class="mono">${gbp(BUDGET)}</b> · <b class="mono">${gbp(Math.abs(diff))}</b> ${diff > 0 ? "over" : "under"}`;
   document.getElementById("sum-rows").innerHTML =
-    `<tr><th>Flights<small>One open-jaw booking: in to Tokyo, home from Osaka</small><small>LHR → HND Sat 15 May · KIX → LHR Sat 29 May</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
+    `<tr><th>Flights<small>Finnair via Helsinki, one booking: in to Tokyo, home from Osaka</small><small>LHR → HND Sat 15 May · KIX → LHR Sat 29 May</small></th><td class="mono">${gbp(FLIGHTS)}</td></tr>` +
     rows.map(r => `<tr class="place-row" data-go="p${r.i}"><th><span class="num">${String(r.i + 1).padStart(2, "0")}</span><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="mono">${gbp(r.v)}</td></tr>`).join("") +
     `<tr><th>Fees and extras<small><span title="Data eSIM for Japan, 15 days, about £12" style="text-decoration:underline dotted;cursor:help">eSIM - £12</span></small><small><span title="UK passports: no visa for stays up to 90 days. Japan's departure tax, ¥1,000, is already in the flight price." style="text-decoration:underline dotted;cursor:help">Visa - none needed</span></small></th><td class="mono">${gbp(EXTRAS)}</td></tr>` +
     `<tr class="tot"><th>Total for 1</th><td class="mono">${gbp(total)}</td></tr>`;

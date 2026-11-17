@@ -1,6 +1,7 @@
 # Italy sample: sources (researched 17 Nov 2026)
 
-Brief (made up): 2 adults + 1 child aged 4, London, late May 2027, 10 days, £5,000, relaxed pace, mid-range, family rooms.
+Brief (made up): 2 adults + 1 child aged 4, London, late May 2027, 10 days, £3,000, relaxed pace, budget-minded, family rooms or apartments.
+Re-priced 17 Nov 2026 to a budget level: Vueling Gatwick–Florence and easyJet Naples–Gatwick ~£540 for 3 (estimate), 3-star family rooms ~€110–130 a night, Campania Express Naples–Sorrento and the Curreri airport bus instead of private transfers.
 Rate used: €1 = £0.87. Dates avoid Italy's 2 June holiday.
 
 - Flights: BA is the only nonstop Heathrow–Florence airline; BA CityFlyer leaves Stansted in April 2027 (flightconnections.com, ibtimes.co.uk). Naples–Gatwick fare is an estimate. **Times not confirmed for May 2027.**
