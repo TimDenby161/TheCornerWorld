@@ -18,7 +18,7 @@
 <meta name="theme-color" content="#2a78d6">
 <script src="../assets/theme.js?v=ae737992"></script>
 <link rel="stylesheet" href="../assets/styles.css?v=94e0ad3d">
-<link rel="stylesheet" href="../assets/plan.css?v=e0862203">
+<link rel="stylesheet" href="../assets/plan.css?v=421f929c">
 </head>
 <body class="page plan">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -35,253 +35,141 @@
 
 <main id="main">
 
-<section class="hero">
-  <svg class="hero-route" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M-20 560 C 160 470, 220 640, 380 560 S 560 330, 700 400 S 940 640, 1060 470 S 1180 200, 1240 230"/>
-    <circle cx="380" cy="560" r="7"/><circle cx="700" cy="400" r="7"/><circle cx="1060" cy="470" r="7"/>
-  </svg>
-  <div class="wrap hero-grid">
-    <div>
-      <p class="eyebrow">Trip planning by The Corner World</p>
-      <h1>Your whole trip, <em>planned hour by hour.</em></h1>
-      <p class="lede">Tell us where you want to go. We send you a trip page with every day on a calendar, every journey timed and every cost added up in pounds. You can move things around and add your own plans.</p>
-      <div class="hero-ctas">
-        <a class="btn btn-primary" href="#start">Plan my trip, from £79</a>
-        <a class="btn btn-ghost" href="samples/central-america/">See a full sample</a>
-      </div>
-      <ul class="proof">
-        <li>Ready in 5 working days</li>
-        <li>Every price checked by a person</li>
-        <li>Changes included</li>
-      </ul>
+<section class="hero" id="top">
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Trip planning</p>
+    <h1>Your whole trip, planned hour by hour.</h1>
+    <p class="lede">Tell us where you want to go. We send you a trip page with every day on a calendar, every journey timed and every cost added up in pounds.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#start">Plan my trip</a>
+      <a class="btn btn-ghost" href="#prices">See prices</a>
+    </div>
+    <ul class="proof">
+      <li><b>From £79</b>for the whole trip</li>
+      <li><b>5 days</b>to your finished page</li>
+      <li><b>Changes</b>included</li>
+    </ul>
+    <a class="scroll-cue" href="#sample">See a real trip page</a>
+  </div>
+</section>
+
+<section class="sample" id="sample">
+  <div class="wrap sample-grid">
+    <div class="sample-copy">
+      <p class="eyebrow">A real trip page</p>
+      <h2 class="section-title">Scroll it. Tap it. It's live.</h2>
+      <p class="section-lede">Central America, 16 days for two. This is the page a client gets, working just as it does on their phone.</p>
     </div>
     <div class="phone-col">
       <div class="phone">
-        <iframe src="samples/central-america/" title="A sample trip page, live: Central America in 16 days" loading="lazy"></iframe>
+        <div class="screen">
+          <iframe src="samples/central-america/" title="A sample trip page, live: Central America in 16 days" loading="lazy"></iframe>
+        </div>
       </div>
-      <p class="phone-tag t1"><span class="dot"></span>Live sample<b>Swipe through it</b></p>
-      <p class="phone-tag t2">16 days, 3 countries<b>Every cost for 2</b></p>
     </div>
-  </div>
-</section>
-
-<section class="features" id="what">
-  <div class="wrap">
-    <p class="eyebrow">What you get</p>
-    <h2 class="section-title">More than a list of places. A plan you can actually follow.</h2>
-    <p class="section-lede">Most itineraries arrive as a PDF you read once. Yours is a page you'll use every day of the trip, on your phone or your laptop.</p>
-    <div class="feature-grid">
-      <article class="feature reveal">
-        <div class="art art-cal" aria-hidden="true"><i class="k-fl"></i><i class="k-bus"></i><i class="k-hike"></i><i class="k-boat"></i><i class="k-food"></i><i class="k-free">Free</i><i class="k-sh"></i></div>
-        <h3>Every hour on a calendar</h3>
-        <p>Days across the top, hours down the side. Flights, buses, boats, tours and meals, each with its time and how long it takes.</p>
-      </article>
-      <article class="feature reveal">
-        <div class="art art-cost" aria-hidden="true">
-          <div>Valladolid<span class="w62"></span><b>£412</b></div>
-          <div>Bacalar<span class="w38"></span><b>£268</b></div>
-          <div>Antigua<span class="w80"></span><b>£530</b></div>
-          <div class="tot">Total<span></span><b>£3,240</b></div>
-        </div>
-        <h3>Every cost, added up</h3>
-        <p>Hotels, transport, activities and food for each stop, in pounds, adding up to one total. You can see straight away if it fits your budget.</p>
-      </article>
-      <article class="feature reveal">
-        <div class="art art-tiers" aria-hidden="true"><div>Low<b>£38</b></div><div class="on">Mid<b>£72</b></div><div>High<b>£165</b></div></div>
-        <h3>Hotels at three prices</h3>
-        <p>For every stop, pick Low, Mid or High and the total changes as you go. Spend where it matters to you and save where it doesn't.</p>
-      </article>
-      <article class="feature reveal">
-        <div class="art art-book" aria-hidden="true"><div><em class="paid">Paid</em>Flight to Cancún</div><div><em class="booked">Booked</em>Lagoon hotel</div><div><em class="todo">To book</em>Tikal sunrise tour</div></div>
-        <h3>What to book, and when</h3>
-        <p>A list of what to book now and what to check nearer the time. Mark each thing paid or booked, and the page keeps track of what you've spent.</p>
-      </article>
-      <article class="feature reveal">
-        <div class="art art-swipe" aria-hidden="true"><div class="mini side"><i></i><i></i><i></i></div><div class="mini mid"><i></i><i></i><i></i></div><div class="mini side"><i></i><i></i><i></i></div></div>
-        <h3>Made for your phone</h3>
-        <p>One swipe per stop and one day at a time, so the plan is easy to check in a queue at the bus station.</p>
-      </article>
-      <article class="feature reveal">
-        <div class="art art-check" aria-hidden="true"><div><div class="seal">✓</div>Routes · times · prices · visas</div></div>
-        <h3>Researched and checked</h3>
-        <p>We work out the route so you never double back, check that the buses run on the day you need them, and look up the entry rules for UK passports.</p>
-      </article>
+    <div class="sample-actions">
+      <a class="btn btn-primary" href="#start">Plan mine</a>
+      <a class="btn btn-ghost" href="../samples/">More sample trips</a>
     </div>
-  </div>
-</section>
-
-<section id="sample">
-  <div class="wrap">
-    <p class="eyebrow">Sample trips</p>
-    <h2 class="section-title">Open one up and try it.</h2>
-    <p class="section-lede">These are full trip pages, built just as a client's would be. Change the hotels, move an activity and watch the total change.</p>
-    <article class="sample-card reveal">
-      <div class="sample-art" aria-hidden="true">
-        <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMax slice">
-          <circle cx="420" cy="150" r="46" fill="#FFE2A8" opacity=".9"/>
-          <path d="M300 300 L420 120 L455 128 L560 300 Z" fill="#3A2E4F"/>
-          <path d="M408 138 L420 120 L455 128 L462 140 Q440 132 408 138 Z" fill="#E8E2EC"/>
-          <path d="M0 300 L120 190 L210 300 Z" fill="#4A3A63"/>
-          <path d="M160 300 h120 v-18 h-12 v-18 h-12 v-18 h-12 v-18 h-24 v18 h-12 v18 h-12 v18 h-12 v18 h-12 z" fill="#2A2240"/>
-          <rect x="208" y="200" width="16" height="12" fill="#2A2240"/>
-          <rect x="0" y="300" width="600" height="100" fill="#22305C"/>
-          <path d="M0 318 h600 M40 336 h220 M300 336 h260 M80 356 h160 M340 356 h180" stroke="#FFB86B" stroke-opacity=".35" stroke-width="3"/>
-          <path d="M0 300 q30 -40 52 -10 q20 -46 50 -6 q18 -30 38 16 Z" fill="#1A2546"/>
-          <path d="M560 300 l6 -70 m-6 70 l-14 -64 m14 64 l20 -60" stroke="#1A2546" stroke-width="4"/>
-          <path d="M566 230 q-30 -6 -40 6 q24 -2 40 -6 q-6 -26 -26 -34 q16 16 26 34 q20 -24 46 -20 q-26 4 -46 20 q30 8 38 30 q-18 -18 -38 -30" fill="#1A2546"/>
-        </svg>
-        <div class="sample-flags"><span>🇲🇽</span><span>🇧🇿</span><span>🇬🇹</span></div>
-      </div>
-      <div class="sample-body">
-        <h3>Central America</h3>
-        <p>Overland through Mexico, Belize and Guatemala: Maya ruins, a lagoon, a reef, a live volcano and a lake to finish.</p>
-        <div class="stats">
-          <div><b>16</b><span>days</span></div>
-          <div><b>6</b><span>stops</span></div>
-          <div><b>£4,410</b><span>for 2, with flights</span></div>
-        </div>
-        <ol class="route">
-          <li>Valladolid</li><li>Bacalar</li><li>Caye Caulker</li><li>Flores</li><li>Antigua</li><li>Lake Atitlán</li>
-        </ol>
-        <a class="btn btn-primary" href="samples/central-america/">Open the sample trip</a>
-        <p class="try">Try it: tap a Free slot to add an activity, or switch a hotel from Mid to Low.</p>
-      </div>
-    </article>
-    <article class="sample-card flip reveal">
-      <div class="sample-art art-vn" aria-hidden="true">
-        <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMax slice">
-          <circle cx="430" cy="120" r="40" fill="#FFF1C9" opacity=".9"/>
-          <path d="M-10 300 C0 200 30 150 70 150 C120 150 130 220 140 300Z" fill="#7FA996"/>
-          <path d="M380 300 C390 190 420 130 470 130 C530 130 550 210 560 300Z" fill="#7FA996"/>
-          <path d="M90 305 C100 170 130 110 180 110 C230 110 250 200 260 305Z" fill="#4E7E66"/>
-          <path d="M470 305 C480 220 500 180 540 180 C580 180 600 240 610 305Z" fill="#4E7E66"/>
-          <path d="M250 305 C258 240 275 210 300 210 C325 210 335 250 342 305Z" fill="#5E8E73"/>
-          <rect x="0" y="298" width="600" height="102" fill="#2F8C88"/>
-          <path d="M0 322 h600 M60 344 h200 M320 344 h240 M100 366 h160 M360 366 h160" stroke="#A6E0DA" stroke-opacity=".4" stroke-width="3"/>
-          <path d="M250 318 L360 318 L346 336 L264 336Z" fill="#5E3520"/>
-          <path d="M272 318 L278 236 L318 246 L312 318Z" fill="#B5542F"/>
-          <path d="M318 318 L324 254 L352 262 L346 318Z" fill="#C8693B"/>
-          <path d="M120 120 v14 M200 102 v14 M520 150 v14" stroke="#2A2340" stroke-width="1.5"/>
-          <ellipse cx="120" cy="146" rx="11" ry="13" fill="#E8433A"/><ellipse cx="200" cy="128" rx="11" ry="13" fill="#F2A33A"/><ellipse cx="520" cy="176" rx="11" ry="13" fill="#F06EA0"/>
-        </svg>
-        <div class="sample-flags"><span>🇻🇳</span></div>
-      </div>
-      <div class="sample-body">
-        <h3>Vietnam, north to south</h3>
-        <p>Hanoi's street food, a night on Lan Ha Bay, karst country by boat and bike, the imperial city, Hoi An's lanterns and Saigon.</p>
-        <div class="stats">
-          <div><b>16</b><span>days</span></div>
-          <div><b>6</b><span>stops</span></div>
-          <div><b>£3,263</b><span>for 2, with flights</span></div>
-        </div>
-        <ol class="route">
-          <li>Hanoi</li><li>Lan Ha Bay</li><li>Ninh Binh</li><li>Hue</li><li>Hoi An</li><li>Ho Chi Minh City</li>
-        </ol>
-        <a class="btn btn-primary" href="samples/vietnam/">Open the sample trip</a>
-        <p class="try">Made from a sample brief: 2 adults from London, March, £4,000, loves food, history, beaches and hiking.</p>
-      </div>
-    </article>
-  </div>
-</section>
-
-<section class="features" id="how">
-  <div class="wrap">
-    <p class="eyebrow">How it works</p>
-    <h2 class="section-title">Four steps from idea to itinerary.</h2>
-    <p class="section-lede">You'll spend about ten minutes on it. We do the research.</p>
-    <ol class="steps">
-      <li class="reveal"><h3>Tell us about the trip</h3><p>Where, when, who's going, your budget and what you love. The short form below covers it.</p></li>
-      <li class="reveal"><h3>We confirm and you pay</h3><p>We reply within a day with any questions and a payment link. Nothing is charged before then.</p></li>
-      <li class="reveal"><h3>Your page arrives</h3><p>Within 5 working days: the route, every day hour by hour, the costs and a booking list.</p></li>
-      <li class="reveal"><h3>Make it yours</h3><p>Ask for changes, like more beach or one stop fewer, and we update the same page.</p></li>
-    </ol>
   </div>
 </section>
 
 <section class="pricing" id="prices">
   <div class="wrap">
     <p class="eyebrow">Prices</p>
-    <h2 class="section-title">One price for the whole plan.</h2>
-    <p class="section-lede">A one-off fee for your trip page, whatever your group size. No charge for each day you're away.</p>
+    <h2 class="section-title">One fee for the whole plan.</h2>
+    <p class="section-lede">The same whatever your group size. You pay only once we've agreed what your page will cover.</p>
     <div class="price-grid">
-      <article class="price reveal">
-        <h3>Short trip</h3>
+      <article class="price">
+        <div class="price-head"><h3>Short trip</h3><p class="amt">£79</p></div>
         <p class="for">Up to 7 days</p>
-        <p class="amt">£79</p>
         <ul>
           <li>Up to 3 stops</li>
-          <li>Hour-by-hour calendar for every day</li>
-          <li>All costs, with hotels at three prices</li>
-          <li>Booking list</li>
           <li>1 round of changes</li>
         </ul>
         <a class="btn btn-ghost" href="#start" data-tier="short">Choose Short trip</a>
       </article>
-      <article class="price pop reveal">
-        <span class="badge-pop">Our pick</span>
-        <h3>Standard</h3>
+      <article class="price pop">
+        <div class="price-head"><h3>Standard <span class="badge-pop">Most chosen</span></h3><p class="amt">£149</p></div>
         <p class="for">8 to 16 days</p>
-        <p class="amt">£149</p>
         <ul>
-          <li>Up to 7 stops, in one or two countries</li>
-          <li>Everything in Short trip</li>
+          <li>Up to 7 stops, one or two countries</li>
           <li>Flights and the order of stops worked out</li>
-          <li>Entry and visa notes for UK passports</li>
           <li>2 rounds of changes</li>
         </ul>
         <a class="btn btn-primary" href="#start" data-tier="standard">Choose Standard</a>
       </article>
-      <article class="price reveal">
-        <h3>Big trip</h3>
+      <article class="price">
+        <div class="price-head"><h3>Big trip</h3><p class="amt">£229</p></div>
         <p class="for">17 days or more, or 3 or more countries</p>
-        <p class="amt">£229</p>
         <ul>
           <li>As many stops as the trip needs</li>
-          <li>Everything in Standard</li>
-          <li>Another way to do the route, with the cost of each</li>
-          <li>Open-jaw and overland routes</li>
+          <li>A second route, costed, to compare</li>
           <li>3 rounds of changes</li>
         </ul>
         <a class="btn btn-ghost" href="#start" data-tier="big">Choose Big trip</a>
       </article>
     </div>
+    <p class="price-note">Every plan has the hour-by-hour calendar, every cost with hotels at three prices, a booking list and entry notes for UK passports.</p>
     <p class="launch">Launch offer: half price for our first five clients. <a href="https://thecornerworld.kit.com/a7c401f468" target="_blank" rel="noopener">Join our emails</a> for the code. <a href="../terms/#launch-offer">Offer terms</a>.</p>
-    <p class="small-print">Prices in pounds, no VAT. You pay only once we've agreed what the trip page will cover, and you can cancel within 14 days. See our <a href="../terms/">terms</a>.</p>
+    <p class="small-print">Prices in pounds, no VAT. Cancel within 14 days. See our <a href="../terms/">terms</a>.</p>
   </div>
 </section>
 
-<section id="honest">
+<section class="features" id="what">
   <div class="wrap">
-    <p class="eyebrow">Good to know</p>
-    <h2 class="section-title">What we do, and what we don't.</h2>
-    <div class="honest">
-      <div class="card reveal">
-        <h3>We do</h3>
-        <ul>
-          <li>Plan the route, the days and the timings</li>
-          <li>Research transport, opening times, entry fees and tours</li>
-          <li>Estimate every cost in pounds, for your whole group</li>
-          <li>Tell you what to book first, with links</li>
-          <li>Update your page when you ask for changes</li>
-        </ul>
-      </div>
-      <div class="card reveal">
-        <h3>We don't</h3>
-        <ul>
-          <li>Take bookings or your money for travel. You book directly, so you keep the protection of the airline, hotel or card you pay with</li>
-          <li>Promise prices. They're careful estimates and can change before you book</li>
-          <li>Replace travel insurance or official advice. Check GOV.UK travel advice before you go</li>
-        </ul>
-      </div>
+    <p class="eyebrow">What's on the page</p>
+    <h2 class="section-title">Everything for the trip, in one place.</h2>
+    <div class="feature-grid">
+      <article class="feature">
+        <div class="art art-cal" aria-hidden="true"><i class="k-fl"></i><i class="k-bus"></i><i class="k-hike"></i><i class="k-boat"></i><i class="k-food"></i><i class="k-free">Free</i><i class="k-sh"></i></div>
+        <div><h3>Every hour on a calendar</h3>
+        <p>Flights, buses, tours and meals, each with its time.</p></div>
+      </article>
+      <article class="feature">
+        <div class="art art-cost" aria-hidden="true">
+          <div>Valladolid<span class="w62"></span><b>£412</b></div>
+          <div>Bacalar<span class="w38"></span><b>£268</b></div>
+          <div>Antigua<span class="w80"></span><b>£530</b></div>
+          <div class="tot">Total<span></span><b>£3,240</b></div>
+        </div>
+        <div><h3>Every cost, added up</h3>
+        <p>Hotels at three prices, and the total changes as you choose.</p></div>
+      </article>
+      <article class="feature">
+        <div class="art art-book" aria-hidden="true"><div><em class="paid">Paid</em>Flight to Cancún</div><div><em class="booked">Booked</em>Lagoon hotel</div><div><em class="todo">To book</em>Tikal sunrise tour</div></div>
+        <div><h3>What to book, and when</h3>
+        <p>Mark things booked or paid as you go.</p></div>
+      </article>
+      <article class="feature">
+        <div class="art art-check" aria-hidden="true"><div><div class="seal">✓</div>Routes · times · prices · visas</div></div>
+        <div><h3>Checked by a person</h3>
+        <p>Routes, timetables and entry rules, looked up for your dates.</p></div>
+      </article>
     </div>
   </div>
 </section>
 
-<section class="features" id="faq">
+<section class="how" id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 class="section-title">About ten minutes of your time.</h2>
+    <ol class="steps">
+      <li><h3>Tell us about the trip</h3><p>Where, when, who's going and your budget.</p></li>
+      <li><h3>We confirm, you pay</h3><p>We reply within a day. Nothing is charged before then.</p></li>
+      <li><h3>Your page arrives</h3><p>Within 5 working days, ready on your phone.</p></li>
+      <li><h3>Make it yours</h3><p>Ask for changes and we update the same page.</p></li>
+    </ol>
+    <a class="btn btn-primary" href="#start">Start my trip</a>
+  </div>
+</section>
+
+<section class="faq-section" id="faq">
   <div class="wrap">
     <p class="eyebrow">Questions</p>
-    <h2 class="section-title">Asked before booking</h2>
+    <h2 class="section-title">Good to know</h2>
     <div class="faq">
+      <details><summary>What don't you do?</summary><p>We don't take bookings or your money for travel: you book directly, so you keep the protection of the airline, hotel or card you pay with. Prices are careful estimates, not promises, and we don't replace travel insurance or GOV.UK travel advice.</p></details>
       <details><summary>Can I change the page myself?</summary><p>Yes. You can add activities to free time, move or remove them, switch hotel prices and mark things booked or paid. The page saves your changes on your device. For bigger changes, like a new stop or different dates, ask us and we'll update it.</p></details>
       <details><summary>Where can I go?</summary><p>Almost anywhere: the map scores over 200 countries, and we can plan a trip to any of them. If somewhere is hard to reach or unsafe, we'll tell you before you pay.</p></details>
       <details><summary>Does it work without signal?</summary><p>Once the page has opened on your phone it keeps your changes there. For remote areas, save a copy or take screenshots of each day before you go.</p></details>
@@ -297,7 +185,7 @@
     <p class="eyebrow">Start here</p>
     <h2 class="section-title">Tell us about your trip.</h2>
     <p class="section-lede">Fill in what you know and leave the rest blank. Your answers go to us by email, and we reply within a day. Our <a href="../privacy/">privacy notice</a> says what we keep and why.</p>
-    <form class="brief reveal" id="brief" novalidate>
+    <form class="brief" id="brief" novalidate>
       <label class="full">Where do you want to go? <input name="where" placeholder="e.g. Vietnam and Cambodia, or 'somewhere warm with ruins'" required></label>
       <label>When? <span>Dates or a month</span><input name="when" placeholder="e.g. late March 2027"></label>
       <label>How long? <span>Days, including travel</span>
@@ -350,13 +238,18 @@
 
 </main>
 
+<div class="sticky-cta" id="sticky-cta" aria-hidden="true">
+  <p><b>From £79</b>Ready in 5 working days</p>
+  <a class="btn btn-primary" href="#start" tabindex="-1">Plan my trip</a>
+</div>
+
 <footer class="plan-footer">
   <div class="wrap">
     <span><!-- trader: written by scripts/build-pages.mjs -->© The Corner World, run by Tim Denby, a sole trader, Flat 127, 21 Durnsford Road, London SW19 8GW<!-- /trader --> · <a href="../privacy/">Privacy</a> · <a href="../terms/">Terms</a></span>
-    <span><a href="../">Map</a> · <a href="samples/central-america/">Central America</a> · <a href="samples/vietnam/">Vietnam</a></span>
+    <span><a href="../">Map</a> · <a href="../samples/">Sample trips</a></span>
   </div>
 </footer>
 
-<script src="../assets/plan.js?v=eb20cc7a"></script>
+<script src="../assets/plan.js?v=dbdd2618"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
-// The trip-planning page: fades sections in, keeps the price in step with the trip length,
-// and turns the brief into an email to the address in data/site.json (contactEmail).
+// The trip-planning page: fits the live sample into the phone, shows the "Plan my trip" bar on a phone
+// once the first screen has gone, keeps the price in step with the trip length, and turns the brief into
+// an email to the address in data/site.json (contactEmail).
 document.documentElement.classList.add("js");
 
 const PRICES = { short: [79, "Short trip"], standard: [149, "Standard plan"], big: [229, "Big trip"] };
@@ -15,6 +16,25 @@ const io = "IntersectionObserver" in window ? new IntersectionObserver(entries =
   for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
 }, { rootMargin: "0px 0px -8% 0px" }) : null;
 document.querySelectorAll(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+
+// The sample in the phone is laid out at a real phone's width (390px) and shrunk to fit the screen,
+// so it looks as it does on a phone rather than squeezed or zoomed in
+const screen = document.querySelector(".screen");
+if (screen && "ResizeObserver" in window) {
+  new ResizeObserver(() => screen.style.setProperty("--s", String(screen.clientWidth / 390))).observe(screen);
+}
+
+// The bar at the foot of a phone's screen: shown once the first screen has scrolled away, and hidden
+// again while the form is on screen (it would only point at itself)
+const bar = document.getElementById("sticky-cta");
+if (bar && io) {
+  const seen = new Map();
+  const watch = new IntersectionObserver(entries => {
+    for (const e of entries) seen.set(e.target.id, e.isIntersecting);
+    bar.classList.toggle("show", !seen.get("top") && !seen.get("start"));
+  });
+  for (const id of ["top", "start"]) { const el = document.getElementById(id); if (el) watch.observe(el); }
+}
 
 function showQuote() {
   const p = PRICES[form.days.value];
