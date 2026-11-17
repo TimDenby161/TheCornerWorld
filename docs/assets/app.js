@@ -1,7 +1,8 @@
-// The Corner World: the destination guides and the trip planner, and what the globe shows of them.
+// The Corner World: every country on the map, scored out of 10, and the trip planner (switched off).
 // The globe itself (drawing, dragging, zooming) is assets/globe.js.
 // Data: data/world.json (map shapes), data/countries.json (basic facts, both built by
-// scripts/build-data.mjs), data/guides.json (the hand-written guides) and data/site.json (settings).
+// scripts/build-data.mjs) and data/site.json (settings). data/guides.json (places to stay and routes)
+// is only for the trip planner, and isn't loaded while it is off.
 // Top 3 things to do in each country: data/activities.json (hand-written).
 // The weather month by month: data/weather.json (built by scripts/build-weather.mjs).
 // Scores out of 10 for each country: data/ratings.json (hand-written, or with npm run rate).
@@ -69,6 +70,14 @@ function scoreScale() {
   return d3.scaleLinear().domain([2.5, 5, 6.5, 8.5]).range(["--g-s1", "--g-s2", "--g-s3", "--g-s4"].map((v) => css.getPropertyValue(v).trim())).interpolate(d3.interpolateRgb).clamp(true);
 }
 const scoreText = (n) => n.toFixed(1);
+// A country's months with great weather (data/weather.json), 1 to 12
+const greatMonths = (id) => (weather[id]?.m || []).flatMap((m, i) => (m[3] === "G" ? [i + 1] : []));
+// What a score of 8 or more in a category earns a country, as "Great for" filters and on its card
+const GREAT = 8;
+const GREAT_LABELS = ["Food", "Activities", "Budget", "Families", "Safety"];
+// The countries the list and "Surprise me" choose from: every scored country (not states and islands)
+const listed = () => countries.filter((c) => !c.within && ratings.scores[c.id]).map((c) => c.id);
+
 function scoreBadge(score, colour) {
   // Styles go on through the DOM: the security policy blocks style="" attributes
   const badge = h("span", { class: "score", title: `Scores ${scoreText(score.overall)} out of 10`, text: scoreText(score.overall) });
@@ -78,7 +87,7 @@ function scoreBadge(score, colour) {
 let trip = emptyTrip();
 let globe = null;
 const pinOf = new Map();
-const state = { tab: "discover", info: "todo", selected: null, place: null, query: "", sort: "score", month: 0, budget: 0, region: "", tags: new Set(), build: { ids: [], nights: 10 }, scroll: 0 };
+const state = { tab: "discover", info: "todo", selected: null, place: null, query: "", sort: "score", month: 0, region: "", great: new Set(), build: { ids: [], nights: 10 }, scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -105,7 +114,7 @@ function icon(name) {
   return svg;
 }
 
-const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const plural = (n, word, many = `${word}s`) => `${n} ${n === 1 ? word : many}`;
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 const wait = (ms) => new Promise((done) => setTimeout(done, ms));
 
@@ -373,7 +382,7 @@ const DISCLOSURE = "Some links earn The Corner World a commission if you book, a
 const isoDay = (date) => date.toISOString().slice(0, 10);
 
 // The partners in site.json as links for a country or one of its places, with the {gaps} in their addresses
-// filled in. The dates are only known inside a trip. scripts/build-pages.mjs does the same for the guide pages.
+// filled in. The dates are only known inside a trip.
 function partnerLinks(country, place, stay) {
   const fill = {
     place: place ? `${place.name}, ${country.name}` : country.name,
@@ -501,14 +510,14 @@ function showTip(target, x, y) {
 function tipLines(target) {
   const line = (cls, text) => text && h("p", { class: cls, text });
   if (target.type === "country") {
-    const c = target.country, g = guides[c.id], whole = byId.get(c.within);
-    const meta = g && [g.places?.length && plural(g.places.length, "place"), g.bestMonths && `best ${monthRanges(g.bestMonths)}`, g.budgetPerDay && `about ${money(g.budgetPerDay)} a day`].filter(Boolean).join(" · ");
+    const c = target.country, whole = byId.get(c.within), best = greatMonths(c.id);
+    const meta = best.length ? `Great weather ${monthRanges(best)}` : "";
     return [
       h("p", { class: "tip-title" }, h("span", { class: "flag", text: c.flag, "aria-hidden": "true" }), c.name),
       line("tip-sub", whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region),
       line("tip-meta", meta),
       scoreOf(c) && h("p", { class: "tip-score" }, scoreBadge(scoreOf(c), scoreScale()(scoreOf(c).overall)), " out of 10"),
-      h("p", { class: g ? "tip-go" : "tip-go none", text: g ? "Open the guide" : whole && guides[whole.id] ? `Covered by the ${whole.name} guide` : "No guide yet" }),
+      h("p", { class: "tip-go", text: "See the scores" }),
     ].filter(Boolean);
   }
   if (target.type === "place") {
@@ -545,30 +554,30 @@ function fitTrip() {
   if (trip.stops.length) globe.fit(trip.stops.map(stopInfo));
 }
 
-function filtersActive() { return Boolean(state.query.trim() || state.month || state.budget || state.region || state.tags.size); }
+function filtersActive() { return Boolean(state.query.trim() || state.month || state.region || state.great.size); }
 
+// Whether a country passes the filters. A state or island is judged as its country.
 function matches(id) {
-  const guide = guides[id];
-  if (!guide) return false;
+  const c = byId.get(id), score = scoreOf(c);
+  if (!c || !score) return false;
   const q = state.query.trim().toLowerCase();
   if (q) {
     // The country box: a word in the country's name (or the country it is part of) starts with what was typed
-    const c = byId.get(id), names = [c?.name, byId.get(c?.within)?.name].filter(Boolean);
+    const names = [c.name, byId.get(c.within)?.name].filter(Boolean);
     if (!names.some((n) => n.toLowerCase().split(/[\s-]+/).some((w) => w.startsWith(q)) || n.toLowerCase().startsWith(q))) return false;
   }
-  if (state.month && !(guide.bestMonths || []).includes(state.month)) return false;
-  if (state.budget && !(guide.budgetPerDay <= state.budget)) return false;
-  if (state.region && byId.get(id)?.region !== state.region) return false;
-  for (const tag of state.tags) if (!(guide.tags || []).includes(tag)) return false;
+  if (state.month && !greatMonths(c.within || id).includes(state.month)) return false;
+  if (state.region && c.region !== state.region) return false;
+  for (const i of state.great) if (score.parts[i] < GREAT) return false;
   return true;
 }
 
-// Colours the map: every country by its score, red to green (with a filter on, only the guides that match), the selection and the trip
+// Colours the map: every country by its score, red to green (with a filter on, only the ones that match), the selection and the trip
 function paint() {
   if (!globe) return;
   const active = filtersActive();
   const inTrip = new Set(trip.stops.map((s) => s.id));
-  // A state is coloured for its country's guide, trip stops and selection as well as its own
+  // A state is coloured for its country's trip stops and selection as well as its own
   const either = (c, test) => test(c.id) || Boolean(c.within && test(c.within));
   const picked = (id) => id === state.selected;
   const fill = (c) => !c ? "none" : either(c, picked) ? "selected" : either(c, (id) => inTrip.has(id)) ? "trip"
@@ -613,11 +622,11 @@ panel.addEventListener("scroll", () => {
   sheet.classList.toggle("scrolled", panel.scrollTop > 4);
 }, { passive: true });
 
-// "Surprise me": the globe spins and lands on a guide. With filters on, it is one of the guides that match.
+// "Surprise me": the globe spins and lands on a country. With filters on, it is one of the ones that match.
 let spinning = false;
 async function surprise() {
   if (spinning) return;
-  const all = Object.keys(guides).filter((id) => byId.has(id) && id !== state.selected);
+  const all = listed().filter((id) => id !== state.selected);
   const fitting = all.filter(matches);
   const pool = fitting.length ? fitting : all;
   const id = pool[Math.floor(Math.random() * pool.length)];
@@ -743,7 +752,7 @@ function select(id, opts = {}) {
   state.place = opts.place || null;
   if (state.place) state.info = "todo";
   const country = byId.get(id);
-  const place = state.place && guides[id].places.find((p) => p.id === state.place);
+  const place = state.place && guides[id]?.places.find((p) => p.id === state.place);
   hideHint();
   if (opts.arrived) { /* the map is already there */ }
   else if (place) globe.flyTo({ lng: place.lng, lat: place.lat, ppd: Math.max(globe.ppd, 48) });
@@ -774,9 +783,7 @@ function render() {
 }
 
 function renderDiscover() {
-  const live = Object.keys(guides).filter((id) => byId.has(id));
-  const tags = [...new Set(live.flatMap((id) => guides[id].tags || []))].sort();
-  const regions = [...new Set(live.map((id) => byId.get(id).region))].filter((r) => REGIONS[r]).sort();
+  const regions = Object.keys(REGIONS);
   const thisMonth = new Date().getMonth() + 1;
 
   // Every filter button is a toggle that knows how to show whether it is on
@@ -790,30 +797,23 @@ function renderDiscover() {
 
   const when = h("span", { class: "group-value" });
   syncs.push(() => { when.textContent = state.month ? MONTHS_LONG[state.month - 1] : "Any month"; });
-  const months = h("div", { class: "month-bar", role: "group", "aria-label": "Best month to go" }, MONTHS.map((m, i) =>
+  const months = h("div", { class: "month-bar", role: "group", "aria-label": "Month with great weather" }, MONTHS.map((m, i) =>
     toggle(m.charAt(0), () => state.month === i + 1, () => { state.month = state.month === i + 1 ? 0 : i + 1; },
       { class: i + 1 === thisMonth ? "now" : "", title: MONTHS_LONG[i], "aria-label": MONTHS_LONG[i] })));
-  const budget = h("div", { class: "seg-row", role: "group", "aria-label": "Budget per person" }, [0, 50, 100, 150].map((n) =>
-    toggle(n ? `Up to ${money(n)}` : "Any", () => state.budget === n, () => { state.budget = n; })));
   const where = h("div", { class: "chips one-line", role: "group", "aria-label": "Part of the world" }, regions.map((r) =>
     toggle(r, () => state.region === r, () => {
       state.region = state.region === r ? "" : r;
       if (state.region) { hideHint(); globe.flyTo(REGIONS[r]); }
     }, { class: "chip" })));
-  const chips = h("div", { class: "chips", role: "group", "aria-label": "Interests" }, tags.map((tag) =>
-    toggle(tag, () => state.tags.has(tag), () => { if (state.tags.has(tag)) state.tags.delete(tag); else state.tags.add(tag); }, { class: "chip" })));
+  const great = h("div", { class: "chips one-line", role: "group", "aria-label": `Great for: scores ${GREAT} or more` }, GREAT_LABELS.map((label, i) =>
+    toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
+      { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
 
   const group = (label, value, body) => h("div", { class: "group" }, h("p", { class: "group-label" }, label, value), body);
-  // Budget and interests stay folded away until asked for; a badge says how many are on
-  const extras = h("b");
-  syncs.push(() => { extras.textContent = (state.budget ? 1 : 0) + state.tags.size || ""; });
   const filters = h("div", { class: "filters" },
     group("Where", null, where),
     group("When", when, months),
-    h("details", { class: "more", open: Boolean(state.budget || state.tags.size) },
-      h("summary", null, "Budget and interests", extras, icon("down")),
-      group("Budget per person, per day", null, budget),
-      tags.length > 0 && group("Interests", null, chips)));
+    group("Great for", null, great));
   for (const sync of syncs) sync();
   // The results narrow to a country as you type its name
   const find = h("input", {
@@ -825,7 +825,7 @@ function renderDiscover() {
       else if (e.key === "Escape" && state.query) { e.preventDefault(); e.stopPropagation(); state.query = e.target.value = ""; renderResults(); paint(); }
     },
   });
-  state.clear = () => { state.month = state.budget = 0; state.region = ""; state.query = find.value = ""; state.tags.clear(); refresh(); };
+  state.clear = () => { state.month = 0; state.region = ""; state.query = find.value = ""; state.great.clear(); refresh(); };
 
   panel.replaceChildren(
     h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
@@ -858,29 +858,30 @@ function countTo(el, to) {
 function renderResults() {
   const box = $("#results"), head = $("#count");
   if (!box) return;
-  const all = Object.keys(guides).filter((id) => byId.has(id)).sort((a, b) => byId.get(a).name.localeCompare(byId.get(b).name));
+  const all = listed().sort((a, b) => byId.get(a).name.localeCompare(byId.get(b).name));
   const shown = all.filter(matches);
   if (state.sort === "score") shown.sort((a, b) => (scoreOf(byId.get(b))?.overall ?? -1) - (scoreOf(byId.get(a))?.overall ?? -1));
   for (const btn of document.querySelectorAll("#sort button")) btn.setAttribute("aria-pressed", String(btn.dataset.sort === state.sort));
   const active = filtersActive();
   const colour = scoreScale();
   const number = h("b");
-  head.replaceChildren(number, active ? ` of ${plural(all.length, "guide")} match` : shown.length === 1 ? " guide" : " guides");
+  head.replaceChildren(number, active ? ` of ${plural(all.length, "country", "countries")} match` : shown.length === 1 ? " country" : " countries");
   $("#clear").hidden = !active;
   box.replaceChildren(shown.length
       ? h("ul", { class: "cards" }, shown.map((id) => {
-          const c = byId.get(id), g = guides[id], whole = byId.get(c.within), places = g.places || [];
-          const meta = [g.bestMonths && `Best ${monthRanges(g.bestMonths)}`, g.budgetPerDay && `about ${money(g.budgetPerDay)} a day`].filter(Boolean).join(" · ");
+          const c = byId.get(id), score = scoreOf(c), best = greatMonths(id);
+          const strong = GREAT_LABELS.filter((_, i) => score.parts[i] >= GREAT);
+          const meta = [strong.length && `Great for ${strong.join(", ").toLowerCase()}`, best.length && `great weather ${monthRanges(best)}`].filter(Boolean).join(" · ");
           return h("li", null, h("button", { type: "button", class: "card", "data-id": id, onclick: () => select(id), ...peekAt(c) },
             h("span", { class: "card-flag", text: c.flag, "aria-hidden": "true" }),
             h("span", { class: "card-main" },
               h("span", { class: "card-title", text: c.name }),
-              h("span", { class: "card-sub", text: [whole ? whole.name : c.subregion || c.region, places.length && plural(places.length, "place")].filter(Boolean).join(" · ") }),
-              h("span", { class: "card-text", text: g.summary }),
-              meta && h("span", { class: "card-meta", text: meta })),
-            scoreOf(c) ? scoreBadge(scoreOf(c), colour(scoreOf(c).overall)) : icon("next")));
+              h("span", { class: "card-sub", text: c.subregion || c.region }),
+              activities[id]?.length > 0 && h("span", { class: "card-text", text: activities[id].slice(0, 3).join(" · ") }),
+              meta && h("span", { class: "card-meta", text: meta.charAt(0).toUpperCase() + meta.slice(1) })),
+            scoreBadge(score, colour(score.overall))));
         }))
-      : h("p", { class: "empty", text: state.query.trim() ? "No guide for a country by that name yet." : "No guides match those choices yet. Try removing one." }));
+      : h("p", { class: "empty", text: state.query.trim() ? "No country by that name." : "No countries match those choices. Try removing one." }));
   countTo(number, shown.length);
 }
 
@@ -892,22 +893,19 @@ function credits() {
 }
 
 // The UK government's travel advice for a country (`advice` in countries.json, from scripts/advice.mjs).
-// As on the guide pages (scripts/build-pages.mjs). Nothing for the UK itself.
+// Nothing for the UK itself.
 function adviceLine(c) {
   if (c.advice == null) return null;
   return h("p", { class: "note" }, "Before you book, read the ",
     h("a", { href: `https://www.gov.uk/foreign-travel-advice/${c.advice}`, target: "_blank", rel: "noopener", text: `UK government's travel advice for ${c.name}` }),
-    ": safety, entry rules and health. Guides are for ideas and planning, and things change, so check anything important before you go.");
+    ": safety, entry rules and health. Our scores are for ideas and planning, and things change, so check anything important before you go.");
 }
 
 // The weather tab: every month rated Great, Okay or Bad, with its average high and low and its rain.
-// A guide's best months are its Great ones (scripts/build-weather.mjs), and its note on them comes first.
 const RATING = { G: "Great", O: "Okay", B: "Bad" };
-function weatherTab(c, g) {
+function weatherTab(c) {
   const w = weather[c.id], kids = [];
-  if (g?.bestMonths) kids.push(h("h2", { class: "section", text: "Best time to go" }),
-    h("p", { class: "note", text: [monthRanges(g.bestMonths) + ".", g.bestTimeNote].filter(Boolean).join(" ") }));
-  if (!w) return kids.length ? kids : [h("p", { class: "empty", text: `There are no weather figures for ${c.name} yet.` })];
+  if (!w) return [h("p", { class: "empty", text: `There are no weather figures for ${c.name} yet.` })];
   const now = new Date().getMonth();
   kids.push(
     h("h2", { class: "section", text: "Month by month" }),
@@ -927,7 +925,7 @@ function weatherTab(c, g) {
 const RATING_ORDER = ["G", "O", "B"];
 
 function renderDestination() {
-  const c = byId.get(state.selected), g = guides[c.id], whole = byId.get(c.within);
+  const c = byId.get(state.selected), whole = byId.get(c.within);
   const facts = [
     ["Capital", c.capital],
     ["Currency", c.currencies.join(", ")],
@@ -936,16 +934,16 @@ function renderDestination() {
   ].filter(([, value]) => value);
 
   const kids = [
-    h("button", { type: "button", class: "back", onclick: clearSelection }, icon("back"), "All destinations"),
+    h("button", { type: "button", class: "back", onclick: clearSelection }, icon("back"), "All countries"),
     h("div", { class: "dest-head" },
       h("span", { class: "flag big", text: c.flag, "aria-hidden": "true" }),
       h("div", null,
-        h("h1", null, c.name, g?.status === "draft" && h("span", { class: "badge", text: "Draft" })),
+        h("h1", null, c.name),
         h("p", { class: "muted", text: [whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region, c.capital && `Capital ${c.capital}`].filter(Boolean).join(" · ") }))),
     TRIP_PLANNER && h("div", { class: "actions" },
       h("button", { type: "button", class: "primary", onclick: () => addStop(c.id) }, icon("plus"), "Add to my trip"),
       placesIn(c.id).length > 0 && h("button", { type: "button", class: "small", text: "Build me a trip here", onclick: () => {
-        state.build = { ids: [c.id], nights: g?.nights?.[0] || state.build.nights };
+        state.build = { ids: [c.id], nights: guides[c.id]?.nights?.[0] || state.build.nights };
         showTab("trip");
       } })),
   ];
@@ -971,74 +969,29 @@ function renderDestination() {
     const top = activities[c.id];
     if (top?.length) body.push(h("h2", { class: "section", text: "Top 3 things to do" }), h("ol", { class: "top3" }, top.slice(0, 3).map((t) => h("li", { text: t }))));
 
-    if (g) {
-      body.push(h("p", { class: "summary", text: g.summary }));
-      if (g.tags?.length) body.push(h("p", { class: "tags" }, g.tags.map((t) => h("span", { class: "tag", text: t }))));
-
-      if (g.places?.length) body.push(
-        h("h2", { class: "section", text: "Places" }),
-        h("ul", { class: "places" }, g.places.map((p) => {
-          const pin = pinOf.get(`${c.id}/${p.id}`);
-          return h("li", { class: p.id === state.place ? "active" : "", "data-place": p.id,
-            onpointerenter: () => globe.light({ type: "place", pin }), onpointerleave: () => globe.light(null) },
-            h("div", null,
-              h("button", { type: "button", class: "link", text: p.name, onclick: () => select(c.id, { place: p.id }) }),
-              PLACE_TYPES[p.type] && h("span", { class: "muted", text: ` · ${PLACE_TYPES[p.type]}` }),
-              h("p", { text: p.blurb }),
-              bookRow(partnerLinks(c, p), p.links)),
-            TRIP_PLANNER && h("button", { type: "button", class: "small", text: "Add", "aria-label": `Add ${p.name} to my trip`, onclick: () => addStop(c.id, p.id) }));
-        })));
-
-      if (g.itineraries?.length) body.push(
-        h("h2", { class: "section", text: TRIP_PLANNER ? "Ready-made itineraries" : "Suggested routes" }),
-        ...g.itineraries.map((it) => {
-          // Pointing at an itinerary draws its route on the map
-          const show = () => globe.preview(it.stops.map((s) => g.places.find((p) => p.id === s.place)).filter(Boolean));
-          return h("div", { class: "itinerary", tabindex: TRIP_PLANNER ? null : 0, onpointerenter: show, onpointerleave: () => globe.preview(null), onfocusin: show, onfocusout: () => globe.preview(null) },
-            h("div", null,
-              h("strong", { text: it.name }),
-              h("p", { text: it.stops.map((s) => `${g.places.find((p) => p.id === s.place).name} ${s.nights}`).join(" → ") + " nights" })),
-            TRIP_PLANNER && h("button", { type: "button", class: "small", text: "Use this", onclick: () => useItinerary(c.id, it) }));
-        }));
-    } else if (whole && guides[whole.id]) {
-      body.push(h("p", { class: "empty" }, `There's no guide for ${c.name} on its own yet. It's covered by the `,
-        h("button", { type: "button", class: "link", text: `${whole.name} guide`, onclick: () => select(whole.id) }), "."));
-    } else if (!top?.length) {
-      body.push(h("p", { class: "empty", text: `There's no guide for ${c.name} yet.` }));
-    }
+    if (!score && !top?.length) body.push(h("p", { class: "empty", text: `There's nothing on ${c.name} yet.` }));
 
     if (c.parts.length) body.push(
       h("h2", { class: "section", text: "Explore by area" }),
       h("p", { class: "tags" }, c.parts.map((part) => h("button", { type: "button", class: "tag", text: part.name, onclick: () => select(part.id),
         onpointerenter: () => globe.light({ type: "country", id: part.id, lng: part.lng, lat: part.lat }), onpointerleave: () => globe.light(null) }))));
   } else if (state.info === "weather") {
-    body.push(...weatherTab(c, g));
+    body.push(...weatherTab(c));
   } else {
     const advice = adviceLine(c);
     if (advice) body.push(h("h2", { class: "section", text: "Before you go" }), advice);
-
-    const stats = [
-      g?.budgetPerDay && ["Budget", `About ${money(g.budgetPerDay)} a day`, "per person, before flights"],
-      g?.nights && ["How long", `${g.nights[0]}–${g.nights[1]} nights`, "suggested stay"],
-    ].filter(Boolean);
-    if (stats.length) body.push(h("div", { class: "stats" }, stats.map(([label, value, sub]) =>
-      h("div", { class: "stat" }, h("span", { class: "stat-l", text: label }), h("span", { class: "stat-v", text: value }), h("span", { class: "stat-l", text: sub })))));
-
-    if (g?.tips?.length) body.push(h("h2", { class: "section", text: "Good to know" }), h("ul", { class: "tips" }, g.tips.map((t) => h("li", { text: t }))));
 
     body.push(
       h("h2", { class: "section", text: "Facts" }),
       h("dl", { class: "facts" }, facts.flatMap(([label, value]) => [h("dt", { text: label }), h("dd", { text: value })])));
 
-    const booking = bookRow(partnerLinks(c), g?.links);
+    const booking = bookRow(partnerLinks(c));
     if (booking) body.push(h("h2", { class: "section", text: "Book it" }), booking);
   }
 
   kids.push(h("div", { id: "info-body", role: "tabpanel", "aria-labelledby": `info-${state.info}` }, ...body), credits());
   panel.replaceChildren(...kids.filter(Boolean));
   disclose(panel, panel.querySelector(".credits"));
-  const active = panel.querySelector(".places .active");
-  if (active) requestAnimationFrame(() => active.scrollIntoView({ block: "center" }));
 }
 
 function renderTrip() {
@@ -1412,7 +1365,7 @@ async function start() {
   let world;
   try {
     let written;
-    [world, countries, guides, site, written, distances, airports, activities, weather, ratings] = await Promise.all([load("world"), load("countries"), load("guides"), load("site"),
+    [world, countries, guides, site, written, distances, airports, activities, weather, ratings] = await Promise.all([load("world"), load("countries"), TRIP_PLANNER ? load("guides") : {}, load("site"),
       load("legs").catch(() => []), load("distances").catch(() => ({})), load("airports").catch(() => airports), load("activities").catch(() => ({})), load("weather").catch(() => ({})), load("ratings").catch(() => ratings)]);
     for (const leg of written) legs.set([leg.from, leg.to].sort().join(" "), leg);
   } catch (err) {

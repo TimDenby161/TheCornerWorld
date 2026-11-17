@@ -1,6 +1,6 @@
 # The Corner World
 
-An interactive globe with destination guides and a trip planner, at https://thecornerworld.com/. A static site in `docs/`, served by GitHub Pages from the `main` branch: no outside requests. The domain is registered with GoDaddy, whose DNS points it at GitHub (four A records for `@` to 185.199.108–111.153, and `www` as a CNAME to `timdenby161.github.io`); `docs/CNAME` names it, and the repository's Pages settings enforce HTTPS. The site's address is `url` in `docs/data/site.json`. The usual build step is `npm run build:pages` after editing a guide.
+An interactive globe that scores every country out of 10, at https://thecornerworld.com/. A static site in `docs/`, served by GitHub Pages from the `main` branch: no outside requests. The domain is registered with GoDaddy, whose DNS points it at GitHub (four A records for `@` to 185.199.108–111.153, and `www` as a CNAME to `timdenby161.github.io`); `docs/CNAME` names it, and the repository's Pages settings enforce HTTPS. The site's address is `url` in `docs/data/site.json`. The usual build step is `npm run build:pages` after editing a guide.
 
 ## Run it
 
@@ -23,47 +23,25 @@ npm run check           # looks for mistakes; changes nothing
 
 ## The map page
 
-`docs/index.html` is a globe that fills the window, with the guides and the trip in a panel over it. On a phone the panel is a sheet that pulls up from the bottom.
+`docs/index.html` is a globe that fills the window, with the countries and their scores in a panel over it. On a phone the panel is a sheet that pulls up from the bottom.
 
-- `docs/assets/globe.js` draws the map and handles dragging, zooming and flying from place to place. It knows nothing about guides or trips.
-- `docs/assets/app.js` is the guides, the filters and the trip planner. It tells the globe what to colour and hears what was clicked.
+- `docs/assets/globe.js` draws the map and handles dragging, zooming and flying from place to place. It knows nothing about scores or trips.
+- `docs/assets/app.js` is the country list, the filters, the country panels and the trip planner (switched off). It tells the globe what to colour and hears what was clicked.
 - `docs/assets/home.css` is the page's look. The map's colours are the `--g-*` values at the top, one set for light and one for dark. The dark set is written out twice, as in `styles.css`.
 
-On the map a visitor can drag to spin, scroll or pinch to zoom, click a country or place, and switch between the globe and a flat map. "Surprise me" spins to a guide at random (one that matches the filters, if any are on). Pointing at a guide in the list turns the globe to it. In My trip, "Play route" flies along the stops in order, and a stop can be dragged to a new position with a mouse.
+On the map a visitor can drag to spin, scroll or pinch to zoom, click a country or place, and switch between the globe and a flat map. "Surprise me" spins to a country at random (one that matches the filters, if any are on). Pointing at a country in the list turns the globe to it. In My trip, "Play route" flies along the stops in order, and a stop can be dragged to a new position with a mouse.
 
 The map is drawn at four levels of detail so that it moves smoothly: full detail close in, and three thinned copies of the shapes from further out (the coarsest is what a phone shows of the whole globe). The copies are made in the browser from `world.json` as the page loads, so nothing needs rebuilding when the map data changes.
 
 The whole map is redrawn on every frame while it moves, so how long one redraw takes decides how smooth it is. D3 can draw any shape in any view but is too slow for that, so `globe.js` does its own drawing for the globe and for the flat map (`trace` and the functions after it) and leaves D3 the second in which one turns into the other. `npm run check` compares the two.
 
-## Adding and editing guides
+## Scores, filters and the country list
 
-All the travel content lives in `docs/data/guides.json`. Each entry is keyed by the country's three-letter code (`JOR`, `ITA`; the codes are in `docs/data/countries.json`). A state has a longer code, such as `AU-NSW` for New South Wales. Every field is optional:
+Every country, state and island that opens on the map shows a "Top 3 things to do" list near the top of its panel, and the first three show on its card. The lists are in `docs/data/activities.json`, keyed by the country codes in `countries.json`: three short lines each, written by hand. A code with no entry shows no list.
 
-| Field | What it does |
-|---|---|
-| `status` | `"draft"` shows a Draft badge. Remove it when the guide is final. |
-| `summary` | The paragraph at the top of the guide and on its card. |
-| `bestMonths` | Month numbers, e.g. `[3, 4, 5]`. Drives the month strip, the "When" filter and the off-season warning in the planner. |
-| `bestTimeNote` | A sentence or two under the month strip. |
-| `budgetPerDay` | Per person, in the currency set in `site.json`. Drives the budget filter and the trip's rough cost. |
-| `nights` | Suggested stay as `[min, max]`. |
-| `tags` | Interests. Any new tag appears as a filter automatically. |
-| `places` | The cities, landmarks and places to go: `id`, `name`, `lat`, `lng`, `blurb`, and `nights` (the suggested stay). Optionally `type` (`"city"`, `"landmark"` or `"place"`), `rank` (see The trip builder) and `airport` (see Airports and flights). A place can also have `links` (see Earning from the site). |
-| `links` | Booking links for the whole country, shown under "Book it": a list of `{ "label": "Car hire", "url": "https://..." }`. |
-| `itineraries` | Ready-made routes: a `name` and `stops`, each a place `id` and `nights`. |
-| `tips` | The "Good to know" list. |
+A country's panel has three tabs: Things to do, Weather and Travel advice. The Weather tab rates every month Great, Okay or Bad, with the average high and low and the rain. The figures are in `docs/data/weather.json`, built by `npm run build:weather` from NASA POWER's daily readings for 2015–2024, corrected for height. The rules for each rating are at the top of `scripts/build-weather.mjs`. The trip planner is switched off for now (`TRIP_PLANNER` in `docs/assets/app.js`).
 
-Countries without a guide still open on the map with their basic facts, and can still be added to a trip.
-
-## Top 3 things to do
-
-The map colours every country by its score out of 10, red for the lowest to green for the highest. Each country is scored 1 to 10 for Food, Activities, Budget friendly, Family friendly and Safety, and its score is the average. The scores are in `docs/data/ratings.json`, one country to a line; a state or island with none of its own takes its country's. To change them, run `npm run rate`: a page on your computer only (not published) where you pick a country, click a number for each category, and it saves straight into the file. The first scores were drafts written by Claude; the page lists which ones you have checked. Where the colours change is `SCORE_STOPS` in `docs/assets/globe.js` and `--g-s1` to `--g-s4` in `docs/assets/home.css`. Guide cards show the score and sort by it (or A to Z), and a country's page shows the five scores as bars.
-
-Every country, state and island that opens on the map shows a "Top 3 things to do" list near the top of its panel, guide or not. The lists are in `docs/data/activities.json`, keyed by the same codes as the guides: three short lines each, written by hand. A code with no entry shows no list.
-
-A country's panel has three tabs: Things to do, Weather and Travel advice. The Weather tab rates every month Great, Okay or Bad, with the average high and low and the rain. The figures are in `docs/data/weather.json`, built by `npm run build:weather` from NASA POWER's daily readings for 2015–2024, corrected for height. A guide's best months always count as its Great ones. The rules for each rating are at the top of `scripts/build-weather.mjs`. The trip planner is switched off for now (`TRIP_PLANNER` in `docs/assets/app.js`).
-
-After changing a guide, run `npm run build:pages` (see Guide pages). After adding or moving places, run `npm run build:distances` and `npm run build:airports` first.
+There used to be destination guides (`docs/guides/`, removed in November 2026). `docs/data/guides.json` is kept only as the trip planner's places and routes, and the site doesn't load it while the planner is off. After adding or moving places in it, run `npm run build:distances` and `npm run build:airports`.
 
 ## The trip builder
 
@@ -101,7 +79,7 @@ Where no journey is written, the site uses the driving time from that file. Fail
 
 `docs/data/airports.json` holds two things: every airport in the world with scheduled flights and a three-letter code (about 4,000), and the airports for each place, which are the nearest with scheduled flights and the nearest large one if that is another. `npm run build:airports` rebuilds it from [OurAirports](https://ourairports.com/data/); run it after adding or moving places, and now and then to pick up new and closed airports. Distances to an airport are straight lines.
 
-Airports are not drawn on the map. A place's airports are listed under it on the guide pages. In a trip:
+Airports are not drawn on the map. In a trip:
 
 - An estimated flight is timed between the two places' airports and names them: "Amman (AMM) to Hanoi (HAN)". It is still an estimate. The site does not know which airlines fly where, so it cannot say whether the flight is direct or exists at all.
 - Every journey by plane, written or estimated, gets a "Search flights" link, which opens a Google Flights search between the two airports on the day of travel.
@@ -118,7 +96,7 @@ The nearest airport is not always the right one. To choose it yourself, add `"ai
 | Setting | What it does |
 |---|---|
 | `currency` | The currency for budgets. |
-| `contactEmail` | Adds an "Ask for help with this trip" button to the planner, which opens an email containing the visitor's trip, and the same offer to each guide page. |
+| `contactEmail` | Adds an "Ask for help with this trip" button to the planner, which opens an email containing the visitor's trip. |
 | `url` | The site's full address, e.g. `https://example.com/`. Needed for the sitemap. |
 | `partners` | Booking links added to every place automatically (see Earning from the site). |
 | `accounts` | The Supabase project that sign-in uses: its `url` and publishable `key`. Set it with `npm run accounts`, not by hand, so the pages are updated to match (see Accounts and sign-in). |
@@ -131,9 +109,9 @@ The nearest airport is not always the right one. To choose it yourself, add `"ai
 - For every place at once, as a partner in `site.json`. The address is a search link from the programme with gaps the site fills in: `{place}` ("Petra, Jordan"), `{country}`, and, inside a trip, `{checkin}`, `{checkout}` (as `2027-03-10`) and `{travellers}`. For example `{ "label": "Places to stay", "url": "https://partner.example/search?q={place}&checkin={checkin}&checkout={checkout}&ref=YOUR-ID" }`. Take the real address format from the programme: each has its own.
 - For one place or one country, as `links` in its guide: a specific tour, a hotel you'd recommend.
 
-The links appear under each place in a guide, under each stop in a trip (with the trip's dates) and on the guide pages. Only `https://` links are shown. Wherever one appears, the page adds a line saying that some links earn a commission.
+The links appear under "Book it" on a country's Travel advice tab (the country-wide partner links) and under each stop in a trip (with the trip's dates). Only `https://` links are shown. Wherever one appears, the page adds a line saying that some links earn a commission.
 
-**Paid planning.** `docs/plan/` is the page that sells it: what's on a trip page, a live sample in a phone frame, prices, and a brief form. The planning button in the trip builder and on each guide goes there (`planning.page`). The form emails the brief to `contactEmail`; until that's set, it copies the answers and says bookings open soon. Prices are in `docs/plan/index.html` and `PRICES` in `docs/assets/plan.js`.
+**Paid planning.** `docs/plan/` is the page that sells it: what's on a trip page, a live sample in a phone frame, prices, and a brief form. The planning button in the trip builder goes there (`planning.page`). The form emails the brief to `contactEmail`; until that's set, it copies the answers and says bookings open soon. Prices are in `docs/plan/index.html` and `PRICES` in `docs/assets/plan.js`.
 
 Trip pages are made with the `/travel-plan-client` skill, and the rest (questions, payment, delivery, changes) is done by email. A client's page is published **locked with a password**: `npm run lock -- <slug>` turns `business/clients/<slug>/trip.html` into `docs/c/<slug>/`, which holds only a password box (`index.html`) and the trip scrambled (`trip.lock`, AES-256-GCM with a key made from the password by PBKDF2-SHA256, 600,000 rounds). It prints the link and the password to email to the client; the password is kept in `business/clients/<slug>/password.txt`, so rebuilding after changes keeps it (delete that file for a new one). The client types it once and their browser remembers it. The repository is public, so this is what keeps a client's trip private: without the password, `trip.lock` is noise. `npm run check` fails if anything readable is in `docs/c/`. (Once accounts are on, a page can instead be published at `admin/`; see Accounts and sign-in.) Samples are in `docs/plan/samples/`. Client briefs and the log are in `business/clients/`, which git ignores: keep it that way, since it holds names and email addresses. Marketplace copy is in `business/listings.md`.
 
@@ -194,11 +172,9 @@ npm run db:stop
 
 A change to the tables or rules is a new file in `supabase/migrations/`, a test for it in `supabase/tests/database/`, and `supabase db push` once the tests pass. If `npm run test:db` loses its connection part-way, the local copy is on an old Postgres image with a fault: `supabase link` (step 2) fixes it.
 
-## Guide pages
+## Privacy, terms and sitemap
 
-`npm run build:pages` writes a plain page for each guide into `docs/guides/` (`docs/guides/jordan/`), plus a list of them all. These are what search engines read and what you link to from elsewhere; the map can't be read that way. Run it after changing `guides.json` or `site.json`, and after `npm run build:airports`. The folder is rebuilt from scratch each time, so don't edit it by hand.
-
-A guide marked `"status": "draft"` gets a page that asks search engines to leave it out. Remove the status to publish it. With `url` set in `site.json`, the script also writes `docs/sitemap.xml` listing the finished guides.
+`npm run build:pages` writes the privacy notice and terms (`docs/privacy/`, `docs/terms/`), the footers of the planning and sample pages, and, with `url` set in `site.json`, `docs/sitemap.xml`. Run it after changing `site.json`.
 
 ## Map and country data
 
@@ -214,7 +190,7 @@ Road distances and driving times are from [OSRM](https://project-osrm.org) using
 
 ## Countries split into states
 
-Australia, Canada, the United Kingdom and the United States are drawn state by state (for the UK: England, Scotland, Wales and Northern Ireland). Each state has its own entry and can have its own guide. The country keeps its entry and its guide too: it comes up in search and lists its states, and a state without a guide links to the country's.
+Australia, Canada, the United Kingdom and the United States are drawn state by state (for the UK: England, Scotland, Wales and Northern Ireland). Each state has its own entry and can have its own scores; one without takes its country's. The country keeps its entry and lists its states under "Explore by area".
 
 Two countries are split more loosely. Indonesia is drawn as Java, Sumatra, Bali, Nusa Tenggara, Sulawesi and Indonesian Borneo (`ID-JW`, `ID-SM`, `ID-BA`, `ID-NU`, `ID-SL`, `ID-KA`), each made of several provinces joined together; Maluku and Papua stay as Indonesia. Malaysia has Malaysian Borneo (`MY-EM`) split off, and the peninsula stays as Malaysia.
 
