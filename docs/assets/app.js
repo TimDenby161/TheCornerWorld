@@ -29,13 +29,15 @@ const phone = matchMedia("(max-width: 820px)");
 let countries = [], byId = new Map(), ratings = { categories: [], scores: {} }, activities = {}, weather = {}, site = { partners: [] };
 
 // A country's scores: { parts: [food, activities, budget, family, safety], likes: [beaches, history, wildlife,
-// hiking, relax], overall } with overall the average of the parts alone, to one decimal place. A state or
+// hiking, relax], overall } with overall the average of six numbers, to one decimal place: the five parts
+// and the best of the likes (a country is judged by what it does best, not by what it lacks). A state or
 // island without its own takes its country's. Null if unscored.
 function scoreOf(c) {
   const all = c && (ratings.scores[c.id] || ratings.scores[c.within]);
   if (!all?.length) return null;
   const n = ratings.categories.length, parts = all.slice(0, n);
-  return { parts, likes: all.slice(n), overall: Math.round(parts.reduce((a, b) => a + b, 0) / parts.length * 10) / 10 };
+  const likes = all.slice(n), six = [...parts, ...(likes.length ? [Math.max(...likes)] : [])];
+  return { parts, likes, overall: Math.round(six.reduce((a, b) => a + b, 0) / six.length * 10) / 10 };
 }
 // A score out of 10 for each name, as bars in the colour of the score
 function bars(names, scores, colour) {

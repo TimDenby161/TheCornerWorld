@@ -5,7 +5,7 @@
 //
 // ratings.json: { categories: [...], interests: [...], checked: [ids you have scored yourself],
 //   scores: { id: [a score for each category, then one for each interest] } }
-// The overall score is the average of the categories alone: the interests (beaches, history…) are not in it.
+// The overall score is the average of six numbers: the categories, and the best of the interests.
 // A state or island with no scores of its own takes its country's.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, renameSync } from "node:fs";
