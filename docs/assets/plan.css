@@ -263,3 +263,15 @@ body.plan { display: block; height: auto; min-height: 100%; background: var(--pa
 .samples .made-cta { padding: 0 0 56px; }
 .samples .made-cta .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
 .samples .made-cta p { margin: 0; font-size: 20px; font-weight: 700; }
+
+/* Samples page on a phone: the trips and the "Plan your trip" line fill the screen exactly, with the
+   button in the bottom corner. The rows grow to take up the room; the footer is below, a scroll away.
+   49px is the height of the top bar (styles.css .app-bar) below the phone's notch. */
+@media (max-width: 640px) {
+  .samples main { display: flex; flex-direction: column; min-height: calc(100svh - 49px - env(safe-area-inset-top)); }
+  .samples section#sample { flex: 1; display: flex; }
+  .samples section#sample > .wrap { flex: 1; display: flex; flex-direction: column; width: 100%; }
+  .samples .sample-card { flex: 1 1 0; min-height: 76px; }
+  .samples .sample-body { display: flex; flex-direction: column; justify-content: center; }
+  .samples section.made-cta { padding: 0 0 calc(env(safe-area-inset-bottom) + 16px); }
+}
