@@ -1,6 +1,6 @@
 // Builds the reference data the site reads: the map shapes, the basic facts for every country,
 // and the two vendored libraries. Run with `npm run build:data` after `npm install`.
-// The travel guides (docs/data/guides.json) are written by hand and are not touched here.
+// The scores (docs/data/ratings.json) and top 3 things to do (activities.json) are written by hand and not touched here.
 import { writeFileSync, copyFileSync } from "node:fs";
 import { advice } from "./advice.mjs";
 import { createRequire } from "node:module";

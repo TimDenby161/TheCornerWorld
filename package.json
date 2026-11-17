@@ -4,8 +4,6 @@
   "type": "module",
   "scripts": {
     "build:data": "node scripts/build-data.mjs",
-    "build:distances": "node scripts/build-distances.mjs",
-    "build:airports": "node scripts/build-airports.mjs",
     "build:weather": "node scripts/build-weather.mjs",
     "build:pages": "node scripts/build-pages.mjs && node scripts/stamp.mjs",
     "build:version": "node scripts/stamp.mjs",

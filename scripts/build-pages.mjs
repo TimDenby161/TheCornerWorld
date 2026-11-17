@@ -81,7 +81,7 @@ writeFileSync(new URL("privacy/index.html", out), page({
   description: "What The Corner World keeps about you, why, and how to have it deleted.",
   index: true,
   body: `<h1>Privacy</h1>
-<p class="lede">You can use the map and the trip planner without telling us anything: a trip you build stays in your own browser. This page is about what happens if you ask us to plan a trip, pay us, or join our emails${accountsOn ? ", or sign in" : ""}.</p>
+<p class="lede">You can use the map without telling us anything. This page is about what happens if you ask us to plan a trip, pay us, or join our emails${accountsOn ? ", or sign in" : ""}.</p>
 <p class="muted">Last updated ${UPDATED}.</p>
 <h2 class="section">Who we are</h2>
 <p class="note">${NAME} is run by ${esc(trader.name || "its owner")}, a sole trader in the UK, who decides how your information is used (the "controller", in the words of UK data protection law).${contactLine ? ` To ask anything about your information, ${contactLine}.` : ""}</p>
@@ -102,8 +102,8 @@ writeFileSync(new URL("privacy/index.html", out), page({
 <ul class="tips">
 <li><b>No tracking:</b> the site has no analytics, no advertising and no cookies of its own, and loads nothing from other websites.</li>
 <li><b>Hosting:</b> the site is served by GitHub Pages. Like any web host, GitHub records the internet (IP) address of each visit in its logs, to keep the service running and secure. We can't see these logs.</li>
-<li><b>Your browser:</b> the trip you build on the map, your choice of light or dark, and, on a trip page, the changes you make and the page's password (so you aren't asked again) are kept in your own browser's storage. They are never sent to us. Clearing your browser's site data removes them.</li>
-<li><b>Links:</b> links to other sites, such as GOV.UK, Google Flights or booking sites, take you to sites with their own privacy notices.</li>
+<li><b>Your browser:</b> your choice of light or dark, and, on a trip page, the changes you make and the page's password (so you aren't asked again) are kept in your own browser's storage. They are never sent to us. Clearing your browser's site data removes them.</li>
+<li><b>Links:</b> links to other sites, such as GOV.UK or booking sites, take you to sites with their own privacy notices.</li>
 </ul>
 `
   // Sign-in (accounts in data/site.json) is described only while it is on
@@ -111,16 +111,15 @@ writeFileSync(new URL("privacy/index.html", out), page({
 <h2 class="section">If you sign in: what we keep</h2>
 <ul class="tips">
 <li><b>From Google, when you sign in:</b> your name, your email address and the address of your profile picture. We never see your Google password.</li>
-<li><b>Your trip:</b> the trip you build on the map (its name, start date, number of travellers, stops and checklist), so it is there on your other devices.</li>
 <li><b>If we made a trip page for you:</b> the page, and the email addresses allowed to open it.</li>
 </ul>
 <p class="note">The choices you make on a trip page (what you have booked or paid, activities you add) stay in your browser and are not sent to us.</p>
 <h2 class="section">If you sign in: what we use it for</h2>
-<p class="note">To sign you in, to keep your trip, and to show your trip page to you and nobody else: the service you asked for when you signed in (Article 6(1)(b)). We don't sell it, share it or use it for advertising.</p>
+<p class="note">To sign you in, and to show your trip page to you and nobody else: the service you asked for when you signed in (Article 6(1)(b)). We don't sell it, share it or use it for advertising.</p>
 <h2 class="section">If you sign in: where it is kept</h2>
 <p class="note">With Supabase, our database provider, on servers in Ireland. Signing in is handled by Google and Supabase. While you are signed in, a sign-in token is kept in your browser's storage, and it is removed when you sign out.</p>
 <h2 class="section">If you sign in: how long, and how to delete it</h2>
-<p class="note">Until you delete your account. On the map, open your account (top right) and choose Delete account: the account and the trip saved to it are deleted at once. A trip page we made for you is kept as described above.</p>
+<p class="note">Until you delete your account. On the map, open your account (top right) and choose Delete account: the account is deleted at once. A trip page we made for you is kept as described above.</p>
 ` : "") + `
 <h2 class="section">Who else handles it</h2>
 <p class="note">Only the companies that run the services above for us: Google (Gmail), Stripe (payments), Kit (our emails) and GitHub (hosting)${accountsOn ? " and Supabase (accounts)" : ""}. Each may only use it to provide that service. Some of them hold it in the United States; where they do, it is protected by the UK's data bridge with the US (the UK Extension to the EU-US Data Privacy Framework) or by the standard data protection contracts approved for the UK. We never sell your information or share it for advertising.</p>
@@ -199,7 +198,7 @@ writeFileSync(new URL("terms/index.html", out), page({
 <p class="note">We may ask what you thought. Say whatever you think, or nothing at all: we never pay for, reward or edit reviews. If you had the launch offer and leave a review, please mention that you had a discount.</p>
 
 <h2 class="section">The free map</h2>
-<p class="note">The map and trip planner are free to use, for ideas and planning. The scores we give countries are our own opinion, not a safety assessment: for safety, read the UK government's travel advice. We try to keep them accurate but can't promise they are complete or up to date, so check anything important before you rely on it. Some booking links may earn us a commission, at no cost to you; we say so where they appear. Linked sites aren't ours and we aren't responsible for them.</p>
+<p class="note">The map is free to use, for ideas and planning. The scores we give countries are our own opinion, not a safety assessment: for safety, read the UK government's travel advice. We try to keep them accurate but can't promise they are complete or up to date, so check anything important before you rely on it. Some booking links may earn us a commission, at no cost to you; we say so where they appear. Linked sites aren't ours and we aren't responsible for them.</p>
 
 <h2 class="section">Complaints, and the law</h2>
 <p class="note">If something's wrong, email us${mail ? ` at ${mail}` : ""} and we'll reply within 5 working days. These terms are governed by the law of England and Wales. If you live in Scotland or Northern Ireland, you can also bring a claim in your own courts. We may update these terms; the version on the day you paid applies to your trip page.</p>

@@ -1,7 +1,7 @@
 // The Corner World: the globe. Draws the world on two canvases, one for the land and one above it for
-// everything that moves or lights up (the route, pins, airports, what the pointer is over), and turns
+// everything that lights up (the selected country, what the pointer is over, small countries' dots), and turns
 // dragging, pinching, the wheel and the arrow keys into movement. It can also unroll into a flat map.
-// It knows nothing about guides or trips: assets/app.js says what to colour and hears what was clicked.
+// It knows nothing about scores: assets/app.js says what to colour and hears what was clicked.
 (function () {
 "use strict";
 
@@ -143,7 +143,7 @@ function seeded(seed) {
 // `features` are the shapes at full detail, in the order they come in `topology.objects[object]`.
 // `detail` is how many pixels a degree must cover on screen before each finer level of detail is drawn.
 // A label gives its place as `lng` and `lat`, or as `at`, a function that returns them when first asked.
-window.createGlobe = function createGlobe({ wrap, base, over, topology, object, features, dots = [], pins = [], airports = [], labels = [], reducedMotion = false, detail = [40, 12, 4], on = {} }) {
+window.createGlobe = function createGlobe({ wrap, base, over, topology, object, features, dots = [], labels = [], reducedMotion = false, detail = [40, 12, 4], on = {} }) {
   const B = base.getContext("2d"), O = over.getContext("2d");
   const pathB = d3.geoPath(null, B), pathO = d3.geoPath(null, O);
 
@@ -190,7 +190,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     feats.forEach((s, i) => { s.lod[1] = mid[i]; s.ball[1] = s.sheet[1] = null; });
     invalidate(true);
   }, 700);
-  for (const list of [dots, pins, airports]) for (const p of list) p.v = vec(p.lng, p.lat);
+  for (const p of dots) p.v = vec(p.lng, p.lat);
   labels.sort((a, b) => b.r - a.r);
   const stars = (() => { const rnd = seeded(7); return Array.from({ length: 170 }, () => ({ x: rnd(), y: rnd(), r: 0.4 + rnd() * 1.1, a: 0.25 + rnd() * 0.75 })); })();
   const lines10 = d3.geoGraticule10(), graticule = drawable([lines10, lines10, lines10, lines10]);
@@ -364,7 +364,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     }
   }
 
-  // Screen pixels to one degree at the middle of the view: what decides when pins, airports and names appear
+  // Screen pixels to one degree at the middle of the view: what decides when dots and names appear
   const ppd = () => (morph >= 1 ? geom.S * flat.k * 0.87 : geom.R * view.k) * RAD;
 
   function resize() {
@@ -392,14 +392,14 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     const get = (name) => css.getPropertyValue(name).trim();
     const rgb = (name) => { const c = d3.rgb(get(name)); return [c.r, c.g, c.b]; };
     theme = {
-      fills: { none: rgb("--g-land"), land: rgb("--g-land"), guide: rgb("--g-guide"), trip: rgb("--g-trip"), selected: rgb("--g-selected") },
+      fills: { none: rgb("--g-land"), land: rgb("--g-land"), selected: rgb("--g-selected") },
       oceanLit: get("--g-ocean-lit"), oceanDeep: get("--g-ocean-deep"), oceanFlat: get("--g-ocean-flat"),
       line: get("--g-line"), grid: get("--g-grid"), halo: rgb("--g-halo"), haloA: parseFloat(get("--g-halo-a")) || 0,
       shade: parseFloat(get("--g-shade")) || 0, gloss: parseFloat(get("--g-gloss")) || 0, stars: parseFloat(get("--g-stars")) || 0,
       ground: parseFloat(get("--g-ground")) || 0,
       label: get("--g-label"), ink: get("--g-ink"), paper: get("--g-paper"), edge: get("--g-edge"),
       hoverFill: get("--g-hover"), hoverLine: get("--g-hover-line"),
-      trip: get("--g-trip"), selected: get("--g-selected"), guide: get("--g-guide"), muted: get("--g-muted"), airport: get("--g-airport"),
+      selected: get("--g-selected"), muted: get("--g-muted"),
       // Scores out of 10, red for the lowest to green for the highest (fill keys "s0" to "s100": tenths of a point)
       score: d3.scaleLinear().domain(SCORE_STOPS).range(["--g-s1", "--g-s2", "--g-s3", "--g-s4"].map(get)).interpolate(d3.interpolateRgb).clamp(true),
     };
@@ -415,7 +415,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     return theme.fills.land;
   }
 
-  // Says what each thing looks like now: { fill(feature), selected(feature), dot(dot), showPin(pin), activePin(pin) }.
+  // Says what each thing looks like now: { fill(feature), selected(feature), dot(dot) }.
   // Colours change over a third of a second rather than at once.
   let tween = null;
   function paint(state) {
@@ -428,11 +428,6 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     }
     for (const d of dots) d.key = state.dot(d);
     const now = performance.now();
-    for (const p of pins) {
-      const shown = state.showPin(p);
-      if (shown && !p.shown) p.born = now + (p.order || 0) * 45;
-      p.shown = shown; p.active = state.activePin(p);
-    }
     // Anything part-way through a change carries on from the colour it has reached
     if (changed) { for (const s of feats) if (s.from !== s.to) s.from = s.col.slice(); tween = { t0: now }; }
     invalidate(true);
@@ -526,15 +521,6 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     });
   }
 
-  // Frames a set of points, such as the stops of a trip
-  function fit(points, opts) {
-    if (!points.length) return Promise.resolve(false);
-    const sum = points.reduce((s, p) => { const v = vec(p.lng, p.lat); return [s[0] + v[0], s[1] + v[1], s[2] + v[2]]; }, [0, 0, 0]);
-    const n = Math.hypot(...sum) || 1, c = [Math.atan2(sum[1], sum[0]) * DEG, Math.asin(clamp(sum[2] / n, -1, 1)) * DEG];
-    const r = Math.max(...points.map((p) => d3.geoDistance(c, [p.lng, p.lat])));
-    return flyTo({ lng: c[0], lat: c[1], r: Math.max(r * 1.35, 0.03) }, opts);
-  }
-
   function setMode(next) {
     if (next === mode || morphAnim) return;
     stopMotion(); spinning = false; setHover(null);
@@ -558,7 +544,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
 
   // ---------- the frame ----------
 
-  let raf = 0, dirtyBase = true, dirtyOver = true, overMoving = false, lastAirports = null;
+  let raf = 0, dirtyBase = true, dirtyOver = true, overMoving = false;
   function invalidate(baseToo) {
     if (baseToo) dirtyBase = true;
     dirtyOver = true;
@@ -679,9 +665,6 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       c.restore();
     }
     drawNames();
-
-    const airportsOn = ppd() >= AIRPORT_PPD.large;
-    if (airportsOn !== lastAirports && on.view) { lastAirports = airportsOn; on.view(snapshot()); }
   }
 
   // Country names, where the country is big enough on screen to hold its name
@@ -714,11 +697,10 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     if ("letterSpacing" in c) c.letterSpacing = "0px";
   }
 
-  // ---------- the layer above: route, markers, whatever is lit up ----------
+  // ---------- the layer above: whatever is lit up, and small countries' dots ----------
 
-  const AIRPORT_PPD = { large: 20, medium: 48, small: 90 };
-  const PIN_PPD = 16, PIN_NAME_PPD = 60;
-  let hits = [], hover = null, lit = null, route = [], preview = null, routeLen = [];
+  const DOT_PPD = 16; // zoomed in this far, small countries' dots are drawn full size
+  let hits = [], hover = null, lit = null;
 
   // Where a point is on screen, or null if it is round the back of the globe or off the canvas
   function spot(p, margin = 24) {
@@ -763,33 +745,8 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       overMoving = moving;
     }
 
-    // The trip's route, and a ready-made itinerary being looked at
-    if (preview && preview.length > 1) {
-      c.beginPath(); pathO({ type: "LineString", coordinates: preview.map((p) => [p.lng, p.lat]) });
-      c.setLineDash([2, 6]); c.strokeStyle = theme.ink; c.lineWidth = 2; c.stroke(); c.setLineDash([]);
-      for (const p of preview) { const q = spot(p); if (!q) continue; c.beginPath(); c.arc(q[0], q[1], 4.5, 0, 7); c.fillStyle = theme.paper; c.fill(); c.strokeStyle = theme.ink; c.lineWidth = 1.5; c.stroke(); }
-    }
-    if (route.length > 1) {
-      const line = { type: "LineString", coordinates: route.map((p) => [p.lng, p.lat]) };
-      c.beginPath(); pathO(line);
-      c.strokeStyle = theme.trip; c.globalAlpha = 0.22; c.lineWidth = 7; c.stroke(); c.globalAlpha = 1;
-      c.setLineDash([7, 6]); c.lineDashOffset = moving ? -(now / 45) % 13 : 0; c.lineWidth = 2.2; c.stroke(); c.setLineDash([]); c.lineDashOffset = 0;
-      if (moving) {
-        // A dot travelling the route, a couple of seconds to each leg
-        const total = routeLen[routeLen.length - 1];
-        if (total > 0) {
-          const at = (now / (2200 * (route.length - 1)) % 1) * total;
-          let i = 1; while (i < routeLen.length - 1 && routeLen[i] < at) i++;
-          const legLen = routeLen[i] - routeLen[i - 1], g = legLen > 0 ? d3.geoInterpolate([route[i - 1].lng, route[i - 1].lat], [route[i].lng, route[i].lat])((at - routeLen[i - 1]) / legLen) : [route[i].lng, route[i].lat];
-          const q = spot({ lng: g[0], lat: g[1], v: vec(g[0], g[1]) });
-          if (q) { c.beginPath(); c.arc(q[0], q[1], 4, 0, 7); c.fillStyle = theme.paper; c.fill(); c.strokeStyle = theme.trip; c.lineWidth = 2; c.stroke(); }
-        }
-        overMoving = true;
-      }
-    }
-
     // Countries too small to click: specks from far out, proper dots once there is room around them
-    const close = density >= PIN_PPD;
+    const close = density >= DOT_PPD;
     for (const d of dots) {
       const q = spot(d); if (!q) continue;
       const plain = d.key === "land" || d.key === "none";
@@ -801,79 +758,11 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
       c.globalAlpha = 1;
       hits.push({ x: q[0], y: q[1], r: close ? 9 : 4.5, target: { type: "country", country: d.country } });
     }
-
-    // Airports: large ones first as the map is zoomed in, then medium, then airstrips
-    if (density >= AIRPORT_PPD.large) {
-      for (const size of ["small", "medium", "large"]) {
-        if (density < AIRPORT_PPD[size]) continue;
-        const d = size === "large" ? 3.6 : 2.8;
-        c.beginPath();
-        for (const a of airports) {
-          if (a.size !== size) continue;
-          const q = spot(a, 8); if (!q) continue;
-          c.moveTo(q[0], q[1] - d); c.lineTo(q[0] + d, q[1]); c.lineTo(q[0], q[1] + d); c.lineTo(q[0] - d, q[1]); c.closePath();
-          hits.push({ x: q[0], y: q[1], r: 8, target: { type: "airport", airport: a } });
-        }
-        c.globalAlpha = size === "large" ? 0.9 : 0.7;
-        c.fillStyle = theme.airport; c.fill(); c.strokeStyle = theme.paper; c.lineWidth = 1; c.stroke();
-        c.globalAlpha = 1;
-      }
-    }
-
-    // Places: all of them once zoomed in, and the selected country's at any zoom, with their names
-    c.font = `600 12px ${FONT}`; c.textAlign = "left"; c.textBaseline = "middle";
-    const named = [];
-    const drawPin = (p, front) => {
-      const q = spot(p); if (!q) return;
-      const hot = p.active || (lit && lit.type === "place" && lit.pin === p) || (hover && hover.type === "place" && hover.pin === p);
-      let size = p.shown ? 5 : 3;
-      if (p.shown && p.born && moving) {
-        const t = (now - p.born) / 380;
-        if (t < 1) { size *= t <= 0 ? 0 : d3.easeBackOut(t); overMoving = true; }
-      }
-      if (hot) size = Math.max(size, 5) + 1.6;
-      if (size <= 0) return;
-      if (p.active && moving) {
-        const u = (now / 1500) % 1;
-        c.beginPath(); c.arc(q[0], q[1], size + 2 + u * 14, 0, 7); c.strokeStyle = theme.trip; c.globalAlpha = 1 - u; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1;
-        overMoving = true;
-      }
-      // Another country's places are small and quiet until pointed at; the selected country's stand out
-      const quiet = !front && !hot;
-      c.beginPath(); c.arc(q[0], q[1], size, 0, 7);
-      c.fillStyle = p.active ? theme.trip : theme.paper; c.fill();
-      c.globalAlpha = quiet ? 0.6 : 1;
-      c.strokeStyle = p.active ? theme.paper : theme.ink; c.lineWidth = quiet ? 1 : 1.6; c.stroke();
-      c.globalAlpha = 1;
-      hits.push({ x: q[0], y: q[1], r: 11, target: { type: "place", pin: p } });
-      if (!front && !hot && density < PIN_NAME_PPD) return;
-      const w = c.measureText(p.name).width, box = [q[0] + 8, q[1] - 9, q[0] + 14 + w, q[1] + 9];
-      if (!hot && named.some((o) => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])) return;
-      named.push(box);
-      c.strokeStyle = theme.paper; c.lineWidth = 3.5; c.strokeText(p.name, q[0] + 10, q[1] + 0.5);
-      c.fillStyle = theme.ink; c.fillText(p.name, q[0] + 10, q[1] + 0.5);
-    };
-    if (density >= PIN_PPD) for (const p of pins) if (!p.shown) drawPin(p, false);
-    for (const p of pins) if (p.shown && !p.active) drawPin(p, true);
-    for (const p of pins) if (p.active) drawPin(p, true);
-
-    // The trip's stops, numbered
-    const wee = density < 9; // from far out the stops are close together, so they are drawn smaller
-    c.font = `700 ${wee ? 9 : 11}px ${FONT}`; c.textAlign = "center";
-    route.forEach((p, i) => {
-      const q = spot(p); if (!q) return;
-      const hot = lit && lit.type === "stop" && lit.index === i;
-      const size = hot ? 13 : wee ? 7.5 : 10;
-      if (hot) { c.beginPath(); c.arc(q[0], q[1], size + 5, 0, 7); c.fillStyle = theme.trip; c.globalAlpha = 0.28; c.fill(); c.globalAlpha = 1; }
-      c.beginPath(); c.arc(q[0], q[1], size, 0, 7); c.fillStyle = theme.trip; c.fill(); c.strokeStyle = "#fff"; c.lineWidth = wee ? 1.5 : 2; c.stroke();
-      c.fillStyle = "#fff"; c.fillText(String(i + 1), q[0], q[1] + 0.5);
-      hits.push({ x: q[0], y: q[1], r: size + 2, target: { type: "stop", index: i } });
-    });
   }
 
   // ---------- the pointer ----------
 
-  // What is at this point of the canvas: a stop, a place, an airport, or failing those the country
+  // What is at this point of the canvas: a small country's dot, or failing that the country
   function pick(x, y) {
     if (morph > 0 && morph < 1) return null;
     for (let i = hits.length - 1; i >= 0; i--) { const hit = hits[i]; if ((hit.x - x) ** 2 + (hit.y - y) ** 2 <= hit.r ** 2) return hit.target; }
@@ -885,7 +774,7 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
     return null;
   }
 
-  const same = (a, b) => a === b || Boolean(a && b && a.type === b.type && a.country === b.country && a.pin === b.pin && a.airport === b.airport && a.index === b.index);
+  const same = (a, b) => a === b || Boolean(a && b && a.type === b.type && a.country === b.country);
   function setHover(target, x, y) {
     if (!same(target, hover)) { hover = target; invalidate(false); }
     over.classList.toggle("can-click", Boolean(target));
@@ -993,24 +882,17 @@ window.createGlobe = function createGlobe({ wrap, base, over, topology, object, 
   resize();
 
   return {
-    paint, flyTo, fit, zoomBy, setMode, resize,
+    paint, flyTo, zoomBy, setMode, resize,
     get mode() { return mode; },
     get ppd() { return ppd(); },
     theme: readTheme,
     insets(next, animate = true) { inset = { ...inset, ...next }; layout(animate); },
-    route(points) {
-      route = points.map((p) => ({ ...p, v: vec(p.lng, p.lat) }));
-      routeLen = route.reduce((list, p, i) => { list.push(i ? list[i - 1] + d3.geoDistance([route[i - 1].lng, route[i - 1].lat], [p.lng, p.lat]) : 0); return list; }, []);
-      invalidate(false);
-    },
-    preview(points) { preview = points ? points.map((p) => ({ ...p, v: vec(p.lng, p.lat) })) : null; invalidate(false); },
-    // Lights something up from outside the map: { type: "country", id }, { type: "place", pin } or { type: "stop", index }
+    // Lights a country up from outside the map: { type: "country", id, lng, lat }
     light(target) {
-      if (target === lit || (target && lit && target.type === lit.type && target.id === lit.id && target.pin === lit.pin && target.index === lit.index)) return;
+      if (target === lit || (target && lit && target.type === lit.type && target.id === lit.id)) return;
       lit = target; invalidate(false);
     },
     get k() { return mode === "flat" ? flat.k : view.k; },
-    pins,
     home() { return mode === "flat" ? flyTo({ lng: 0, lat: 0, k: 1 }) : flyTo({ lng: view.lng, lat: 18, k: 1 }); },
     spin(yes) { spinning = yes && !reducedMotion; if (spinning) invalidate(true); },
     // The opening: the globe arrives from a little way off, turning into place

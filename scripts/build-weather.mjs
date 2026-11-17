@@ -7,17 +7,18 @@
 // temperatures are put right for the place's own height, which comes from Open-Meteo's elevation service
 // (Copernicus 90 m), at 6.5 °C for every 1,000 m.
 //
-// Where the figures are for: a guide's first place; a few big countries and states by their main city (below);
+// Where the figures are for: a place written in scripts/weather-points.json; a few big countries and states by their main city (below);
 // anywhere else, the middle of the country.
 //
 // The rating: Bad if the average high is under 7 °C or over 37 °C, or over 280 mm of rain falls. Great if the
 // high is 17–33 °C with 160 mm of rain or less. Okay in between. (NASA's rain runs high in the wet tropics,
-// hence the generous limits.) A guide's best months (guides.json) are written
-// by hand and come first: they are its Great months, and no other month of that guide is Great.
+// hence the generous limits.) Best months written by hand in weather-points.json (`best`, kept from the old
+// destination guides) come first: they are that country's Great months, and no other month of it is Great.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const read = (name) => JSON.parse(readFileSync(new URL(`../docs/data/${name}.json`, import.meta.url)));
-const countries = read("countries"), guides = read("guides");
+const countries = read("countries");
+const written = JSON.parse(readFileSync(new URL("weather-points.json", import.meta.url)));
 
 // Big places whose middle is empty country: their weather is taken where people go
 const CITIES = {
@@ -31,8 +32,8 @@ const CITIES = {
 };
 
 const points = countries.map((c) => {
-  const first = guides[c.id]?.places?.[0];
-  if (first) return { id: c.id, at: first.name, lat: first.lat, lng: first.lng };
+  const first = written[c.id];
+  if (first?.at) return { id: c.id, at: first.at, lat: first.lat, lng: first.lng };
   if (CITIES[c.id]) { const [at, lat, lng] = CITIES[c.id]; return { id: c.id, at, lat, lng }; }
   return { id: c.id, at: null, lat: c.lat, lng: c.lng };
 });
@@ -93,7 +94,7 @@ let done = 0;
 async function one(p) {
   const { cell, m: avg } = await nasa(p);
   const fix = (cell - height.get(p.id)) * 0.0065;
-  const best = guides[p.id]?.bestMonths;
+  const best = written[p.id]?.best;
   const months = avg.map(([h, l, r], i) => {
     const high = h + fix, low = l + fix, rain = r * [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][i];
     let score = rate(round(high), round(rain)); // on the figures shown, so the same figures always rate the same
@@ -103,7 +104,7 @@ async function one(p) {
   if (best?.length) {
     const said = months.map((m, i) => rate(...[m[0], m[2]]) === "G" ? i + 1 : 0).filter(Boolean);
     const agree = best.filter((m) => said.includes(m)).length;
-    report.push(`${p.id}: guide ${best.join(",")} · figures ${said.join(",") || "none"} (${agree}/${best.length})`);
+    report.push(`${p.id}: written ${best.join(",")} · figures ${said.join(",") || "none"} (${agree}/${best.length})`);
   }
   out[p.id] = p.at ? { at: p.at, m: months } : { m: months };
   if (++done % 25 === 0) console.log(`${done}/${points.length}`);
