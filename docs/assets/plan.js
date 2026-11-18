@@ -4,6 +4,10 @@
 document.documentElement.classList.add("js");
 
 const PRICES = { short: [79, "Short trip"], standard: [149, "Standard plan"], big: [229, "Big trip"] };
+// The launch offer: half price for the first five clients. Set to false to show full prices again.
+const LAUNCH_HALF_PRICE = true;
+const money = n => "£" + (Number.isInteger(n) ? n : n.toFixed(2));
+const nowPrice = full => LAUNCH_HALF_PRICE ? full / 2 : full;
 const form = document.getElementById("brief");
 const quote = document.getElementById("quote");
 const msg = document.getElementById("brief-msg");
@@ -40,7 +44,8 @@ function showQuote() {
   const p = PRICES[form.days.value];
   quote.replaceChildren();
   if (!p) { quote.textContent = "Choose a trip length to see the price"; return; }
-  const b = document.createElement("b"); b.textContent = "£" + p[0];
+  const b = document.createElement("b"); b.textContent = money(nowPrice(p[0]));
+  if (LAUNCH_HALF_PRICE) { const was = document.createElement("s"); was.textContent = money(p[0]); quote.append(was); }
   quote.append(b, p[1]);
 }
 form.days.addEventListener("change", showQuote);
@@ -58,7 +63,7 @@ function briefText() {
   return [
     `Where: ${v("where")}`,
     `When: ${v("when")}`,
-    `How long: ${form.days.selectedOptions[0]?.text || "—"}${p ? ` (${p[1]}, £${p[0]})` : ""}`,
+    `How long: ${form.days.selectedOptions[0]?.text || "—"}${p ? ` (${p[1]}, ${money(nowPrice(p[0]))}${LAUNCH_HALF_PRICE ? ` launch price, usually ${money(p[0])}` : ""})` : ""}`,
     `Who's going: ${v("who")}`,
     `Flying from: ${v("from")}`,
     `Budget: ${v("budget")}`,

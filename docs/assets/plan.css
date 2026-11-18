@@ -78,10 +78,13 @@ html:has(body.plan) { scroll-behavior: smooth; }
 .price-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
 .price { display: flex; flex-direction: column; padding: 26px; border-radius: 20px; border: 1px solid var(--border); background: var(--page-plane); }
 .price.pop { border: 2px solid var(--blue); padding: 25px; }
-.price-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.price-head { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .price h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0; font-size: 19px; }
 .price .badge-pop { padding: 3px 9px; border-radius: 999px; background: var(--blue-btn); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .price .amt { margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.price .amt s { margin-right: 8px; font-size: .5em; font-weight: 600; color: var(--text-muted); text-decoration-thickness: 2px; }
+.quote s { margin-right: 6px; font-size: 18px; font-weight: 600; color: var(--text-muted); text-decoration-thickness: 2px; }
+.proof b s, .sticky-cta b s { font-weight: 600; color: var(--text-muted); text-decoration-thickness: 2px; }
 .price .for { margin: 6px 0 18px; color: var(--text-muted); font-size: 14px; }
 .price ul { margin: 0 0 24px; padding: 18px 0 0; list-style: none; display: grid; gap: 10px; flex: 1; align-content: start; border-top: 1px solid var(--border); }
 .price li { display: flex; gap: 10px; line-height: 1.4; font-size: 15px; }
