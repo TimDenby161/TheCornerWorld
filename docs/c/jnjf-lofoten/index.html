@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- A client's trip page, locked with a password. trip.lock is the page scrambled; once the right
+     password unscrambles it, ../../assets/unlock.js shows it and runs its script from memory, which is
+     what blob: allows. Nothing written into a page can use it, only a script already running. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Your trip | The Corner World</title>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="stylesheet" href="../../assets/trip-view.css?v=5700d1d9" id="tv-style">
+</head>
+<body>
+<main class="tv" id="tv">
+  <p class="tv-brand"><a href="../../">The Corner World</a></p>
+  <h1 class="tv-title">Your trip</h1>
+  <p class="tv-text" id="tv-text" role="status">Enter the password from our email to open your trip page.</p>
+  <div class="tv-actions" id="tv-actions"></div>
+  <noscript><p class="tv-text">Your trip page needs JavaScript switched on.</p></noscript>
+</main>
+<script src="../../assets/unlock.js?v=3c946d08"></script>
+</body>
+</html>
