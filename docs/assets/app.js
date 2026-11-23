@@ -270,8 +270,7 @@ function disclose(box, before) {
 
 // ---------- the map ----------
 
-// Where to point the map to take in a country: the middle of its largest landmass and the angle across it
-// (in radians), so far-off territories don't pull the view out to the whole world.
+// Where to point the map to take in a country: the middle of its land and the angle across it (in radians).
 // A country is framed to fill about 80% of the free map: its outline's circle is padded by a tenth, so near 1 (the circle overstates most shapes)
 // Malaysia is two halves with the sea between, so its size alone frames only one of them
 const FRAMES = { MYS: { lng: 109.6, lat: 3.6, r: 0.16, fill: 1 } };
@@ -288,9 +287,26 @@ function frameOf(country) {
   // A ring squashed flat by the map's simplification can read as "everything but this island": skip those
   const sized = polygons.map((p) => [p, d3.geoArea(p)]).filter(([, area]) => area < Math.PI);
   if (!sized.length) return (country.frame = bySize);
-  const main = sized.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
-  const middle = d3.geoCentroid(main);
-  const r = Math.max(...main.coordinates[0].map((point) => d3.geoDistance(middle, point)));
+  // The largest piece of land, and every island near it worth seeing, so a click on Hawaii or the Bahamas shows the
+  // whole group, not one island of it. An island counts if it is at least 1% the size of the largest piece and lies
+  // within 800 km of the group (or one and a half times the largest piece's reach, for a big one), so far-off
+  // territories (France's in South America, New Zealand's Chatham Islands) don't pull the view out to sea.
+  const pieces = sized.map(([p, area]) => {
+    const middle = d3.geoCentroid(p);
+    return { p, area, middle, r: Math.max(...p.coordinates[0].map((point) => d3.geoDistance(middle, point))) };
+  });
+  const main = pieces.reduce((a, b) => (b.area > a.area ? b : a));
+  const reach = Math.max(800 / 6371, main.r * 1.5), least = main.area * 0.01;
+  const group = [main];
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const x of pieces) {
+      if (group.includes(x) || x.area < least) continue;
+      if (group.some((g) => d3.geoDistance(g.middle, x.middle) - g.r - x.r < reach)) { group.push(x); grew = true; }
+    }
+  }
+  const middle = d3.geoCentroid({ type: "MultiPolygon", coordinates: group.map((g) => g.p.coordinates) });
+  const r = Math.max(...group.flatMap((g) => g.p.coordinates[0].map((point) => d3.geoDistance(middle, point))));
   return (country.frame = { lng: middle[0], lat: middle[1], r: Math.max(r * 1.1, 0.004), fill: 1 });
 }
 

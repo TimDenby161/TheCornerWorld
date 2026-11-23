@@ -87,7 +87,8 @@ const REGIONS = {
   ] },
   VNM: { regions: [ // by where each province's middle is
     ["VN-NTH", "Northern Vietnam", (s) => s.lat >= 19.5],
-    ["VN-CEN", "Central Vietnam", (s) => s.lat >= 11.4 && s.lng >= 107.2],
+    // From Thanh Hóa's southern neighbours down to the Central Highlands, but not Bình Phước and Tây Ninh in the south-west
+    ["VN-CEN", "Central Vietnam", (s) => s.lat >= 11.4 && (s.lat >= 12.5 || s.lng >= 107.2)],
     ["VN-STH", "Southern Vietnam", "rest"],
   ] },
   THA: { regions: [
