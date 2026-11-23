@@ -229,6 +229,10 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .group .chips + .chips { margin-top: 6px; }
 .group-label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 7px; font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .group-value { font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
+.home-pick { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-1); color: var(--text-primary); font: inherit; font-size: 14px; font-weight: 550; }
+.home-pick:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 20%, transparent); }
+.home-note { margin: 5px 0 0; font-size: 12px; color: var(--text-muted); }
+.budget-note { margin: 8px 0 0; font-size: 12.5px; }
 .home .chips { margin-top: 0; }
 .home .chips.one-line { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 5px; }
 .home .chips.one-line .chip { padding: 6px 2px; white-space: nowrap; text-align: center; }
@@ -257,7 +261,7 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 
 .results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 10px; }
 .home .results-head .section { margin: 0; }
-.results-head b { color: var(--text-primary); font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.results-head b { color: var(--text-primary); font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: 0; }
 .results-head .link { font-size: 13px; }
 .search.find { margin-bottom: 12px; }
 .search.find .ic { top: 12px; }

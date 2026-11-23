@@ -1,6 +1,6 @@
 // The UK government's travel advice page for a country, as the last part of its address
 // (https://www.gov.uk/foreign-travel-advice/<slug>). scripts/build-data.mjs writes it into countries.json
-// as `advice`; the guide pages and the map link to it. Checked against GOV.UK on 16 November 2026: every
+// as `advice`; the guide pages and the map link to it. Checked against GOV.UK on 16 November 2026 (Antarctica on 23 November): every
 // country on the map either has its page here or gets "" (GOV.UK's list of countries). The UK and the
 // Crown Dependencies get null: there's no travel advice for home.
 //
@@ -17,6 +17,7 @@ const SLUGS = {
   FRO: "denmark", GRL: "denmark", ALA: "finland", SJM: "norway", BVT: "norway", PCN: "pitcairn-island",
   SGS: "south-georgia-and-south-sandwich-islands", BES: "bonaire-st-eustatius-saba",
   CXR: "australia", CCK: "australia", NFK: "australia", HMD: "australia", ATF: "france",
+  ATA: "antarctica-british-antarctic-territory",
 };
 
 const slug = (name) => name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

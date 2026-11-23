@@ -32,16 +32,113 @@ let countries = [], byId = new Map(), ratings = { categories: [], scores: {} }, 
 let cities = {};
 const cityById = new Map();
 
+// ---------- getting there ----------
+
+// The Budget score in ratings.json is what a country costs once you're there. What it costs a visitor also
+// depends on the flights from home, so the Budget score shown is the average of the two: the cost there and
+// a score for the flights, worked out from how far the place is from the visitor's home. Home is guessed
+// from the browser's time zone (nothing is sent anywhere: the site makes no outside requests, so it can't
+// look up an IP address) and the visitor can change it under "Flying from"; their choice is kept in the browser.
+const BUDGET = 2; // where Budget friendly is among the categories
+const HOME_KEY = "tcw.home";
+// Time zone to home (a country, or a state where a country's are on the map)
+const ZONES = {
+  "Europe/London": "GBR", "Europe/Belfast": "GBR", "Europe/Dublin": "IRL", "Europe/Paris": "FRA", "Europe/Berlin": "DEU", "Europe/Madrid": "ESP",
+  "Europe/Lisbon": "PRT", "Europe/Rome": "ITA", "Europe/Amsterdam": "NLD", "Europe/Brussels": "BEL", "Europe/Luxembourg": "LUX", "Europe/Zurich": "CHE",
+  "Europe/Vienna": "AUT", "Europe/Prague": "CZE", "Europe/Warsaw": "POL", "Europe/Budapest": "HUN", "Europe/Bratislava": "SVK", "Europe/Ljubljana": "SVN",
+  "Europe/Zagreb": "HRV", "Europe/Belgrade": "SRB", "Europe/Sarajevo": "BIH", "Europe/Skopje": "MKD", "Europe/Tirane": "ALB", "Europe/Podgorica": "MNE",
+  "Europe/Athens": "GRC", "Europe/Sofia": "BGR", "Europe/Bucharest": "ROU", "Europe/Chisinau": "MDA", "Europe/Kiev": "UKR", "Europe/Kyiv": "UKR",
+  "Europe/Minsk": "BLR", "Europe/Vilnius": "LTU", "Europe/Riga": "LVA", "Europe/Tallinn": "EST", "Europe/Helsinki": "FIN", "Europe/Stockholm": "SWE",
+  "Europe/Oslo": "NOR", "Europe/Copenhagen": "DNK", "Atlantic/Reykjavik": "ISL", "Europe/Malta": "MLT", "Asia/Nicosia": "CYP", "Europe/Istanbul": "TUR",
+  "Europe/Moscow": "RUS", "Atlantic/Canary": "ES-GCA", "Atlantic/Madeira": "PT-30", "Atlantic/Azores": "PT-20",
+  "America/New_York": "US-NY", "America/Detroit": "US-MI", "America/Indiana/Indianapolis": "US-IN", "America/Kentucky/Louisville": "US-KY",
+  "America/Chicago": "US-IL", "America/Denver": "US-CO", "America/Boise": "US-ID", "America/Phoenix": "US-AZ", "America/Los_Angeles": "US-CA",
+  "America/Anchorage": "US-AK", "Pacific/Honolulu": "US-HI",
+  "America/Toronto": "CA-ON", "America/Montreal": "CA-QC", "America/Vancouver": "CA-BC", "America/Edmonton": "CA-AB", "America/Winnipeg": "CA-MB",
+  "America/Regina": "CA-SK", "America/Halifax": "CA-NS", "America/St_Johns": "CA-NL", "America/Moncton": "CA-NB",
+  "America/Mexico_City": "MEX", "America/Cancun": "MEX", "America/Monterrey": "MEX", "America/Tijuana": "MEX", "America/Guatemala": "GTM",
+  "America/Belize": "BLZ", "America/El_Salvador": "SLV", "America/Tegucigalpa": "HND", "America/Managua": "NIC", "America/Costa_Rica": "CRI",
+  "America/Panama": "PAN", "America/Havana": "CUB", "America/Jamaica": "JAM", "America/Santo_Domingo": "DOM", "America/Puerto_Rico": "PRI",
+  "America/Port_of_Spain": "TTO", "America/Barbados": "BRB", "America/Bogota": "COL", "America/Caracas": "VEN", "America/Lima": "PER",
+  "America/Guayaquil": "ECU", "America/La_Paz": "BOL", "America/Santiago": "CHL", "America/Argentina/Buenos_Aires": "ARG", "America/Buenos_Aires": "ARG",
+  "America/Montevideo": "URY", "America/Asuncion": "PRY", "America/Sao_Paulo": "BRA", "America/Fortaleza": "BRA", "America/Manaus": "BRA",
+  "Africa/Casablanca": "MAR", "Africa/Algiers": "DZA", "Africa/Tunis": "TUN", "Africa/Cairo": "EGY", "Africa/Lagos": "NGA", "Africa/Accra": "GHA",
+  "Africa/Dakar": "SEN", "Africa/Abidjan": "CIV", "Africa/Nairobi": "KEN", "Africa/Addis_Ababa": "ETH", "Africa/Dar_es_Salaam": "TZA",
+  "Africa/Kampala": "UGA", "Africa/Kigali": "RWA", "Africa/Lusaka": "ZMB", "Africa/Harare": "ZWE", "Africa/Maputo": "MOZ", "Africa/Windhoek": "NAM",
+  "Africa/Gaborone": "BWA", "Africa/Johannesburg": "ZAF", "Indian/Mauritius": "MUS", "Indian/Antananarivo": "MDG",
+  "Asia/Dubai": "ARE", "Asia/Qatar": "QAT", "Asia/Bahrain": "BHR", "Asia/Kuwait": "KWT", "Asia/Riyadh": "SAU", "Asia/Muscat": "OMN",
+  "Asia/Amman": "JOR", "Asia/Beirut": "LBN", "Asia/Jerusalem": "ISR", "Asia/Baghdad": "IRQ", "Asia/Tehran": "IRN", "Asia/Tbilisi": "GEO",
+  "Asia/Yerevan": "ARM", "Asia/Baku": "AZE", "Asia/Almaty": "KAZ", "Asia/Tashkent": "UZB", "Asia/Bishkek": "KGZ", "Asia/Karachi": "PAK",
+  "Asia/Kabul": "AFG", "Asia/Kolkata": "IND", "Asia/Calcutta": "IND", "Asia/Kathmandu": "NPL", "Asia/Dhaka": "BGD", "Asia/Colombo": "LKA",
+  "Indian/Maldives": "MDV", "Asia/Thimphu": "BTN", "Asia/Yangon": "MMR", "Asia/Bangkok": "THA", "Asia/Vientiane": "LAO", "Asia/Phnom_Penh": "KHM",
+  "Asia/Ho_Chi_Minh": "VNM", "Asia/Saigon": "VNM", "Asia/Kuala_Lumpur": "MY-PM", "Asia/Kuching": "MY-EM", "Asia/Singapore": "SGP",
+  "Asia/Jakarta": "ID-JW", "Asia/Makassar": "ID-BA", "Asia/Manila": "PHL", "Asia/Shanghai": "CHN", "Asia/Hong_Kong": "HKG", "Asia/Macau": "MAC",
+  "Asia/Taipei": "TWN", "Asia/Seoul": "KOR", "Asia/Tokyo": "JPN", "Asia/Ulaanbaatar": "MNG", "Asia/Novosibirsk": "RUS", "Asia/Yekaterinburg": "RUS",
+  "Asia/Vladivostok": "RUS",
+  "Australia/Sydney": "AU-NSW", "Australia/Melbourne": "AU-VIC", "Australia/Brisbane": "AU-QLD", "Australia/Perth": "AU-WA",
+  "Australia/Adelaide": "AU-SA", "Australia/Hobart": "AU-TAS", "Australia/Darwin": "AU-NT", "Australia/Canberra": "AU-ACT",
+  "Pacific/Auckland": "NZL", "Pacific/Fiji": "FJI", "Pacific/Tahiti": "PYF", "Pacific/Guam": "GUM",
+};
+// Where people fly from and to in countries whose middle is far from their main airports (lat, lng, and a
+// name for the place). Other places use the middle of their shape.
+const HUBS = {
+  GBR: [51.5, -0.1, "London"], RUS: [55.8, 37.6, "Moscow"], CAN: [43.7, -79.4, "Toronto"], AUS: [-33.9, 151.2, "Sydney"],
+  CHN: [31.2, 121.5, "Shanghai"], BRA: [-23.5, -46.6, "São Paulo"], USA: [40.7, -74, "New York"], CHL: [-33.4, -70.7, "Santiago"],
+  ARG: [-34.6, -58.4, "Buenos Aires"], NOR: [59.9, 10.8, "Oslo"], SWE: [59.3, 18.1, "Stockholm"], FIN: [60.2, 24.9, "Helsinki"],
+  IDN: [-8.4, 115.2, "Bali"], KAZ: [43.2, 76.9, "Almaty"], EGY: [30, 31.2, "Cairo"], ZAF: [-33.9, 18.4, "Cape Town"], NZL: [-36.8, 174.8, "Auckland"],
+};
+// Names that read with "the" in front
+const THE = new Set(["USA", "NLD", "PHL", "ARE", "BHS", "GMB", "CZE", "DOM", "CAF", "COD", "MDV", "SYC", "SLB", "MHL", "COM", "CYM", "VGB", "VIR", "TCA", "FRO", "FLK"]);
+// Flight score by distance (km): short hops score 10, the other side of the world 2
+const FLIGHT_STEPS = [[0, 10], [1000, 9.5], [2500, 8], [5000, 6.5], [8000, 5], [11000, 3.5], [14000, 2.5], [17000, 2]];
+
+const where = (c) => (HUBS[c.id] ? { lat: HUBS[c.id][0], lng: HUBS[c.id][1] } : { lat: c.lat, lng: c.lng });
+const homeName = (c) => HUBS[c.id]?.[2] || (THE.has(c.id) ? `the ${c.name}` : c.name);
+
+function guessHome() {
+  try { const kept = localStorage.getItem(HOME_KEY); if (byId.has(kept)) return kept; } catch { /* storage blocked */ }
+  let zone = "";
+  try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { /* no time zone */ }
+  return byId.has(ZONES[zone]) ? ZONES[zone] : "GBR";
+}
+function setHome(id) {
+  state.home = id;
+  scoreCache.clear();
+  try { localStorage.setItem(HOME_KEY, id); } catch { /* storage blocked: lasts for this visit */ }
+}
+
+// How far a place is from home, in km, and the flight score for that
+function getThere(c) {
+  const home = byId.get(state.home);
+  if (!home || !c) return null;
+  const a = where(home), b = c.within ? { lat: c.lat, lng: c.lng } : where(c);
+  const km = Math.round(d3.geoDistance([a.lng, a.lat], [b.lng, b.lat]) * 6371);
+  let i = 1;
+  while (i < FLIGHT_STEPS.length - 1 && km > FLIGHT_STEPS[i][0]) i++;
+  const [[k0, s0], [k1, s1]] = [FLIGHT_STEPS[i - 1], FLIGHT_STEPS[i]];
+  return { km, score: clamp(s0 + (s1 - s0) * (km - k0) / (k1 - k0), s1, s0), from: homeName(home) };
+}
+
 // A country's scores: { parts: [food, activities, budget, family, safety], likes: [beaches, history, wildlife,
-// hiking, relax], overall } with overall the average of six numbers, to one decimal place: the five parts
-// and the best of the likes (a country is judged by what it does best, not by what it lacks). A state or
-// island without its own takes its country's. Null if unscored.
+// hiking, relax], overall, there, flight } with overall the average of six numbers, to one decimal place: the
+// five parts and the best of the likes (a country is judged by what it does best, not by what it lacks). The
+// budget part includes the flights from home (see "getting there"); `there` is the cost there alone and
+// `flight` the distance and its score. A state or island without its own scores takes its country's. Null if unscored.
+const scoreCache = new Map();
 function scoreOf(c) {
-  const all = c && (ratings.scores[c.id] || ratings.scores[c.within]);
-  if (!all?.length) return null;
-  const n = ratings.categories.length, parts = all.slice(0, n);
-  const likes = all.slice(n), six = [...parts, ...(likes.length ? [Math.max(...likes)] : [])];
-  return { parts, likes, overall: Math.round(six.reduce((a, b) => a + b, 0) / six.length * 10) / 10 };
+  if (!c) return null;
+  if (scoreCache.has(c.id)) return scoreCache.get(c.id);
+  const all = ratings.scores[c.id] || ratings.scores[c.within];
+  let score = null;
+  if (all?.length) {
+    const n = ratings.categories.length, parts = all.slice(0, n);
+    const there = parts[BUDGET], flight = getThere(c);
+    if (flight && there != null) parts[BUDGET] = clamp(Math.round((there + flight.score) / 2), 1, 10);
+    const likes = all.slice(n), six = [...parts, ...(likes.length ? [Math.max(...likes)] : [])];
+    score = { parts, likes, there, flight, overall: Math.round(six.reduce((a, b) => a + b, 0) / six.length * 10) / 10 };
+  }
+  scoreCache.set(c.id, score);
+  return score;
 }
 // A score out of 10 for each name, as bars in the colour of the score
 function bars(names, scores, colour) {
@@ -57,13 +154,15 @@ function scoreScale() {
   return d3.scaleLinear().domain([2.5, 5, 6.5, 8.5]).range(["--g-s1", "--g-s2", "--g-s3", "--g-s4"].map((v) => css.getPropertyValue(v).trim())).interpolate(d3.interpolateRgb).clamp(true);
 }
 const scoreText = (n) => n.toFixed(1);
-// A country's months with great weather (data/weather.json), 1 to 12
-const greatMonths = (id) => (weather[id]?.m || []).flatMap((m, i) => (m[3] === "G" ? [i + 1] : []));
+// A place's months with great weather (data/weather.json), 1 to 12. Every state, island and region has its own
+// (Lofoten and Oslo are good at different times); only one without falls back on its country's.
+const greatMonths = (id) => (weather[id] || weather[byId.get(id)?.within])?.m?.flatMap((m, i) => (m[3] === "G" ? [i + 1] : [])) || [];
 // What a score of 8 or more in a category earns a country, as "Great for" filters and on its card
 const GREAT = 8;
 const GREAT_LABELS = ["Food", "Activities", "Budget", "Families", "Safety"];
-// The countries the list and "Surprise me" choose from: every scored country (not states and islands)
-const listed = () => countries.filter((c) => !c.within && ratings.scores[c.id]).map((c) => c.id);
+// The destinations the list and "Surprise me" choose from: every country, state, island and region with scores of
+// its own. Each is judged on its own scores and weather, not its country's.
+const listed = () => countries.filter((c) => ratings.scores[c.id]).map((c) => c.id);
 
 function scoreBadge(score, colour) {
   // Styles go on through the DOM: the security policy blocks style="" attributes
@@ -72,7 +171,7 @@ function scoreBadge(score, colour) {
   return badge;
 }
 let globe = null;
-const state = { info: "todo", selected: null, city: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
+const state = { home: "GBR", info: "todo", selected: null, city: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -251,7 +350,7 @@ function showTip(target, x, y) {
 
 function tipLines(target) {
   const line = (cls, text) => text && h("p", { class: cls, text });
-  const c = target.country, whole = byId.get(c.within), best = greatMonths(c.within || c.id);
+  const c = target.country, whole = byId.get(c.within), best = greatMonths(c.id);
   return [
     h("p", { class: "tip-title" }, h("span", { class: "flag", text: c.flag, "aria-hidden": "true" }), c.name),
     line("tip-sub", whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region),
@@ -289,14 +388,15 @@ function matches(id) {
     const names = [c.name, byId.get(c.within)?.name].filter(Boolean);
     if (!names.some((n) => n.toLowerCase().split(/[\s-]+/).some((w) => w.startsWith(q)) || n.toLowerCase().startsWith(q))) return false;
   }
-  if (state.month && !greatMonths(c.within || id).includes(state.month)) return false;
+  if (state.month && !greatMonths(id).includes(state.month)) return false;
   if (state.region && c.region !== state.region) return false;
   for (const i of state.great) if (score.parts[i] < GREAT) return false;
   for (const i of state.likes) if (!(score.likes[i] >= GREAT)) return false;
   return true;
 }
 
-// Colours the map: every country by its score, red to green (with a filter on, only the ones that match), and the selection
+// Colours the map: every place by its own score, red to green (with a filter on, only the ones that match on their
+// own scores and weather), and the selection
 function paint() {
   if (!globe) return;
   const active = filtersActive();
@@ -304,7 +404,7 @@ function paint() {
   const either = (c, test) => test(c.id) || Boolean(c.within && test(c.within));
   const picked = (id) => id === state.selected;
   const fill = (c) => !c ? "none" : either(c, picked) ? "selected"
-    : active && !either(c, matches) ? "land" : scoreOf(c) ? `s${Math.round(scoreOf(c).overall * 10)}` : "land";
+    : active && !matches(c.id) ? "land" : scoreOf(c) ? `s${Math.round(scoreOf(c).overall * 10)}` : "land";
   globe.paint({
     fill: (f) => fill(f.country),
     selected: (f) => Boolean(f.country) && either(f.country, picked),
@@ -532,8 +632,18 @@ function renderDiscover() {
     toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
       { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
 
+  // Home, for the flights in the Budget scores: every country, and the states and islands that are on the map
+  const placeName = (c) => (c.within ? `${c.name} (${byId.get(c.within).name})` : c.name);
+  const homes = countries.filter((c) => !c.within || byId.has(c.within)).sort((a, b) => placeName(a).localeCompare(placeName(b)));
+  const from = h("select", { id: "home", class: "home-pick", onchange: (e) => { setHome(e.target.value); refresh(); } },
+    homes.map((c) => h("option", { value: c.id, selected: c.id === state.home, text: placeName(c) })));
+
   const group = (label, value, ...body) => h("div", { class: "group" }, h("p", { class: "group-label" }, label, value), ...body);
   const filters = h("div", { class: "filters" },
+    h("div", { class: "group" },
+      h("label", { class: "group-label", for: "home", text: "Flying from" }),
+      from,
+      h("p", { class: "home-note", text: "Budget scores include the flights from here." })),
     group("Where", null, where),
     group("When", when, months),
     // The categories and the interests share one heading, a row each
@@ -589,7 +699,8 @@ function renderResults() {
   const active = filtersActive();
   const colour = scoreScale();
   const number = h("b");
-  head.replaceChildren(number, active ? ` of ${plural(all.length, "country", "countries")} match` : shown.length === 1 ? " country" : " countries");
+  // With filters on: "3 of 243 destinations left"; with none: "243 destinations"
+  head.replaceChildren(number, active ? ` of ${plural(all.length, "destination")} left` : shown.length === 1 ? " destination" : " destinations");
   $("#clear").hidden = !active;
   box.replaceChildren(shown.length
       ? h("ul", { class: "cards" }, shown.map((id) => {
@@ -600,12 +711,12 @@ function renderResults() {
             h("span", { class: "card-flag", text: c.flag, "aria-hidden": "true" }),
             h("span", { class: "card-main" },
               h("span", { class: "card-title", text: c.name }),
-              h("span", { class: "card-sub", text: c.subregion || c.region }),
+              h("span", { class: "card-sub", text: c.within ? [c.group, byId.get(c.within).name].filter(Boolean).join(", ") : c.subregion || c.region }),
               activities[id]?.length > 0 && h("span", { class: "card-text", text: activities[id].slice(0, 3).join(" · ") }),
               meta && h("span", { class: "card-meta", text: meta.charAt(0).toUpperCase() + meta.slice(1) })),
             scoreBadge(score, colour(score.overall))));
         }))
-      : h("p", { class: "empty", text: state.query.trim() ? "No country by that name." : "No countries match those choices. Try removing one." }));
+      : h("p", { class: "empty", text: state.query.trim() ? "No destination by that name." : "No destinations left with those choices. Try removing one." }));
   countTo(number, shown.length);
 }
 
@@ -679,6 +790,8 @@ function renderDestination() {
       body.push(h("div", { class: "rating" },
         h("div", { class: "rating-head" }, h("h2", { class: "section", text: "Our scores" }), scoreBadge(score, colour(score.overall)), h("span", { class: "muted", text: "out of 10" })),
         bars(ratings.categories, score.parts, colour),
+        score.flight && h("p", { class: "note budget-note",
+          text: `Budget is the cost there (${score.there}/10) and the flights (${Math.round(score.flight.score)}/10): ${c.name} is ${score.flight.km.toLocaleString("en-GB")} km from ${score.flight.from}. Change where you fly from on the Discover page.` }),
         h("h2", { class: "section rating-sub", text: "Interests" }),
         bars(ratings.interests, score.likes, colour)));
     }
@@ -776,6 +889,7 @@ async function start() {
   }
   for (const c of countries) { c.features = []; c.parts = []; byId.set(c.id, c); }
   for (const c of countries) byId.get(c.within)?.parts.push(c); // a country's states
+  state.home = guessHome();
   for (const [id, list] of Object.entries(cities)) {
     if (!byId.has(id)) { delete cities[id]; continue; }
     for (const city of list) { city.id = `${id.toLowerCase()}-${slug(city.name)}`; city.country = byId.get(id); cityById.set(city.id, city); }

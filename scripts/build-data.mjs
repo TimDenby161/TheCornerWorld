@@ -4,7 +4,7 @@
 import { writeFileSync, copyFileSync } from "node:fs";
 import { advice } from "./advice.mjs";
 import { createRequire } from "node:module";
-import { geoArea, geoCentroid, geoDistance } from "d3";
+import { geoArea, geoCentroid, geoContains, geoDistance } from "d3";
 import { feature, merge } from "topojson-client";
 import { topology } from "topojson-server";
 
@@ -49,8 +49,20 @@ const out = new URL("../docs/", import.meta.url);
 
 // The map names each shape by its ISO numeric code; a few disputed areas have a name only.
 const featureKey = (g) => g.id ?? g.properties.name;
-const geometries = world.objects.countries.geometries.filter((g) => g.id !== "010"); // no Antarctica
-world.objects.countries.geometries = geometries;
+const geometries = world.objects.countries.geometries;
+
+// Antarctica comes as a tiny circle round the South Pole with its coast as a hole: right on a sphere, but the
+// globe's zoomed-out copies thin that circle to nothing and lose the continent. Its coast alone becomes the
+// outline (it already runs the way an outline does, with the land, and the pole, inside it).
+{
+  const antarctica = geometries.find((g) => g.id === "010");
+  const [, ky] = world.transform.scale, [, ty] = world.transform.translate;
+  const decodeArc = (a) => { let y = 0; return world.arcs[a < 0 ? ~a : a].map(([, dy]) => [0, (y += dy) * ky + ty]); };
+  const polar =(rings) => rings.length === 2 && rings[0].every((a) => decodeArc(a).every(([, lat]) => lat < -89.9));
+  const i = antarctica.arcs.findIndex(polar);
+  if (i < 0) throw new Error("Antarctica: the map no longer draws the continent as a ring round the pole");
+  antarctica.arcs[i] = [antarctica.arcs[i][1]];
+}
 delete world.objects.land;
 
 // Arcs are stored as a start point followed by steps, in whole grid units
@@ -175,6 +187,11 @@ const states = {
     "ID-BA": "Denpasar", // Bali
     IDN: { of: ["ID-MA", "ID-MU", "ID-PA", "ID-PB"] }, // Maluku and Papua
   },
+  // Norway's travel regions and Moldova's breakaway east are made by fetch-regions.mjs, not fetch-states.mjs
+  NOR: {
+    "NO-LOF": "Svolvær", "NO-NN": "Tromsø", "NO-TRD": "Trondheim", "NO-FJ": "Bergen", "NO-EN": "Oslo", "NO-SN": "Kristiansand",
+  },
+  MDA: { MDA: {}, "MD-TR": "Tiraspol" }, // the rest stays as Moldova's own shape
 };
 // Outlines too small to list on their own are drawn as part of a neighbour
 const drawnWith = { "AU-X02~": "AU-NSW" }; // Jervis Bay Territory, with New South Wales
@@ -226,7 +243,10 @@ for (const [cca3, named] of Object.entries(states)) {
   for (const arcs of whole.type === "Polygon" ? [whole.arcs] : whole.arcs) {
     const coast = arcs.flat().flatMap((a) => decode(world.arcs[a < 0 ? ~a : a]));
     if (coast.filter((point) => traced.has(String(point))).length > coast.length / 2) continue;
+    // Outlines from a more detailed map (fetch-regions.mjs) never trace the same points: there, a piece is covered
+    // if its middle is inside one
     const centre = geoCentroid(feature(world, { type: "Polygon", arcs }));
+    if (listed.some((f) => geoContains(f, centre))) continue;
     const dist = (f) => Math.min(...f.geometry.coordinates.flat(f.geometry.type === "Polygon" ? 1 : 2).map((point) => geoDistance(centre, point)));
     const nearest = listed.reduce((a, b) => (dist(b) < dist(a) ? b : a));
     geometries.push({ type: "Polygon", arcs, id: shapeId(nearest.properties.id), properties: { name: nearest.properties.name } });
@@ -249,7 +269,7 @@ const keys = new Set(geometries.map(featureKey));
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const countries = all
-  .filter((c) => c.cca3 !== "ATA" && !replaced.has(c.ccn3))
+  .filter((c) => !replaced.has(c.ccn3))
   .map((c) => {
     const key = shapeless.has(c.cca3) ? null : keys.has(c.ccn3) ? c.ccn3 : keys.has(c.name.common) ? c.name.common : null;
     const suffixes = c.idd?.suffixes ?? [];
@@ -272,6 +292,9 @@ const countries = all
     };
   })
   .sort((a, b) => a.name.localeCompare(b.name));
+// Facts where a part differs from its country: Transnistria runs its own money
+const differs = { "MD-TR": { currencies: ["Transnistrian ruble (PRB), cash only"] } };
+for (const c of countries) Object.assign(c, differs[c.id]);
 // The UK government's travel advice for each (see scripts/advice.mjs)
 const countryById = new Map(countries.map((c) => [c.id, c]));
 for (const c of countries) c.advice = advice(c, countryById);

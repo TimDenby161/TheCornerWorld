@@ -70,7 +70,7 @@
   "MWI": {"at":"Kande Beach","lat":-11.95,"lng":34.12},
   "MYS": {"at":"Kuala Lumpur","lat":3.14,"lng":101.69},
   "NLD": {"at":"Amsterdam","lat":52.37,"lng":4.9},
-  "NOR": {"at":"Reine","lat":67.93,"lng":13.09},
+  "NOR": {"at":"Oslo","lat":59.91,"lng":10.75},
   "NPL": {"at":"Kathmandu","lat":27.72,"lng":85.32},
   "NZL": {"at":"Auckland","lat":-36.85,"lng":174.76,"best":[12,1,2,3,4]},
   "OMN": {"at":"Muscat","lat":23.59,"lng":58.41},
@@ -107,5 +107,13 @@
   "XWB": {"at":"Bethlehem","lat":31.7,"lng":35.2},
   "ZAF": {"at":"Cape Town","lat":-33.92,"lng":18.42},
   "ZMB": {"at":"South Luangwa National Park","lat":-13.1,"lng":31.79},
-  "ZWE": {"at":"Victoria Falls","lat":-17.93,"lng":25.83}
+  "ZWE": {"at":"Victoria Falls","lat":-17.93,"lng":25.83},
+  "ATA": {"at":"Paradise Bay, Antarctic Peninsula","lat":-64.83,"lng":-62.87,"best":[12,1,2]},
+  "MD-TR": {"at":"Tiraspol","lat":46.84,"lng":29.63},
+  "NO-LOF": {"at":"Reine","lat":67.93,"lng":13.09,"best":[6,7,8]},
+  "NO-NN": {"at":"Tromsø","lat":69.65,"lng":18.96},
+  "NO-TRD": {"at":"Trondheim","lat":63.43,"lng":10.4},
+  "NO-FJ": {"at":"Bergen","lat":60.39,"lng":5.32},
+  "NO-EN": {"at":"Oslo","lat":59.91,"lng":10.75},
+  "NO-SN": {"at":"Kristiansand","lat":58.15,"lng":8.0}
 }
