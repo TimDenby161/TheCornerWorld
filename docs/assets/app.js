@@ -286,7 +286,7 @@ function buildMap(world) {
   }
 
   // Countries too small to click (or missing from the map at this detail) get a dot
-  const dots = countries.filter((c) => c.capital && !c.parts.length && (!c.features.length || c.area < 2500)).map((c) => ({ country: c, lng: c.lng, lat: c.lat }));
+  const dots = countries.filter((c) => (c.capital || c.town) && !c.parts.length && (!c.features.length || c.area < 2500)).map((c) => ({ country: c, lng: c.lng, lat: c.lat }));
 
   // A name for every country and state with a shape. A country drawn as its states gives way to their
   // names once there is room for them. Where a name goes is the middle of the country's shape, which
@@ -762,6 +762,7 @@ function renderDestination() {
   const c = byId.get(state.selected), whole = byId.get(c.within);
   const facts = [
     ["Capital", c.capital],
+    ["Main town", c.town], // a travel region has no capital, only a main town for visitors
     ["Currency", c.currencies.join(", ")],
     ["Languages", c.languages.join(", ")],
     ["Dialling code", c.dial],
@@ -773,7 +774,7 @@ function renderDestination() {
       h("span", { class: "flag big", text: c.flag, "aria-hidden": "true" }),
       h("div", null,
         h("h1", null, c.name),
-        h("p", { class: "muted", text: [whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region, c.capital && `Capital ${c.capital}`].filter(Boolean).join(" · ") }))),
+        h("p", { class: "muted", text: [whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region, c.capital ? `Capital ${c.capital}` : c.town && `Main town ${c.town}`].filter(Boolean).join(" · ") }))),
   ];
 
   // Three tabs: what there is to do, the weather month by month, and what to know before going

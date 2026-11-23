@@ -4,7 +4,8 @@
 import { writeFileSync, copyFileSync } from "node:fs";
 import { advice } from "./advice.mjs";
 import { createRequire } from "node:module";
-import { geoArea, geoCentroid, geoContains, geoDistance } from "d3";
+import { geoArea, geoCentroid, geoDistance, polygonArea as d3area } from "d3";
+import clip from "polygon-clipping";
 import { feature, merge } from "topojson-client";
 import { topology } from "topojson-server";
 
@@ -187,11 +188,45 @@ const states = {
     "ID-BA": "Denpasar", // Bali
     IDN: { of: ["ID-MA", "ID-MU", "ID-PA", "ID-PB"] }, // Maluku and Papua
   },
-  // Norway's travel regions and Moldova's breakaway east are made by fetch-regions.mjs, not fetch-states.mjs
+  // Countries in travel regions, and Moldova's breakaway east, are made by fetch-regions.mjs, not fetch-states.mjs.
+  // A region has no capital: { town } is the main town for visitors. An entry under the country's own code is the
+  // part that stays the country's own shape.
+  MDA: { MDA: {}, "MD-TR": "Tiraspol" },
   NOR: {
-    "NO-LOF": "Svolvær", "NO-NN": "Tromsø", "NO-TRD": "Trondheim", "NO-FJ": "Bergen", "NO-EN": "Oslo", "NO-SN": "Kristiansand",
+    "NO-LOF": { town: "Svolvær" }, "NO-NN": { town: "Tromsø" }, "NO-TRD": { town: "Trondheim" }, "NO-FJ": { town: "Bergen" },
+    "NO-EN": { town: "Oslo" }, "NO-SN": { town: "Kristiansand" },
   },
-  MDA: { MDA: {}, "MD-TR": "Tiraspol" }, // the rest stays as Moldova's own shape
+  BRA: { "BR-AMZ": { town: "Manaus" }, "BR-NEB": { town: "Salvador" }, "BR-PAN": { town: "Cuiabá" }, BRA: {} },
+  CHN: {
+    "CN-NEC": { town: "Harbin" }, "CN-NTH": { town: "Beijing" }, "CN-EST": { town: "Shanghai" }, "CN-STH": { town: "Guangzhou" },
+    "CN-SWC": { town: "Chengdu" }, "CN-HAI": { town: "Sanya" }, "CN-TIB": { town: "Lhasa" }, "CN-SLK": { town: "Ürümqi" },
+  },
+  IND: {
+    "IN-HIM": { town: "Leh" }, "IN-NEI": { town: "Guwahati" }, "IN-WCO": { town: "Mumbai" }, "IN-SEI": { town: "Chennai" },
+    "IN-ANI": { town: "Port Blair" }, "IN-NTH": { town: "New Delhi" },
+  },
+  RUS: { "RU-SOU": { town: "Sochi" }, RUS: {} },
+  ZAF: { "ZA-WC": "Cape Town", ZAF: {} },
+  MEX: { "MX-PAC": { town: "Puerto Vallarta" }, MEX: {} },
+  ARG: { "AR-PAT": { town: "Bariloche" }, ARG: {} },
+  CHL: { "CL-LAK": { town: "Puerto Varas" }, "CL-PAT": { town: "Punta Arenas" }, CHL: {} },
+  PER: { "PE-AMZ": { town: "Iquitos" }, PER: {} },
+  COL: { "CO-AMZ": { town: "Leticia" }, COL: {} },
+  ECU: { "EC-GAL": { town: "Puerto Ayora" }, "EC-AMZ": { town: "Tena" }, "EC-CST": { town: "Guayaquil" }, ECU: {} },
+  BOL: { "BO-ALT": { town: "Uyuni" }, "BO-LOW": { town: "Santa Cruz" }, BOL: {} },
+  VNM: { "VN-NTH": { town: "Hanoi" }, "VN-CEN": { town: "Da Nang" }, "VN-STH": { town: "Ho Chi Minh City" } },
+  THA: { "TH-NTH": { town: "Chiang Mai" }, "TH-AND": { town: "Phuket" }, "TH-GLF": { town: "Koh Samui" }, THA: {} },
+  PHL: { "PH-PAL": { town: "Puerto Princesa" }, "PH-MIN": { town: "Davao" }, "PH-VIS": { town: "Cebu" }, "PH-LUZ": { town: "Manila" } },
+  JPN: { "JP-HKD": { town: "Sapporo" }, "JP-OKI": { town: "Naha" }, JPN: {} },
+  TUR: { "TR-CST": { town: "Antalya" }, "TR-EST": { town: "Erzurum" }, TUR: {} },
+  IRN: { "IR-GLF": { town: "Bandar Abbas" }, IRN: {} },
+  ITA: { "IT-ALP": { town: "Bolzano" }, ITA: {} },
+  FRA: { "FR-ALP": { town: "Chamonix" }, FRA: {} },
+  ESP: { "ES-AND": { town: "Seville" }, "ES-GRN": { town: "Bilbao" }, ESP: {} },
+  SWE: { "SE-LAP": { town: "Kiruna" }, SWE: {} },
+  PAK: { "PK-GB": { town: "Gilgit" }, PAK: {} },
+  OMN: { "OM-DHO": { town: "Salalah" }, OMN: {} },
+  ETH: { "ET-AFR": { town: "Semera" }, ETH: {} },
 };
 // Outlines too small to list on their own are drawn as part of a neighbour
 const drawnWith = { "AU-X02~": "AU-NSW" }; // Jervis Bay Territory, with New South Wales
@@ -233,7 +268,7 @@ for (const [cca3, named] of Object.entries(states)) {
     all.push({
       cca3: id, ccn3: id, name: { common: name }, flag: entry.flag ?? country.flag, capital: capital ? [capital] : [],
       region: country.region, subregion: country.subregion, languages: country.languages, idd: country.idd,
-      currencies: country.currencies, latlng: [lat, lng], area: Math.round(geoArea(f) * 6371 ** 2), within: cca3,
+      currencies: country.currencies, latlng: [lat, lng], area: Math.round(geoArea(f) * 6371 ** 2), within: cca3, town: entry.town,
     });
   }
   // Far-off islands in the country's shape that no state outline covers stay on the map, with the nearest state.
@@ -244,9 +279,12 @@ for (const [cca3, named] of Object.entries(states)) {
     const coast = arcs.flat().flatMap((a) => decode(world.arcs[a < 0 ? ~a : a]));
     if (coast.filter((point) => traced.has(String(point))).length > coast.length / 2) continue;
     // Outlines from a more detailed map (fetch-regions.mjs) never trace the same points: there, a piece is covered
-    // if its middle is inside one
+    // if most of it lies under them. (Not "if its middle does": Vietnam's middle is in Laos.)
+    const piece = feature(world, { type: "Polygon", arcs }).geometry.coordinates;
+    const flatArea = (multi) => multi.reduce((sum, rings) => sum + rings.reduce((s, ring, i) => s + (i ? -1 : 1) * Math.abs(d3area(ring)), 0), 0);
+    const under = listed.reduce((sum, f) => sum + flatArea(clip.intersection(piece, f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates)), 0);
+    if (under > flatArea([piece]) / 2) continue;
     const centre = geoCentroid(feature(world, { type: "Polygon", arcs }));
-    if (listed.some((f) => geoContains(f, centre))) continue;
     const dist = (f) => Math.min(...f.geometry.coordinates.flat(f.geometry.type === "Polygon" ? 1 : 2).map((point) => geoDistance(centre, point)));
     const nearest = listed.reduce((a, b) => (dist(b) < dist(a) ? b : a));
     geometries.push({ type: "Polygon", arcs, id: shapeId(nearest.properties.id), properties: { name: nearest.properties.name } });
@@ -289,6 +327,7 @@ const countries = all
       area: c.area,
       within: c.within,
       group: c.group,
+      town: c.town,
     };
   })
   .sort((a, b) => a.name.localeCompare(b.name));
