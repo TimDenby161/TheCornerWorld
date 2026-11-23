@@ -269,10 +269,11 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .more summary b:empty { display: none; }
 .more .group:first-of-type { margin-top: 8px; }
 
-.results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 10px; }
-.home .results-head .section { margin: 0; }
-.results-head b { color: var(--text-primary); font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: 0; }
-.results-head .link { font-size: 13px; }
+.hero-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.left-count { margin: 0; font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.left-count b { color: var(--text-primary); font-size: 16px; }
+.hero-side .link { font-size: 13px; }
+.hero-side .link[hidden] { display: none; }
 .search.find { margin-bottom: 12px; }
 .search.find .ic { top: 12px; }
 .search.find input { height: 42px; border-radius: 12px; font-size: 14px; }
@@ -293,7 +294,7 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .card > .score { align-self: center; }
 .tip p.tip-score { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--text-muted); font-size: 12px; }
 .tip-score .score { min-width: 34px; height: 22px; font-size: 12px; }
-.sort { display: inline-grid; grid-auto-flow: column; gap: 3px; margin: 0 0 10px; padding: 3px; border-radius: 10px; background: var(--chip-bg); }
+.sort { display: inline-grid; grid-auto-flow: column; gap: 3px; margin: 26px 0 10px; padding: 3px; border-radius: 10px; background: var(--chip-bg); }
 .sort button { height: 28px; padding: 0 12px; border: 0; border-radius: 8px; background: none; color: var(--text-secondary); font-size: 12.5px; font-weight: 600; }
 .sort button[aria-pressed="true"] { background: var(--thumb); color: var(--text-primary); box-shadow: 0 1px 2px rgba(11, 11, 11, .14); }
 .rating { margin: 4px 0 6px; }

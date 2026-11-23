@@ -225,7 +225,6 @@ function icon(name) {
   return svg;
 }
 
-const plural = (n, word, many = `${word}s`) => `${n} ${n === 1 ? word : many}`;
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 const wait = (ms) => new Promise((done) => setTimeout(done, ms));
 
@@ -716,10 +715,14 @@ function renderDiscover() {
   state.clear = () => { state.month = 0; state.hot = false; state.region = ""; state.query = find.value = ""; state.great.clear(); state.likes.clear(); refresh(); };
 
   panel.replaceChildren(
-    h("div", { class: "hero-row" }, h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })), gear),
+    // How many destinations are left sits beside the heading, so a phone's first screen is the heading and the filters
+    h("div", { class: "hero-row" }, h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
+      h("div", { class: "hero-side" },
+        h("p", { class: "left-count", id: "count", "aria-live": "polite" }),
+        h("button", { type: "button", class: "link", id: "clear", text: "Clear", "aria-label": "Clear filters", onclick: () => state.clear() }),
+        gear)),
     settings,
     filters,
-    h("div", { class: "results-head" }, h("h2", { class: "section", id: "count" }), h("button", { type: "button", class: "link", id: "clear", text: "Clear filters", onclick: () => state.clear() })),
     h("div", { class: "sort", id: "sort", role: "group", "aria-label": "Order" }, [["score", "Top rated"], ["name", "A to Z"]].map(([key, label]) =>
       h("button", { type: "button", "data-sort": key, "aria-pressed": String(state.sort === key), text: label, onclick: () => { state.sort = key; renderResults(); } }))),
     h("label", { class: "sr-only", for: "search", text: "Filter by country" }),
@@ -759,8 +762,9 @@ function renderResults() {
   const active = filtersActive();
   const colour = scoreScale();
   const number = h("b");
-  // With filters on: "3 of 243 destinations left"; with none: "243 destinations"
-  head.replaceChildren(number, active ? ` of ${plural(all.length, "destination")} left` : shown.length === 1 ? " destination" : " destinations");
+  // With filters on: "3/243" (all a phone has room for beside the heading); with none: "243 destinations"
+  head.replaceChildren(number, active ? `/${all.length}` : shown.length === 1 ? " destination" : " destinations");
+  head.title = active ? `${shown.length} of ${all.length} destinations left` : "";
   $("#clear").hidden = !active;
   box.replaceChildren(shown.length
       ? h("ul", { class: "cards" }, shown.map((id) => {
