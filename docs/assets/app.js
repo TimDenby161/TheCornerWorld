@@ -156,9 +156,35 @@ function scoreScale() {
 const scoreText = (n) => n.toFixed(1);
 // A place's months with great weather (data/weather.json), 1 to 12. Every state, island and region has its own
 // (Lofoten and Oslo are good at different times); only one without falls back on its country's.
-const greatMonths = (id) => (weather[id] || weather[byId.get(id)?.within])?.m?.flatMap((m, i) => (m[3] === "G" ? [i + 1] : [])) || [];
+const weatherOf = (id) => weather[id] || weather[byId.get(id)?.within];
+const greatMonths = (id) => weatherOf(id)?.m?.flatMap((m, i) => (m[3] === "G" ? [i + 1] : [])) || [];
 // What a score of 8 or more in a category earns a country, as "Great for" filters and on its card
 const GREAT = 8;
+// A place is worth going at a time its weather isn't Great when that time has something only it has: the northern
+// lights, the midnight sun (`s` in weather.json, from scripts/weather-points.json), or snow for one with a Skiing score
+// of 8 or more: December to March north of the equator, June to September south of it.
+const SKI_NORTH = [12, 1, 2, 3], SKI_SOUTH = [6, 7, 8, 9];
+function seasons(id) {
+  const c = byId.get(id), all = { ...(weatherOf(id)?.s || {}) };
+  const ski = ratings.interests.indexOf("Skiing"), score = scoreOf(c);
+  if (ski >= 0 && score?.likes[ski] >= GREAT) all.Skiing = c.lat < 0 ? SKI_SOUTH : SKI_NORTH;
+  return all;
+}
+// The months a place is good to go: great weather, or one of its seasons
+const goodMonths = (id) => [...new Set([...greatMonths(id), ...Object.values(seasons(id)).flat()])];
+// Why: "Great weather Jun–Aug · Northern lights Sep–Mar · Midnight sun May–Jul"
+function whenText(id) {
+  const best = greatMonths(id);
+  return [best.length && `Great weather ${monthRanges(best)}`, ...Object.entries(seasons(id)).map(([what, months]) => `${what} ${monthRanges(months)}`)].filter(Boolean).join(" · ");
+}
+// "Hot weather": an average high of HOT °C or more in the month chosen, or, with no month chosen, in at least
+// HOT_MONTHS months of the year
+const HOT = 27, HOT_MONTHS = 4;
+function hot(id, month) {
+  const m = weatherOf(id)?.m;
+  if (!m) return false;
+  return month ? m[month - 1][0] >= HOT : m.filter((x) => x[0] >= HOT).length >= HOT_MONTHS;
+}
 const GREAT_LABELS = ["Food", "Activities", "Budget", "Families", "Safety"];
 // The destinations the list and "Surprise me" choose from: every country, state, island and region with scores of
 // its own. Each is judged on its own scores and weather, not its country's.
@@ -171,7 +197,7 @@ function scoreBadge(score, colour) {
   return badge;
 }
 let globe = null;
-const state = { home: "GBR", info: "todo", selected: null, city: null, query: "", sort: "score", month: 0, region: "", great: new Set(), likes: new Set(), scroll: 0 };
+const state = { home: "GBR", info: "todo", selected: null, city: null, query: "", sort: "score", month: 0, hot: false, region: "", great: new Set(), likes: new Set(), scroll: 0 };
 
 // ---------- small helpers ----------
 
@@ -350,11 +376,11 @@ function showTip(target, x, y) {
 
 function tipLines(target) {
   const line = (cls, text) => text && h("p", { class: cls, text });
-  const c = target.country, whole = byId.get(c.within), best = greatMonths(c.id);
+  const c = target.country, whole = byId.get(c.within), when = whenText(c.id);
   return [
     h("p", { class: "tip-title" }, h("span", { class: "flag", text: c.flag, "aria-hidden": "true" }), c.name),
     line("tip-sub", whole ? [c.group, whole.name].filter(Boolean).join(", ") : c.subregion || c.region),
-    line("tip-meta", best.length ? `Great weather ${monthRanges(best)}` : ""),
+    line("tip-meta", when),
     scoreOf(c) && h("p", { class: "tip-score" }, scoreBadge(scoreOf(c), scoreScale()(scoreOf(c).overall)), " out of 10"),
     h("p", { class: "tip-go", text: "See the scores" }),
   ].filter(Boolean);
@@ -376,7 +402,7 @@ function hideHint() {
   $("#hint").classList.add("gone");
 }
 
-function filtersActive() { return Boolean(state.query.trim() || state.month || state.region || state.great.size || state.likes.size); }
+function filtersActive() { return Boolean(state.query.trim() || state.month || state.hot || state.region || state.great.size || state.likes.size); }
 
 // Whether a country passes the filters. A state or island is judged as its country.
 function matches(id) {
@@ -388,7 +414,10 @@ function matches(id) {
     const names = [c.name, byId.get(c.within)?.name].filter(Boolean);
     if (!names.some((n) => n.toLowerCase().split(/[\s-]+/).some((w) => w.startsWith(q)) || n.toLowerCase().startsWith(q))) return false;
   }
-  if (state.month && !greatMonths(id).includes(state.month)) return false;
+  if (state.month && !goodMonths(id).includes(state.month)) return false;
+  if (state.hot && !hot(id, state.month)) return false;
+  // Skiing in a month means snow that month, not a sunny July in the Alps
+  if (state.month && state.likes.has(ratings.interests.indexOf("Skiing")) && !seasons(id).Skiing?.includes(state.month)) return false;
   if (state.region && c.region !== state.region) return false;
   for (const i of state.great) if (score.parts[i] < GREAT) return false;
   for (const i of state.likes) if (!(score.likes[i] >= GREAT)) return false;
@@ -617,7 +646,7 @@ function renderDiscover() {
 
   const when = h("span", { class: "group-value" });
   syncs.push(() => { when.textContent = state.month ? MONTHS_LONG[state.month - 1] : "Any month"; });
-  const months = h("div", { class: "month-bar", role: "group", "aria-label": "Month with great weather" }, MONTHS.map((m, i) =>
+  const months = h("div", { class: "month-bar", role: "group", "aria-label": "A good month to go" }, MONTHS.map((m, i) =>
     toggle(m.charAt(0), () => state.month === i + 1, () => { state.month = state.month === i + 1 ? 0 : i + 1; },
       { class: i + 1 === thisMonth ? "now" : "", title: MONTHS_LONG[i], "aria-label": MONTHS_LONG[i] })));
   const where = h("div", { class: "chips one-line", role: "group", "aria-label": "Part of the world" }, regions.map((r) =>
@@ -625,9 +654,14 @@ function renderDiscover() {
       state.region = state.region === r ? "" : r;
       if (state.region) { hideHint(); globe.flyTo(REGIONS[r]); }
     }, { class: "chip" })));
-  const likes = h("div", { class: "chips one-line", role: "group", "aria-label": `Interests: scores ${GREAT} or more` }, ratings.interests.map((label, i) =>
-    toggle(label, () => state.likes.has(i), () => { if (state.likes.has(i)) state.likes.delete(i); else state.likes.add(i); },
-      { class: "chip", title: `${label}: ${GREAT} or more out of 10` })));
+  const hotChip = h("div", { class: "chips hot-row" }, toggle(`Hot weather, ${HOT} °C+`, () => state.hot, () => { state.hot = !state.hot; },
+    { class: "chip", title: `Average highs of ${HOT} °C or more in the month chosen (with no month chosen, for at least ${HOT_MONTHS} months of the year)` }));
+  // The interests, four to a row
+  const likeChip = (label, i) => toggle(label, () => state.likes.has(i), () => { if (state.likes.has(i)) state.likes.delete(i); else state.likes.add(i); },
+    { class: "chip", title: `${label}: ${GREAT} or more out of 10` });
+  const likes = [];
+  for (let i = 0; i < ratings.interests.length; i += 4) likes.push(h("div", { class: "chips one-line", role: "group", "aria-label": `Interests: scores ${GREAT} or more` },
+    ratings.interests.slice(i, i + 4).map((label, j) => likeChip(label, i + j))));
   const great = h("div", { class: "chips one-line", role: "group", "aria-label": `Great for: scores ${GREAT} or more` }, GREAT_LABELS.map((label, i) =>
     toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
       { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
@@ -645,9 +679,9 @@ function renderDiscover() {
       from,
       h("p", { class: "home-note", text: "Budget scores include the flights from here." })),
     group("Where", null, where),
-    group("When", when, months),
+    group("When", when, months, hotChip),
     // The categories and the interests share one heading, a row each
-    group("Great for", null, great, likes));
+    group("Great for", null, great, ...likes));
   for (const sync of syncs) sync();
   // The results narrow to a country as you type its name
   const find = h("input", {
@@ -659,7 +693,7 @@ function renderDiscover() {
       else if (e.key === "Escape" && state.query) { e.preventDefault(); e.stopPropagation(); state.query = e.target.value = ""; renderResults(); paint(); }
     },
   });
-  state.clear = () => { state.month = 0; state.region = ""; state.query = find.value = ""; state.great.clear(); state.likes.clear(); refresh(); };
+  state.clear = () => { state.month = 0; state.hot = false; state.region = ""; state.query = find.value = ""; state.great.clear(); state.likes.clear(); refresh(); };
 
   panel.replaceChildren(
     h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
@@ -704,9 +738,9 @@ function renderResults() {
   $("#clear").hidden = !active;
   box.replaceChildren(shown.length
       ? h("ul", { class: "cards" }, shown.map((id) => {
-          const c = byId.get(id), score = scoreOf(c), best = greatMonths(id);
+          const c = byId.get(id), score = scoreOf(c), when = whenText(id);
           const strong = [...GREAT_LABELS.filter((_, i) => score.parts[i] >= GREAT), ...ratings.interests.filter((_, i) => score.likes[i] >= GREAT)];
-          const meta = [strong.length && `Great for ${strong.join(", ").toLowerCase()}`, best.length && `great weather ${monthRanges(best)}`].filter(Boolean).join(" · ");
+          const meta = [strong.length && `Great for ${strong.join(", ").toLowerCase()}`, when && when.charAt(0).toLowerCase() + when.slice(1)].filter(Boolean).join(" · ");
           return h("li", null, h("button", { type: "button", class: "card", "data-id": id, onclick: () => select(id), ...peekAt(c) },
             h("span", { class: "card-flag", text: c.flag, "aria-hidden": "true" }),
             h("span", { class: "card-main" },
@@ -746,6 +780,8 @@ function weatherTab(c) {
     h("div", { class: "wx-strip", role: "img", "aria-label": RATING_ORDER.map((r) => `${RATING[r]}: ${monthRanges(w.m.flatMap((m, i) => (m[3] === r ? [i + 1] : []))) || "none"}`).join(". ") },
       w.m.map((m, i) => h("span", { class: `wx-${m[3]}`, text: MONTHS[i].charAt(0), title: `${MONTHS_LONG[i]}: ${RATING[m[3]]}` }))),
     h("p", { class: "wx-key", "aria-hidden": "true" }, RATING_ORDER.map((r) => h("span", null, h("i", { class: `wx-${r}` }), RATING[r]))),
+    // What else makes a month worth going, whatever the weather
+    Object.keys(seasons(c.id)).length > 0 && h("p", { class: "wx-also", text: `Also worth going for: ${Object.entries(seasons(c.id)).map(([what, months]) => `${what.toLowerCase()} ${monthRanges(months)}`).join(", ")}.` }),
     h("table", { class: "wx" },
       h("thead", null, h("tr", null, ["Month", "", "High / low", "Rain"].map((t) => h("th", { scope: "col", text: t })))),
       h("tbody", null, w.m.map(([high, low, rain, r], i) => h("tr", { class: i === now ? "now" : "" },

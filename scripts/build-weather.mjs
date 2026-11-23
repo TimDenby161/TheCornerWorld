@@ -14,6 +14,11 @@
 // high is 17–33 °C with 160 mm of rain or less. Okay in between. (NASA's rain runs high in the wet tropics,
 // hence the generous limits.) Best months written by hand in weather-points.json (`best`, kept from the old
 // destination guides) come first: they are that country's Great months, and no other month of it is Great.
+//
+// A place can also be worth going at a time its weather isn't Great, for something only that season has: the
+// northern lights, the midnight sun. Those are `also` in weather-points.json ({ "Northern lights": [9, 10, ...] }),
+// written into weather.json as `s`, and the map counts those months as good ones too. (Ski seasons are worked out
+// on the page from the Skiing score.)
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const read = (name) => JSON.parse(readFileSync(new URL(`../docs/data/${name}.json`, import.meta.url)));
@@ -106,7 +111,7 @@ async function one(p) {
     const agree = best.filter((m) => said.includes(m)).length;
     report.push(`${p.id}: written ${best.join(",")} · figures ${said.join(",") || "none"} (${agree}/${best.length})`);
   }
-  out[p.id] = p.at ? { at: p.at, m: months } : { m: months };
+  out[p.id] = { ...(p.at && { at: p.at }), m: months, ...(written[p.id]?.also && { s: written[p.id].also }) };
   if (++done % 25 === 0) console.log(`${done}/${points.length}`);
 }
 
