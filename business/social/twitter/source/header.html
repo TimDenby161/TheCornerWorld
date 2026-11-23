@@ -1,0 +1,143 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1500px; height: 500px; overflow: hidden; }
+  body {
+    position: relative; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #0b0b0b;
+    background: radial-gradient(1200px 700px at 30% 20%, #ffffff 0%, #eef3f9 50%, #dce6f1 100%);
+  }
+  canvas { position: absolute; inset: 0; }
+  .copy { position: absolute; left: 88px; top: 62px; width: 900px; white-space: nowrap; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 600; color: #52514e; letter-spacing: .01em; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  h1 { margin: 18px 0 0; display: flex; align-items: center; gap: 22px; font-size: 80px; line-height: 1; font-weight: 800; letter-spacing: -.035em; }
+  h1 img { width: 72px; height: 72px; }
+  p { margin: 22px 0 0; font-size: 29px; line-height: 1.32; color: #3a3936; font-weight: 500; letter-spacing: -.01em; }
+  p b { color: #0b0b0b; font-weight: 700; }
+</style></head>
+<body>
+<canvas id="c" width="3000" height="1000" style="width:1500px;height:500px"></canvas>
+<div class="copy">
+  <div class="eyebrow">
+    <span class="dot" style="background:#2a78d6"></span>Map
+    <span class="dot" style="background:#1baf7a"></span>Guides
+    <span class="dot" style="background:#eb6834"></span>Trip planning
+  </div>
+  <h1><img src="mark.svg" alt="">The Corner World</h1>
+  <p>Explore the world on a map, read <b>destination guides</b><br>and plan your trip, every hour and every £.</p>
+</div>
+<script src="world.js"></script>
+<script>
+const W = WORLD, guides = new Set(GUIDES);
+const RAD = Math.PI / 180;
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+ctx.scale(2, 2);
+
+// Globe placement: big, on the right, running off the bottom edge
+const CX = 1180, CY = 360, R = 360;
+const LNG0 = 18, LAT0 = 32;               // centre of view: Europe, Africa, west Asia
+const cl0 = Math.cos(LAT0 * RAD), sl0 = Math.sin(LAT0 * RAD);
+function proj(lng, lat) {
+  const l = (lng - LNG0) * RAD, p = lat * RAD;
+  const x = Math.cos(p) * Math.sin(l);
+  const y = cl0 * Math.sin(p) - sl0 * Math.cos(p) * Math.cos(l);
+  const z = sl0 * Math.sin(p) + cl0 * Math.cos(p) * Math.cos(l);
+  return [x, y, z];
+}
+function toScreen([x, y, z]) {
+  if (z < 0) { const m = Math.hypot(x, y) || 1; x /= m; y /= m; } // push hidden points to the rim
+  return [CX + x * R, CY - y * R];
+}
+
+// Decode TopoJSON arcs
+const [kx, ky] = W.transform.scale, [dx, dy] = W.transform.translate;
+const arcs = W.arcs.map(a => { let x = 0, y = 0; return a.map(([ax, ay]) => [(x += ax) * kx + dx, (y += ay) * ky + dy]); });
+function ring(ids) {
+  const pts = [];
+  for (const i of ids) { const a = i < 0 ? arcs[~i].slice().reverse() : arcs[i]; pts.push(...(pts.length ? a.slice(1) : a)); }
+  return pts;
+}
+
+// Ocean disc with soft shading
+ctx.save();
+ctx.shadowColor = "rgba(30,70,120,.28)"; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
+ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2);
+let g = ctx.createRadialGradient(CX - R * .35, CY - R * .45, R * .1, CX, CY, R);
+g.addColorStop(0, "#eef6fe"); g.addColorStop(.7, "#cfe2f6"); g.addColorStop(1, "#a6c9ec");
+ctx.fillStyle = g; ctx.fill();
+ctx.restore();
+
+ctx.save();
+ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2); ctx.clip();
+
+// Graticule
+ctx.strokeStyle = "rgba(30,70,120,.12)"; ctx.lineWidth = 1;
+function line(pts) { let on = false; ctx.beginPath(); for (const [lng, lat] of pts) { const v = proj(lng, lat); if (v[2] < 0) { on = false; continue; } const [sx, sy] = toScreen(v); on ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy); on = true; } ctx.stroke(); }
+for (let lng = -180; lng < 180; lng += 20) { const p = []; for (let lat = -80; lat <= 80; lat += 2) p.push([lng, lat]); line(p); }
+for (let lat = -60; lat <= 60; lat += 20) { const p = []; for (let lng = -180; lng <= 180; lng += 2) p.push([lng, lat]); line(p); }
+
+// Countries
+for (const geo of W.objects.countries.geometries) {
+  const polys = geo.type === "Polygon" ? [geo.arcs] : geo.type === "MultiPolygon" ? geo.arcs : [];
+  ctx.beginPath();
+  let any = false;
+  for (const poly of polys) for (const r of poly) {
+    const pts = ring(r).map(([lng, lat]) => proj(lng, lat));
+    if (!pts.some(v => v[2] > 0)) continue;
+    any = true;
+    pts.forEach((v, i) => { const [sx, sy] = toScreen(v); i ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy); });
+    ctx.closePath();
+  }
+  if (!any) continue;
+  ctx.fillStyle = guides.has(geo.id) ? "#7fd0ae" : "#e9e6db";
+  ctx.fill("evenodd");
+  ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = .8; ctx.stroke();
+}
+
+// Gloss
+g = ctx.createRadialGradient(CX - R * .4, CY - R * .5, 0, CX - R * .4, CY - R * .5, R * 1.1);
+g.addColorStop(0, "rgba(255,255,255,.35)"); g.addColorStop(1, "rgba(255,255,255,0)");
+ctx.fillStyle = g; ctx.fillRect(CX - R, CY - R, R * 2, R * 2);
+g = ctx.createRadialGradient(CX, CY, R * .75, CX, CY, R);
+g.addColorStop(0, "rgba(20,50,90,0)"); g.addColorStop(1, "rgba(20,50,90,.16)");
+ctx.fillStyle = g; ctx.fillRect(CX - R, CY - R, R * 2, R * 2);
+
+// A trip: great-circle legs between stops, in the trip orange
+const stops = [[-0.13, 51.5], [12.5, 41.9], [28.98, 41.0], [35.5, 30.3], [55.3, 25.2]]; // London, Rome, Istanbul, Petra, Dubai
+function gc([l1, p1], [l2, p2], n = 60) {
+  const a = [Math.cos(p1*RAD)*Math.cos(l1*RAD), Math.cos(p1*RAD)*Math.sin(l1*RAD), Math.sin(p1*RAD)];
+  const b = [Math.cos(p2*RAD)*Math.cos(l2*RAD), Math.cos(p2*RAD)*Math.sin(l2*RAD), Math.sin(p2*RAD)];
+  const d = Math.acos(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]), out = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, s1 = Math.sin((1 - t) * d) / Math.sin(d), s2 = Math.sin(t * d) / Math.sin(d);
+    const v = [s1*a[0] + s2*b[0], s1*a[1] + s2*b[1], s1*a[2] + s2*b[2]];
+    const lift = 1 + Math.sin(t * Math.PI) * d * .12; // arc gently above the surface
+    const [x, y, z] = proj(Math.atan2(v[1], v[0]) / RAD, Math.asin(v[2]) / RAD);
+    out.push([CX + x * R * lift, CY - y * R * lift]);
+  }
+  return out;
+}
+ctx.lineCap = "round"; ctx.lineJoin = "round";
+for (let i = 0; i < stops.length - 1; i++) {
+  const p = gc(stops[i], stops[i + 1]);
+  ctx.beginPath(); p.forEach(([x, y], j) => j ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+  ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = 6; ctx.stroke();
+  ctx.strokeStyle = "#eb6834"; ctx.lineWidth = 3; ctx.setLineDash(i % 2 ? [7, 6] : []); ctx.stroke(); ctx.setLineDash([]);
+}
+stops.forEach((s, i) => {
+  const [x, y] = toScreen(proj(...s));
+  ctx.beginPath(); ctx.arc(x, y, i === 0 ? 9 : 7, 0, Math.PI * 2);
+  ctx.fillStyle = "#fff"; ctx.fill();
+  ctx.lineWidth = 3.5; ctx.strokeStyle = i === 0 ? "#2a78d6" : "#eb6834"; ctx.stroke();
+});
+ctx.restore();
+
+// Rim highlight
+ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2);
+ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 2; ctx.stroke();
+
+// Brand corner wedges, echoing the logo: ocean blue top-left, land green bottom-right
+ctx.fillStyle = "#2a78d6"; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(62, 0); ctx.lineTo(0, 62); ctx.fill();
+ctx.fillStyle = "#1baf7a"; ctx.beginPath(); ctx.moveTo(1500, 500); ctx.lineTo(1438, 500); ctx.lineTo(1500, 438); ctx.fill();
+</script>
+</body></html>

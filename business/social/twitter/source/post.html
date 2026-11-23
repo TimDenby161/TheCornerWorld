@@ -1,0 +1,178 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1200px; height: 675px; overflow: hidden; }
+  body {
+    position: relative; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #0b0b0b;
+    background: radial-gradient(1100px 700px at 25% 15%, #ffffff 0%, #eef3f9 55%, #dce6f1 100%);
+  }
+  canvas { position: absolute; inset: 0; }
+  .copy { position: absolute; left: 72px; top: 64px; width: 540px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 650; color: #52514e; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #eb6834; }
+  h1 { margin: 16px 0 0; font-size: 56px; line-height: 1.02; font-weight: 800; letter-spacing: -.035em; }
+  ol { margin: 26px 0 0; padding: 0; list-style: none; columns: 2; column-gap: 24px; }
+  li { display: flex; align-items: center; gap: 10px; font-size: 23px; font-weight: 600; margin: 0 0 11px; break-inside: avoid; color: #222; }
+  li .n { width: 22px; color: #8a8883; font-weight: 700; font-size: 18px; text-align: right; }
+  li .f { font-size: 24px; }
+  li .s { margin-left: auto; font-size: 16px; font-weight: 800; color: #fff; border-radius: 8px; padding: 3px 7px; }
+  p.sub { margin: 20px 0 0; font-size: 24px; line-height: 1.35; color: #3a3936; font-weight: 500; }
+  p.sub b { color: #0b0b0b; }
+  .foot { position: absolute; left: 72px; bottom: 44px; display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 750; letter-spacing: -.01em; }
+  .foot img { width: 40px; height: 40px; }
+  .foot span { color: #2a78d6; }
+  .legend { position: absolute; right: 56px; bottom: 34px; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 650; color: #52514e; background: rgba(255,255,255,.85); padding: 8px 14px; border-radius: 99px; }
+  .legend i { display: block; width: 120px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #d9483b, #f0973b, #e8cf55, #3cb27b); }
+  h1.spot { display: flex; align-items: center; gap: 16px; font-size: 54px; white-space: nowrap; }
+  h1.spot span { font-size: 54px; }
+  h1.spot b { font-size: 30px; color: #fff; border-radius: 12px; padding: 6px 12px; letter-spacing: -.01em; }
+  .bars { margin-top: 24px; display: grid; gap: 9px; width: 470px; }
+  .bar { display: grid; grid-template-columns: 130px 1fr 30px; align-items: center; gap: 12px; font-size: 19px; font-weight: 600; color: #3a3936; }
+  .bar i { display: block; height: 12px; border-radius: 6px; background: rgba(30,70,120,.1); overflow: hidden; }
+  .bar u { display: block; height: 100%; border-radius: 6px; }
+  .bar em { font-style: normal; font-weight: 800; text-align: right; color: #0b0b0b; }
+  .todo { margin-top: 22px; }
+  .todo div { font-size: 15px; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; color: #eb6834; margin-bottom: 6px; }
+  .todo p { margin: 0 0 5px; font-size: 20px; font-weight: 600; color: #222; }
+  .todo p::before { content: "→ "; color: #1baf7a; }
+  .phone { position: absolute; right: 120px; top: 50px; width: 300px; height: 560px; border-radius: 44px; background: #111; padding: 12px; box-shadow: 0 30px 60px rgba(30,70,120,.3); }
+  .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 34px; display: block; }
+</style></head>
+<body>
+<canvas id="c" width="2400" height="1350" style="width:1200px;height:675px"></canvas>
+<div class="copy" id="copy"></div>
+<div class="foot"><img src="mark.svg" alt=""><div>The Corner World · <span>thecornerworld.com</span></div></div>
+<script src="world.js"></script>
+<script src="scores.js"></script>
+<script>
+const P = new URLSearchParams(location.search).get("p") || "1";
+const RAD = Math.PI / 180, S = SCORES;
+const overall = s => (s.slice(0, 5).reduce((a, b) => a + b, 0) + Math.max(...s.slice(5))) / 6;
+const stops = [2.5, 5, 6.5, 8.5], cols = [[217,72,59],[240,151,59],[232,207,85],[60,178,123]];
+function colour(v) {
+  if (v <= stops[0]) return `rgb(${cols[0]})`;
+  for (let i = 1; i < 4; i++) if (v <= stops[i]) {
+    const t = (v - stops[i-1]) / (stops[i] - stops[i-1]);
+    return `rgb(${cols[i-1].map((c, j) => Math.round(c + (cols[i][j] - c) * t))})`;
+  }
+  return `rgb(${cols[3]})`;
+}
+function best(f, n = 10) {
+  return Object.entries(S).filter(([, c]) => c.a > 20000 && !c.alias)
+    .sort((a, b) => f(b[1].s) + overall(b[1].s) / 10 - f(a[1].s) - overall(a[1].s) / 10).slice(0, n);
+}
+function list(rows, f) {
+  return "<ol>" + rows.map(([, c], i) => {
+    const v = f(c.s);
+    return `<li><span class="n">${i + 1}</span><span class="f">${c.f}</span>${c.n.replace("United States", "USA")}<span class="s" style="background:${colour(v)}">${Number.isInteger(v) ? v : v.toFixed(1)}</span></li>`;
+  }).join("") + "</ol>";
+}
+
+const posts = {
+  "1": { eye: "Every country on Earth", h: "I rated all 237<br>countries out of 10", sub: "Food, things to do, budget, family, safety, plus beaches, history, wildlife and hiking.<br><b>Spin the globe and see where scores best.</b>", lng: 15, lat: 25, R: 400, cx: 1040, cy: 400, f: overall },
+  "2": { eye: "Big trip, small budget", h: "10 countries where<br>your £ goes furthest", f: s => s[2], lng: 85, lat: 20, R: 400, cx: 1080, cy: 380, hi: true },
+  "3": { eye: "Best for beaches", h: "The 10 best beach<br>countries, rated", f: s => s[5], lng: 40, lat: 10, R: 400, cx: 1080, cy: 380, hi: true },
+  "4": { eye: "Best for hiking", h: "10 countries made<br>for walking boots", f: s => s[8], lng: -75, lat: 15, R: 400, cx: 1080, cy: 380, hi: true },
+  "6": { eye: "Best for history", h: "10 countries where<br>history comes alive", f: s => s[6], lng: 30, lat: 30, R: 400, cx: 1080, cy: 380, hi: true },
+  "7": { eye: "Best for wildlife", h: "10 countries for<br>seeing wildlife", f: s => s[7], lng: 42, lat: -5, R: 400, cx: 1080, cy: 380, hi: true },
+  "8": { eye: "Best for food", h: "10 countries worth<br>flying to just to eat", f: s => s[0], lng: 60, lat: 28, R: 400, cx: 1080, cy: 380, hi: true },
+  "9": { eye: "Best for families", h: "10 countries that<br>work with kids", f: s => s[3], lng: 25, lat: 35, R: 400, cx: 1080, cy: 380, hi: true },
+  "10": { eye: "Best for safety", h: "10 countries where<br>you can relax", f: s => s[4], lng: 10, lat: 45, R: 400, cx: 1080, cy: 380, hi: true },
+  "11": { eye: "Winter sun", h: "10 places that are<br>warm in December", temps: [["THA",31],["OMN",29],["KHM",33],["LAO",27],["PHL",29],["ARE",26],["COL",30],["PAN",30],["ARG",26],["KEN",28]], lng: 85, lat: 12, R: 400, cx: 1080, cy: 380 },
+  "12": { spot: "JPN" }, "13": { spot: "VNM" }, "14": { spot: "ALB" }, "15": { spot: "GEO" },
+  "16": { eye: "The top of the table", h: "The 10 highest-rated<br>countries on my map", f: overall, lng: 60, lat: 30, R: 400, cx: 1080, cy: 380, hi: true },
+  "17": { spot: "PER" }, "18": { spot: "MAR" }, "19": { spot: "LKA" }, "20": { spot: "PRT" },
+  "21": { spot: "THA" }, "22": { spot: "MEX" }, "23": { spot: "SVN" }, "24": { spot: "IDN" },
+  "25": { spot: "JOR" }, "27": { spot: "TWN" },
+  "26": { eye: "Best for things to do", h: "10 countries you'll<br>never get bored in", f: s => s[1], lng: 50, lat: 25, R: 400, cx: 1080, cy: 380, hi: true },
+  "5": { eye: "Trip planning", h: "Every hour planned.<br>Every £ counted.", sub: "I plan trips as a page on your phone: each day hour by hour, every bus timed, hotels at three prices and <b>one total for your group</b>.<br><br>Try a free sample trip.", phone: "shot.png" },
+};
+const p = posts[P];
+const byId = id => Object.entries(S).find(([, c]) => c.id === id && !c.alias);
+if (p.spot) {
+  const [, c] = byId(p.spot), s = c.s, o = overall(s);
+  const names = ["Food", "Things to do", "Budget", "Family", "Safety"], ints = ["Beaches", "History", "Wildlife", "Hiking", "Relaxing"];
+  const bi = s.slice(5).indexOf(Math.max(...s.slice(5)));
+  const bars = names.map((n, i) => [n, s[i]]).concat([[ints[bi], s[5 + bi]]]);
+  document.getElementById("copy").innerHTML = `
+    <div class="eyebrow"><span class="dot"></span>Country spotlight</div>
+    <h1 class="spot"><span>${c.f}</span>${c.n}<b style="background:${colour(o)}">${o.toFixed(1)}</b></h1>
+    <div class="bars">${bars.map(([n, v]) => `<div class="bar"><span>${n}</span><i><u style="width:${v * 10}%;background:${colour(v)}"></u></i><em>${v}</em></div>`).join("")}</div>
+    <div class="todo"><div>Top 3 things to do</div>${c.todo.slice(0, 3).map(t => `<p>${t}</p>`).join("")}</div>`;
+  Object.assign(p, { lng: c.lng, lat: Math.max(-40, Math.min(50, c.lat)), R: 400, cx: 1080, cy: 380, f: overall });
+  drawGlobe(p, new Set([c.id]));
+  corners();
+  throw 0;
+}
+const rows = p.hi ? best(p.f) : p.temps ? p.temps.map(([id]) => byId(id)) : null;
+const listHtml = p.temps
+  ? "<ol>" + p.temps.map(([id, t], i) => { const [, c] = byId(id); return `<li><span class="n">${i + 1}</span><span class="f">${c.f}</span>${c.n.replace("United Arab Emirates", "UAE")}<span class="s" style="background:#eb6834">${t}°</span></li>`; }).join("") + "</ol>"
+  : rows ? list(rows, p.f) : `<p class="sub">${p.sub}</p>`;
+document.getElementById("copy").innerHTML =
+  `<div class="eyebrow"><span class="dot"></span>${p.eye}</div><h1>${p.h}</h1>` + listHtml;
+if (p.temps) p.hi = true, p.f = overall;
+if (p.phone) {
+  document.body.insertAdjacentHTML("beforeend", `<div class="phone"><img src="${p.phone}"></div>`);
+} else {
+  if (!p.hi) document.body.insertAdjacentHTML("beforeend", `<div class="legend">1 <i></i> 10</div>`);
+  drawGlobe(p, rows ? new Set(rows.map(([, c]) => c.id)) : null);
+}
+corners();
+
+function drawGlobe({ lng: LNG0, lat: LAT0, R, cx: CX, cy: CY, f }, picked) {
+  const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  const cl0 = Math.cos(LAT0 * RAD), sl0 = Math.sin(LAT0 * RAD);
+  const proj = (lng, lat) => {
+    const l = (lng - LNG0) * RAD, ph = lat * RAD;
+    return [Math.cos(ph) * Math.sin(l), cl0 * Math.sin(ph) - sl0 * Math.cos(ph) * Math.cos(l), sl0 * Math.sin(ph) + cl0 * Math.cos(ph) * Math.cos(l)];
+  };
+  const scr = ([x, y, z]) => { if (z < 0) { const m = Math.hypot(x, y) || 1; x /= m; y /= m; } return [CX + x * R, CY - y * R]; };
+  const W = WORLD, [kx, ky] = W.transform.scale, [dx, dy] = W.transform.translate;
+  const arcs = W.arcs.map(a => { let x = 0, y = 0; return a.map(([ax, ay]) => [(x += ax) * kx + dx, (y += ay) * ky + dy]); });
+  const ring = ids => { const pts = []; for (const i of ids) { const a = i < 0 ? arcs[~i].slice().reverse() : arcs[i]; pts.push(...(pts.length ? a.slice(1) : a)); } return pts; };
+
+  ctx.save();
+  ctx.shadowColor = "rgba(30,70,120,.28)"; ctx.shadowBlur = 60; ctx.shadowOffsetY = 18;
+  ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  let g = ctx.createRadialGradient(CX - R * .35, CY - R * .45, R * .1, CX, CY, R);
+  g.addColorStop(0, "#eef6fe"); g.addColorStop(.7, "#cfe2f6"); g.addColorStop(1, "#a6c9ec");
+  ctx.fillStyle = g; ctx.fill(); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2); ctx.clip();
+  ctx.strokeStyle = "rgba(30,70,120,.12)"; ctx.lineWidth = 1;
+  const line = pts => { let on = false; ctx.beginPath(); for (const [a, b] of pts) { const v = proj(a, b); if (v[2] < 0) { on = false; continue; } const [sx, sy] = scr(v); on ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy); on = true; } ctx.stroke(); };
+  for (let a = -180; a < 180; a += 20) { const q = []; for (let b = -80; b <= 80; b += 2) q.push([a, b]); line(q); }
+  for (let b = -60; b <= 60; b += 20) { const q = []; for (let a = -180; a <= 180; a += 2) q.push([a, b]); line(q); }
+  for (const geo of W.objects.countries.geometries) {
+    const polys = geo.type === "Polygon" ? [geo.arcs] : geo.type === "MultiPolygon" ? geo.arcs : [];
+    ctx.beginPath(); let any = false;
+    for (const poly of polys) for (const r of poly) {
+      const pts = ring(r).map(([a, b]) => proj(a, b));
+      if (!pts.some(v => v[2] > 0)) continue;
+      any = true; pts.forEach((v, i) => { const [sx, sy] = scr(v); i ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy); }); ctx.closePath();
+    }
+    if (!any) continue;
+    const c = S[geo.id] || S["A2-" + String(geo.id).split("-")[0]];
+    if (picked) ctx.fillStyle = c && picked.has(c.id) ? (posts[P].temps ? "#eb6834" : colour(f(c.s))) : "#e9e6db";
+    else ctx.fillStyle = c ? colour(f(c.s)) : "#e9e6db";
+    ctx.fill("evenodd");
+    ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = .8; ctx.stroke();
+  }
+  g = ctx.createRadialGradient(CX - R * .4, CY - R * .5, 0, CX - R * .4, CY - R * .5, R * 1.1);
+  g.addColorStop(0, "rgba(255,255,255,.3)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g; ctx.fillRect(CX - R, CY - R, R * 2, R * 2);
+  g = ctx.createRadialGradient(CX, CY, R * .75, CX, CY, R);
+  g.addColorStop(0, "rgba(20,50,90,0)"); g.addColorStop(1, "rgba(20,50,90,.16)");
+  ctx.fillStyle = g; ctx.fillRect(CX - R, CY - R, R * 2, R * 2);
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 2; ctx.stroke();
+}
+function corners() {
+  const ctx = document.getElementById("c").getContext("2d");
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  ctx.fillStyle = "#2a78d6"; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(54, 0); ctx.lineTo(0, 54); ctx.fill();
+  ctx.fillStyle = "#1baf7a"; ctx.beginPath(); ctx.moveTo(1200, 675); ctx.lineTo(1146, 675); ctx.lineTo(1200, 621); ctx.fill();
+}
+</script>
+</body></html>
