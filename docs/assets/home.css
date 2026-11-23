@@ -241,12 +241,11 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .home-note { margin: 5px 0 0; font-size: 12px; color: var(--text-muted); }
 .budget-note { margin: 8px 0 0; font-size: 12.5px; }
 .home .chips { margin-top: 0; }
-.hot-row { margin-top: 6px; }
-.hot-row .chip { width: 100%; }
 .group .chips.one-line + .chips.one-line { margin-top: 6px; }
 .wx-also { margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .home .chips.one-line { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 5px; }
-.home .chips.one-line .chip { padding: 6px 2px; white-space: nowrap; text-align: center; }
+.home .chips.one-line .chip, .home .chips.grid5 .chip { padding: 6px 2px; white-space: nowrap; text-align: center; }
+.home .chips.grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px 5px; }
 .home .chip { padding: 6px 13px; background: var(--surface-1); font-weight: 550; transition: background .15s, border-color .15s, color .15s, transform .15s var(--ease); }
 .home .chip:hover { border-color: var(--strong-line); color: var(--text-primary); }
 .home .chip:active { transform: scale(.95); }
@@ -362,8 +361,8 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
   /* Tighter on a phone, so every filter fits in the sheet before any scrolling */
   .group { margin-top: 10px; }
   .group-label { margin-bottom: 5px; }
-  .group .chips.one-line + .chips.one-line, .hot-row { margin-top: 5px; }
-  .home .chips.one-line .chip { padding: 5px 2px; }
+  .home .chips.grid5 { row-gap: 5px; }
+  .home .chips.one-line .chip, .home .chips.grid5 .chip { padding: 5px 2px; }
   .month-bar button { height: 32px; }
   .legend, .zoom, .hint { display: none; }
   .sheet-drag { -webkit-user-select: none; user-select: none; }

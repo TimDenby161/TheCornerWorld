@@ -673,17 +673,15 @@ function renderDiscover() {
       state.region = state.region === r ? "" : r;
       if (state.region) { hideHint(); globe.flyTo(REGIONS[r]); }
     }, { class: "chip" })));
-  const hotChip = h("div", { class: "chips hot-row" }, toggle(`Hot weather, ${HOT} °C+`, () => state.hot, () => { state.hot = !state.hot; },
-    { class: "chip", title: `Average highs of ${HOT} °C or more in the month chosen (with no month chosen, for at least ${HOT_MONTHS} months of the year)` }));
-  // The interests, four to a row
+  // Great for: the categories, the interests and hot weather in one grid, five to a row (5, 5, 4, with room for one more)
+  const greatChip = (label, i) => toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
+    { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` });
   const likeChip = (label, i) => toggle(label, () => state.likes.has(i), () => { if (state.likes.has(i)) state.likes.delete(i); else state.likes.add(i); },
     { class: "chip", title: `${label}: ${GREAT} or more out of 10` });
-  const likes = [];
-  for (let i = 0; i < ratings.interests.length; i += 4) likes.push(h("div", { class: "chips one-line", role: "group", "aria-label": `Interests: scores ${GREAT} or more` },
-    ratings.interests.slice(i, i + 4).map((label, j) => likeChip(label, i + j))));
-  const great = h("div", { class: "chips one-line", role: "group", "aria-label": `Great for: scores ${GREAT} or more` }, GREAT_LABELS.map((label, i) =>
-    toggle(label, () => state.great.has(i), () => { if (state.great.has(i)) state.great.delete(i); else state.great.add(i); },
-      { class: "chip", title: `${ratings.categories[i] || label}: ${GREAT} or more out of 10` })));
+  const hotChip = toggle(`Hot ${HOT}°+`, () => state.hot, () => { state.hot = !state.hot; },
+    { class: "chip", title: `Hot weather: average highs of ${HOT} °C or more in the month chosen (with no month chosen, for at least ${HOT_MONTHS} months of the year)` });
+  const great = h("div", { class: "chips grid5", role: "group", "aria-label": `Great for: scores ${GREAT} or more` },
+    GREAT_LABELS.map(greatChip), ratings.interests.map(likeChip), hotChip);
 
   // Home, for the flights in the Budget scores: every country, and the states and islands that are on the map
   const placeName = (c) => (c.within ? `${c.name} (${byId.get(c.within).name})` : c.name);
@@ -701,9 +699,9 @@ function renderDiscover() {
     onclick: () => { state.settingsOpen = !state.settingsOpen; settings.hidden = !state.settingsOpen; gear.setAttribute("aria-expanded", String(state.settingsOpen)); } }, icon("settings"));
   const filters = h("div", { class: "filters" },
     group("Where", null, where),
-    group("When", when, months, hotChip),
+    group("When", when, months),
     // The categories and the interests share one heading, a row each
-    group("Great for", null, great, ...likes));
+    group("Great for", null, great));
   for (const sync of syncs) sync();
   // The results narrow to a country as you type its name
   const find = h("input", {
