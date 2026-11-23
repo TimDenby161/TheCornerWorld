@@ -211,7 +211,14 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
 .panel.swap > :nth-child(n+7) { animation-delay: .18s; }
 
 .home .panel h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
-.home .panel h1.hero { margin: 4px 0 18px; font-size: 42px; line-height: 1; letter-spacing: -0.045em; }
+.home .panel h1.hero { margin: 0; font-size: 30px; line-height: 1.1; letter-spacing: -0.04em; }
+.hero-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 2px 0 4px; }
+.gear { flex: none; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-1); color: var(--text-secondary); cursor: pointer; transition: color .15s, border-color .15s; }
+.gear:hover, .gear[aria-expanded="true"] { color: var(--text-primary); border-color: var(--strong-line); }
+.gear .ic { width: 17px; height: 17px; transition: transform .3s var(--ease); }
+.gear[aria-expanded="true"] .ic { transform: rotate(60deg); }
+.settings { margin: 10px 0 4px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-1); }
+.settings[hidden] { display: none; }
 .hero em { font-style: normal; color: var(--blue); }
 .home .lede { margin-bottom: 18px; font-size: 15px; }
 .home .section { margin: 26px 0 10px; font-size: 12px; font-weight: 650; letter-spacing: .06em; }
@@ -350,7 +357,14 @@ table.wx { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 
   .grip { display: block; width: 44px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--strong-line); }
   .sheet-head { display: block; padding-bottom: 2px; }
   .panel { padding: 6px 16px calc(env(safe-area-inset-bottom) + 28px); }
-  .home .panel h1.hero { font-size: 34px; }
+  .home .panel h1.hero { font-size: 24px; }
+  .gear { width: 30px; height: 30px; }
+  /* Tighter on a phone, so every filter fits in the sheet before any scrolling */
+  .group { margin-top: 10px; }
+  .group-label { margin-bottom: 5px; }
+  .group .chips.one-line + .chips.one-line, .hot-row { margin-top: 5px; }
+  .home .chips.one-line .chip { padding: 5px 2px; }
+  .month-bar button { height: 32px; }
   .legend, .zoom, .hint { display: none; }
   .sheet-drag { -webkit-user-select: none; user-select: none; }
   .tools, .cue { bottom: calc(var(--sheet-h) + 10px); transition: bottom .42s var(--ease); }

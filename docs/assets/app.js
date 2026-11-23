@@ -20,6 +20,7 @@ const REGIONS = {
 const ICONS = {
   search: "M11 4a7 7 0 1 0 0 14a7 7 0 0 0 0-14zM21 21l-4.3-4.3",
   back: "M19 12H5M11 18l-6-6 6-6",
+  settings: "M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z",
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -554,7 +555,9 @@ async function surprise() {
 // ---------- the panel, and the sheet it sits in on a phone ----------
 
 // On a phone the panel is a sheet over the map that rests at three heights
-const SNAPS = { peek: () => 124, half: () => Math.round(innerHeight * 0.47), full: () => innerHeight - 72 };
+// Half is tall enough for all the filters (measured in renderDiscover), from 47% to 62% of the screen
+let filtersFit = 0;
+const SNAPS = { peek: () => 124, half: () => Math.round(clamp(filtersFit, innerHeight * 0.47, innerHeight * 0.62)), full: () => innerHeight - 72 };
 let snap = "half";
 
 function setSnap(name, animate = true) {
@@ -689,11 +692,14 @@ function renderDiscover() {
     homes.map((c) => h("option", { value: c.id, selected: c.id === state.home, text: placeName(c) })));
 
   const group = (label, value, ...body) => h("div", { class: "group" }, h("p", { class: "group-label" }, label, value), ...body);
+  // Flying from is a setting, out of the way under the gear, so the filters fit on a phone's first screen
+  const settings = h("div", { class: "settings", id: "settings", hidden: !state.settingsOpen },
+    h("label", { class: "group-label", for: "home", text: "Flying from" }),
+    from,
+    h("p", { class: "home-note", text: "Budget scores include the flights from here." }));
+  const gear = h("button", { type: "button", class: "gear", "aria-label": "Settings", title: "Settings: flying from", "aria-controls": "settings", "aria-expanded": String(!!state.settingsOpen),
+    onclick: () => { state.settingsOpen = !state.settingsOpen; settings.hidden = !state.settingsOpen; gear.setAttribute("aria-expanded", String(state.settingsOpen)); } }, icon("settings"));
   const filters = h("div", { class: "filters" },
-    h("div", { class: "group" },
-      h("label", { class: "group-label", for: "home", text: "Flying from" }),
-      from,
-      h("p", { class: "home-note", text: "Budget scores include the flights from here." })),
     group("Where", null, where),
     group("When", when, months, hotChip),
     // The categories and the interests share one heading, a row each
@@ -712,7 +718,8 @@ function renderDiscover() {
   state.clear = () => { state.month = 0; state.hot = false; state.region = ""; state.query = find.value = ""; state.great.clear(); state.likes.clear(); refresh(); };
 
   panel.replaceChildren(
-    h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })),
+    h("div", { class: "hero-row" }, h("h1", { class: "hero" }, "Where to ", h("em", { text: "next?" })), gear),
+    settings,
     filters,
     h("div", { class: "results-head" }, h("h2", { class: "section", id: "count" }), h("button", { type: "button", class: "link", id: "clear", text: "Clear filters", onclick: () => state.clear() })),
     h("div", { class: "sort", id: "sort", role: "group", "aria-label": "Order" }, [["score", "Top rated"], ["name", "A to Z"]].map(([key, label]) =>
@@ -722,6 +729,11 @@ function renderDiscover() {
     h("div", { id: "results" }),
     credits());
   renderResults();
+  // offsetTop is from the top of the sheet (the nearest positioned box) and ignores the panel's scroll and animation
+  if (phone.matches) {
+    filtersFit = filters.offsetTop + filters.offsetHeight + 12;
+    if (snap === "half") setSnap("half");
+  }
 }
 
 // The number in a heading counts up or down to its new value
