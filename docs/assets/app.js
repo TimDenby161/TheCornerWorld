@@ -191,9 +191,9 @@ const GREAT_LABELS = ["Food", "Activities", "Budget", "Families", "Safety"];
 // its own. Each is judged on its own scores and weather, not its country's.
 const listed = () => countries.filter((c) => ratings.scores[c.id]).map((c) => c.id);
 
-function scoreBadge(score, colour) {
+function scoreBadge(score, colour, value = score.overall, title = `Scores ${scoreText(value)} out of 10`) {
   // Styles go on through the DOM: the security policy blocks style="" attributes
-  const badge = h("span", { class: "score", title: `Scores ${scoreText(score.overall)} out of 10`, text: scoreText(score.overall) });
+  const badge = h("span", { class: "score", title, text: scoreText(value) });
   badge.style.setProperty("--score", colour);
   return badge;
 }
@@ -419,6 +419,13 @@ function hideHint() {
 }
 
 function filtersActive() { return Boolean(state.query.trim() || state.month || state.hot || state.region || state.great.size || state.likes.size); }
+
+// What Top rated orders by: with Great for choices on, the average of those scores; with none, the overall score
+function chosenScore(score) {
+  const picked = [...[...state.great].map((i) => score.parts[i]), ...[...state.likes].map((i) => score.likes[i])].filter((n) => n != null);
+  return picked.length ? Math.round(picked.reduce((a, b) => a + b, 0) / picked.length * 10) / 10 : score.overall;
+}
+const chosenNames = () => [...[...state.great].map((i) => GREAT_LABELS[i]), ...[...state.likes].map((i) => ratings.interests[i])];
 
 // Whether a country passes the filters. A state or island is judged as its country.
 function matches(id) {
@@ -757,7 +764,11 @@ function renderResults() {
   if (!box) return;
   const all = listed().sort((a, b) => byId.get(a).name.localeCompare(byId.get(b).name));
   const shown = all.filter(matches);
-  if (state.sort === "score") shown.sort((a, b) => (scoreOf(byId.get(b))?.overall ?? -1) - (scoreOf(byId.get(a))?.overall ?? -1));
+  // Top rated: the best for what is chosen first, then the best overall
+  const rank = (id) => { const sc = scoreOf(byId.get(id)); return sc ? [chosenScore(sc), sc.overall] : [-1, -1]; };
+  if (state.sort === "score") shown.sort((a, b) => { const [a1, a2] = rank(a), [b1, b2] = rank(b); return b1 - a1 || b2 - a2; });
+  const named = chosenNames();
+  const badgeTitle = (v) => named.length ? `${named.join(", ")}: ${scoreText(v)} out of 10` : `Scores ${scoreText(v)} out of 10`;
   for (const btn of document.querySelectorAll("#sort button")) btn.setAttribute("aria-pressed", String(btn.dataset.sort === state.sort));
   const active = filtersActive();
   const colour = scoreScale();
@@ -778,7 +789,7 @@ function renderResults() {
               h("span", { class: "card-sub", text: c.within ? [c.group, byId.get(c.within).name].filter(Boolean).join(", ") : c.subregion || c.region }),
               activities[id]?.length > 0 && h("span", { class: "card-text", text: activities[id].slice(0, 3).join(" · ") }),
               meta && h("span", { class: "card-meta", text: meta.charAt(0).toUpperCase() + meta.slice(1) })),
-            scoreBadge(score, colour(score.overall))));
+            scoreBadge(score, colour(chosenScore(score)), chosenScore(score), badgeTitle(chosenScore(score)))));
         }))
       : h("p", { class: "empty", text: state.query.trim() ? "No destination by that name." : "No destinations left with those choices. Try removing one." }));
   countTo(number, shown.length);
