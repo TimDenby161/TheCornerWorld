@@ -53,6 +53,12 @@ A country's panel has three tabs: Things to do, Weather and Travel advice. The W
 
 There used to be destination guides and a trip planner (removed in November 2026; they are in the git history). The weather for 109 countries is taken at a place they named, with their best months: those are kept in `scripts/weather-points.json` for `npm run build:weather`.
 
+## Place pages and the share card
+
+`npm run build:pages` also writes a page for every place with its own scores, at `docs/places/<slug>/` (and an index at `docs/places/`): the best time to visit with the weather month by month, the top three things to do, the scores (before flights, which only the map can add), facts, areas and the UK travel advice, with a link that opens the place on the globe (`#c=JPN`). They are in the sitemap, so search engines find them. A region's address carries its country's name (`spain-andalusia`). The trader's address stays on the privacy and terms pages only.
+
+Every page shares as `docs/assets/share.png`: the real globe coloured by score. Redraw it after big score changes with `npm run build:card` (needs Google Chrome).
+
 ## Settings
 
 `docs/data/site.json`:

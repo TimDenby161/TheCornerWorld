@@ -11,7 +11,8 @@
     "lock": "node scripts/lock.mjs",
     "serve": "python3 -m http.server 8000 --bind 127.0.0.1 --directory docs",
     "serve:phone": "python3 -m http.server 8000 --directory docs",
-    "rate": "node scripts/rate.mjs"
+    "rate": "node scripts/rate.mjs",
+    "build:card": "node scripts/share-card.mjs"
   },
   "devDependencies": {
     "d3": "^7.9.0",

@@ -32,7 +32,7 @@ function page({ up, path, title, description, index, body, footer }) {
 ${index ? "" : `<meta name="robots" content="noindex">\n`}${base ? `<link rel="canonical" href="${esc(base + path)}">\n<meta property="og:url" content="${esc(base + path)}">\n` : ""}<meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:type" content="article">
-<link rel="icon" type="image/svg+xml" href="${up}favicon.svg">
+${base ? `<meta property="og:image" content="${esc(base)}assets/share.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">\n` : ""}<link rel="icon" type="image/svg+xml" href="${up}favicon.svg">
 <link rel="apple-touch-icon" href="${up}apple-touch-icon.png">
 <link rel="manifest" href="${up}manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Corner World">
