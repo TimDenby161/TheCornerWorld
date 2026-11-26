@@ -55,6 +55,7 @@ ${base ? `<meta property="og:image" content="${esc(base)}assets/share.png">\n<me
 ${body}
 <p class="credits">Country facts: mledoze/countries (${ODBL}). Airports: OurAirports.</p>
 ${footer === "short" ? `<p class="credits"><a href="${up}places/">All places</a> · <a href="${up}privacy/">Privacy</a> · <a href="${up}terms/">Terms</a></p>` : legal(up)}
+<p class="credits">Also from The Corner: <a href="https://thecornerfc.com/">The Corner FC</a> (football ranks and predictions) · <a href="https://thecornertt.pages.dev/">The Corner TT</a> (table tennis ranking points)</p>
 </main>
 </body>
 </html>

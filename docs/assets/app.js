@@ -798,7 +798,9 @@ function renderResults() {
 function credits() {
   const odbl = () => h("a", { href: "https://opendatacommons.org/licenses/odbl/1-0/", target: "_blank", rel: "noopener", text: "ODbL" });
   return h("p", { class: "credits" },
-    "Map shapes: Natural Earth. Country facts: mledoze/countries (", odbl(), "). Weather: NASA POWER. ", h("a", { href: "places/", text: "All places" }), " · ", h("a", { href: "privacy/", text: "Privacy" }), " · ", h("a", { href: "terms/", text: "Terms" }));
+    "Map shapes: Natural Earth. Country facts: mledoze/countries (", odbl(), "). Weather: NASA POWER. ", h("a", { href: "places/", text: "All places" }), " · ", h("a", { href: "privacy/", text: "Privacy" }), " · ", h("a", { href: "terms/", text: "Terms" }),
+    h("br"), "Also from The Corner: ", h("a", { href: "https://thecornerfc.com/", text: "The Corner FC" }), " (football ranks and predictions) · ",
+    h("a", { href: "https://thecornertt.pages.dev/", text: "The Corner TT" }), " (table tennis ranking points)");
 }
 
 // The UK government's travel advice for a country (`advice` in countries.json, from scripts/advice.mjs).
