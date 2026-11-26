@@ -1,0 +1,25 @@
+# Runs `npm run check` (security policy on every page, nothing loaded from other sites, no email
+# addresses or readable client trips in docs/, library copies match npm, data parses, versions
+# current, globe drawing tests) on every push and pull request. Given no secrets.
+name: Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
