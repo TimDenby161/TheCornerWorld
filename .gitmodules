@@ -1,0 +1,3 @@
+[submodule "site/lib/TheCorner.Web"]
+	path = site/lib/TheCorner.Web
+	url = https://github.com/TimDenby161/TheCorner.Web.git

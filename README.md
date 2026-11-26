@@ -2,6 +2,17 @@
 
 An interactive globe that scores every country out of 10, at https://thecornerworld.com/. A static site in `docs/`, served by GitHub Pages from the `main` branch: no outside requests. The domain is registered with GoDaddy, whose DNS points it at GitHub (four A records for `@` to 185.199.108–111.153, and `www` as a CNAME to `timdenby161.github.io`); `docs/CNAME` names it, and the repository's Pages settings enforce HTTPS. The site's address is `url` in `docs/data/site.json`. The usual build step is `npm run build:pages` after editing a guide.
 
+## The .NET site (being moved to)
+
+`site/` is The Corner World as an ASP.NET Core app, the first step of moving the family's sites onto one stack: it serves `docs/` exactly as it is, behind the shared security core in `site/lib/TheCorner.Web` (a git submodule: clone with `--recurse-submodules`, or run `git submodule update --init`). Over GitHub Pages it adds real security headers (the page policy as a header, so no other site can frame a page; HSTS), refuses posts from other sites, and has a staging copy that search engines never index. The sample and client trip pages get their own looser policy for their inline styles, and nothing else does.
+
+```bash
+cd site/TheCornerWorld.Web && SITE_ENV=production dotnet run --urls http://127.0.0.1:5290
+dotnet test site/TheCornerWorld.slnx
+```
+
+It isn't live yet: GitHub Pages still serves thecornerworld.com until the move's hosting step.
+
 ## Run it
 
 ```bash

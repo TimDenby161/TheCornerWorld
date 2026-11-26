@@ -1,0 +1,27 @@
+# The .NET site (site/): builds it and runs its tests against docs/ on every push and pull request
+# that touches either. Given no secrets. Deploying to Azure comes with phase 1b of the move
+# (TheCornerFC-private brain, apps/family-stack-plan.md), once the owner has moved the DNS.
+name: Site
+
+on:
+  push:
+    paths: ['site/**', 'docs/**', '.github/workflows/site.yml', '.gitmodules']
+  pull_request:
+    paths: ['site/**', 'docs/**', '.github/workflows/site.yml', '.gitmodules']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet test site/TheCornerWorld.slnx
