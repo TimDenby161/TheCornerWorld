@@ -246,3 +246,18 @@ button.tag:hover { color: var(--text-primary); }
 .leg a { color: var(--blue-text); }
 /* Four menu items don't fit beside the name on a phone: keep the logo, drop the words */
 @media (max-width: 520px) { .brand > span:last-child { display: none; } }
+
+/* Place pages (docs/places/, written by scripts/build-pages.mjs) */
+.back-link { margin: 0 0 12px; font-size: 14px; color: var(--text-secondary); }
+.back-link a { color: inherit; }
+.place-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.place-table caption { text-align: left; color: var(--text-muted); font-size: 12px; padding: 0 0 6px; }
+.place-table th, .place-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+.place-table thead th { color: var(--text-muted); font-weight: 600; font-size: 12px; }
+.place-table tbody th { font-weight: 500; }
+.place-table tr.on td:last-child { color: var(--aqua); font-weight: 600; }
+.page .tags a.tag { text-decoration: none; display: inline-block; }
+.page .tags a.tag:hover { color: var(--text-primary); }
+.page ul.tags { list-style: none; padding: 0; }
+.great-for { margin: 16px 0 0; font-size: 12px; color: var(--text-muted); }
+.great-for + .tags { margin-top: 6px; }

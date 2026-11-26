@@ -1,7 +1,7 @@
 // Writes the privacy notice and the terms, the footers of the planning and sample pages, and the
 // sitemap, from docs/data/site.json. Run with `npm run build:pages` after changing site.json.
 // Needs no `npm install`.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 
 const out = new URL("../docs/", import.meta.url);
 const read = (name) => JSON.parse(readFileSync(new URL(`data/${name}.json`, out), "utf8"));
@@ -19,7 +19,7 @@ const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 's
 const base = /^https:\/\//.test(site.url || "") ? site.url.replace(/\/*$/, "/") : "";
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
 // `up` is the way back to docs/ from the page; `path` is the page's place under it
-function page({ up, path, title, description, index, body }) {
+function page({ up, path, title, description, index, body, footer }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -54,7 +54,7 @@ ${index ? "" : `<meta name="robots" content="noindex">\n`}${base ? `<link rel="c
 <main>
 ${body}
 <p class="credits">Country facts: mledoze/countries (${ODBL}). Airports: OurAirports.</p>
-${legal(up)}
+${footer === "short" ? `<p class="credits"><a href="${up}places/">All places</a> · <a href="${up}privacy/">Privacy</a> · <a href="${up}terms/">Terms</a></p>` : legal(up)}
 </main>
 </body>
 </html>
@@ -204,9 +204,143 @@ for (const page of ["plan/index.html", "samples/index.html"]) {
   (all, open, close) => `${open}© ${NAME}${trader.name ? `, run by ${esc(trader.name)}, a sole trader${trader.address ? `, ${esc(trader.address)}` : ""}` : ""}${close}`));
 }
 
+// ---------- A page for every place with its own scores (docs/places/<slug>/) ----------
+// So search engines and shared links reach each place: "Best time to visit Japan", its scores, top three things
+// to do, the weather month by month and the travel advice, with a link that opens it on the globe (#c=JPN).
+// Written from the same data files as the map. The overall score here leaves out flights (the map adds them from
+// the visitor's home, which a fixed page can't know), and says so. The trader's address stays on the privacy and
+// terms pages, not repeated on hundreds of these.
+const countries = read("countries"), ratings = read("ratings"), activities = read("activities"), weather = read("weather");
+const byId = new Map(countries.map((c) => [c.id, c]));
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const RATING = { G: "Great", O: "Okay", B: "Bad" };
+const GREAT = 8, SKI_NORTH = [12, 1, 2, 3], SKI_SOUTH = [6, 7, 8, 9]; // as in assets/app.js
+const LETTERS = { ø: "o", æ: "ae", œ: "oe", ß: "ss", ł: "l", đ: "d", ð: "d", þ: "th", ı: "i", ħ: "h" };
+const slugify = (s) => s.toLowerCase().replace(/[øæœßłđðþıħ]/g, (ch) => LETTERS[ch]).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/&/g, " and ")
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+function monthRanges(months) { // as in assets/app.js
+  const on = MONTHS.map((_, i) => months.includes(i + 1));
+  if (on.every(Boolean)) return "All year";
+  const runs = [];
+  for (let i = 0; i < 12; i++) {
+    if (!on[i] || on[(i + 11) % 12]) continue;
+    let j = i;
+    while (on[(j + 1) % 12]) j = (j + 1) % 12;
+    runs.push(i === j ? MONTHS[i] : `${MONTHS[i]}–${MONTHS[j]}`);
+  }
+  return runs.join(", ");
+}
+
+const places = countries.filter((c) => ratings.scores[c.id]);
+const slugOf = new Map();
+for (const c of places) { // a region carries its country's name unless it already has it: "spain-andalusia"
+  const parent = c.within && byId.get(c.within);
+  let slug = slugify(parent && !c.name.includes(parent.name) ? `${parent.name} ${c.name}` : c.name);
+  while ([...slugOf.values()].includes(slug)) slug += `-${c.id.toLowerCase()}`;
+  slugOf.set(c.id, slug);
+}
+
+function placeFacts(c) {
+  const all = ratings.scores[c.id], n = ratings.categories.length;
+  const parts = all.slice(0, n), likes = all.slice(n);
+  const six = [...parts, ...(likes.length ? [Math.max(...likes)] : [])];
+  const overall = Math.round(six.reduce((a, b) => a + b, 0) / six.length * 10) / 10;
+  const w = weather[c.id] || weather[c.within];
+  const great = w?.m?.flatMap((m, i) => (m[3] === "G" ? [i + 1] : [])) || [];
+  const seasons = { ...(w?.s || {}) };
+  const ski = ratings.interests.indexOf("Skiing");
+  if (ski >= 0 && likes[ski] >= GREAT) seasons.Skiing = c.lat < 0 ? SKI_SOUTH : SKI_NORTH;
+  const when = [great.length && `Great weather ${monthRanges(great)}`,
+    ...Object.entries(seasons).map(([what, months]) => `${what} ${monthRanges(months)}`)].filter(Boolean);
+  return { parts, likes, overall, w, great, when, todo: activities[c.id] || [] };
+}
+
+function placePage(c) {
+  const f = placeFacts(c), parent = c.within && byId.get(c.within), slug = slugOf.get(c.id);
+  const full = parent ? `${c.name}, ${parent.name}` : c.name;
+  const scoreRows = [...ratings.categories.map((name, i) => [name, f.parts[i]]), ...ratings.interests.map((name, i) => [name, f.likes[i]])]
+    .filter(([, v]) => v != null)
+    .map(([name, v]) => `<tr><th scope="row">${esc(name)}</th><td>${v}</td><td>${v >= GREAT ? "Great" : ""}</td></tr>`).join("\n");
+  const weatherRows = (f.w?.m || []).map((m, i) =>
+    `<tr${m[3] === "G" ? ' class="on"' : ""}><th scope="row">${MONTH_NAMES[i]}</th><td>${m[0]}°</td><td>${m[1]}°</td><td>${m[2]} mm</td><td>${RATING[m[3]] || ""}</td></tr>`).join("\n");
+  const areas = places.filter((p) => p.within === c.id);
+  const greatFor = ratings.categories.filter((_, i) => f.parts[i] >= GREAT).concat(ratings.interests.filter((_, i) => f.likes[i] >= GREAT));
+  const where = c.town || c.capital;
+  const facts = [
+    parent && ["Part of", `<a href="../${esc(slugOf.get(parent.id))}/">${esc(parent.flag || "")} ${esc(parent.name)}</a>`],
+    where && [c.town ? "Main town" : "Capital", esc(where)],
+    c.subregion && ["Region", esc(c.subregion)],
+    c.currencies?.length && ["Currency", esc(c.currencies.join(", "))],
+    c.languages?.length && ["Languages", esc(c.languages.slice(0, 4).join(", "))],
+  ].filter(Boolean);
+  const description = [`${full} scores ${f.overall.toFixed(1)} out of 10 on The Corner World.`,
+    f.when.length ? `Best time to visit: ${f.when.join("; ")}.` : "",
+    f.todo.length ? `Top things to do: ${f.todo.slice(0, 2).join("; ")}.` : ""].filter(Boolean).join(" ");
+  const body = `
+<p class="back-link"><a href="../">All places</a>${parent ? ` · <a href="../${esc(slugOf.get(parent.id))}/">${esc(parent.name)}</a>` : ""}</p>
+<div class="dest-head"><p class="flag big" aria-hidden="true">${esc(c.flag || "")}</p><div><h1>${esc(c.name)}</h1><p class="lede">${parent ? `${esc(parent.name)} · ` : ""}${esc(c.subregion || c.region || "")}</p></div></div>
+<div class="stats">
+  <p class="stat"><span class="stat-v">${f.overall.toFixed(1)}</span><span class="stat-l">out of 10, before flights</span></p>
+  <p class="stat"><span class="stat-v">${esc(f.great.length ? monthRanges(f.great) : "None")}</span><span class="stat-l">great weather</span></p>
+</div>
+${greatFor.length ? `<p class="great-for">Great for</p>\n<ul class="tags">${greatFor.map((g) => `<li class="tag">${esc(g)}</li>`).join("")}</ul>` : ""}
+<p><a class="primary cta" href="../../#c=${encodeURIComponent(c.id)}">See ${esc(c.name)} on the globe</a></p>
+${f.todo.length ? `<h2 class="section">Top 3 things to do</h2>\n<ol class="top3">${f.todo.map((t) => `<li>${esc(t)}</li>`).join("")}</ol>` : ""}
+<h2 class="section">Best time to visit ${esc(c.name)}</h2>
+<p>${f.when.length ? esc(f.when.join(" · ")) : "No month has great weather; okay months are marked below."}</p>
+${weatherRows ? `<table class="place-table"><caption>Average weather${f.w?.at ? ` at ${esc(f.w.at)}` : where ? ` around ${esc(where)}` : ""}, 2015 to 2024</caption>
+<thead><tr><th scope="col">Month</th><th scope="col">High</th><th scope="col">Low</th><th scope="col">Rain</th><th scope="col">Weather</th></tr></thead>
+<tbody>
+${weatherRows}
+</tbody></table>` : ""}
+<h2 class="section">Scores out of 10</h2>
+<table class="place-table"><tbody>
+${scoreRows}
+</tbody></table>
+<p class="note">Our own judgement of each category. The overall score is the average of the five categories and the best interest. On the globe, Budget also counts the flights from where you live.</p>
+${facts.length ? `<h2 class="section">Facts</h2>\n<dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>` : ""}
+${areas.length ? `<h2 class="section">Explore by area</h2>\n<ul class="tags">${areas.map((a) => `<li><a class="tag" href="../${esc(slugOf.get(a.id))}/">${esc(a.name)}</a></li>`).join("")}</ul>` : ""}
+${c.advice != null ? `<h2 class="section">Before you go</h2>\n<p class="note">Read the <a href="https://www.gov.uk/foreign-travel-advice/${esc(c.advice)}" target="_blank" rel="noopener">UK government's travel advice for ${esc(parent ? parent.name : c.name)}</a>.</p>` : ""}
+<h2 class="section">Want it planned for you?</h2>
+<p class="note">A trip page for ${esc(c.name)}: every day hour by hour, every journey timed and every cost added up. <a href="../../plan/">See what you get</a>.</p>
+<p class="credits">Weather: NASA POWER daily readings, 2015 to 2024. Scores and things to do: The Corner World.</p>`;
+  return page({
+    up: "../../", path: `places/${slug}/`, index: true, body, footer: "short",
+    title: `Best time to visit ${full}: weather, things to do and scores | ${NAME}`, description,
+  });
+}
+
+function placesIndex() {
+  const byRegion = new Map();
+  for (const c of [...places].sort((a, b) => a.name.localeCompare(b.name))) {
+    const region = (c.within ? byId.get(c.within)?.region : c.region) || "Other";
+    if (!byRegion.has(region)) byRegion.set(region, []);
+    byRegion.get(region).push(c);
+  }
+  const body = `
+<h1>Every place we score</h1>
+<p class="lede">${places.length} countries, regions and islands, each with its best time to visit, top three things to do and scores out of 10.</p>
+${[...byRegion.keys()].sort().map((region) => `<h2 class="section">${esc(region)}</h2>
+<ul class="tags">${byRegion.get(region).map((c) => `<li><a class="tag" href="${esc(slugOf.get(c.id))}/">${esc(c.flag || "")} ${esc(c.name)}${c.within ? `, ${esc(byId.get(c.within)?.name || "")}` : ""}</a></li>`).join("")}</ul>`).join("\n")}`;
+  return page({ up: "../", path: "places/", index: true, body, footer: "short",
+    title: `Every place: best time to visit, things to do and scores | ${NAME}`,
+    description: `The best time to visit, top things to do and scores out of 10 for ${places.length} countries, regions and islands.` });
+}
+
+rmSync(new URL("places/", out), { recursive: true, force: true }); // places that left the data leave the site
+mkdirSync(new URL("places/", out), { recursive: true });
+writeFileSync(new URL("places/index.html", out), placesIndex());
+for (const c of places) {
+  mkdirSync(new URL(`places/${slugOf.get(c.id)}/`, out), { recursive: true });
+  writeFileSync(new URL(`places/${slugOf.get(c.id)}/index.html`, out), placePage(c));
+}
+console.log(`${places.length} place pages written`);
+
 // The sitemap needs full addresses, so it waits for `url` in site.json
 if (base) {
-  const urls = ["", "samples/", "plan/", "privacy/", "terms/"];
+  const urls = ["", "samples/", "plan/", "privacy/", "terms/", "places/", ...places.map((c) => `places/${slugOf.get(c.id)}/`)];
   writeFileSync(new URL("sitemap.xml", out), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `<url><loc>${esc(base + u)}</loc></url>`).join("\n")}
